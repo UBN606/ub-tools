@@ -1,6 +1,6 @@
 # UB Tools: quote The Urantia Book from the source, not from memory
 
-AI assistants misquote The Urantia Book. They mostly do it with small, believable changes: a dropped word, the Bible's wording in place of the UB's, a citation one paragraph off. When we checked our own articles at the Urantia Book Network, we found 11 misquotes and dozens of imprecise figures, all written with care. In a closed-book test of three Claude models, they mostly declined to quote, and 3 of the 4 quotes they did attempt had a word changed.
+AI assistants misquote The Urantia Book. They mostly do it with small, believable changes: a dropped word, the Bible's wording in place of the UB's, a citation one paragraph off. When we checked our own articles at the Urantia Book Network, we found 11 misquotes and dozens of imprecise figures, all written with care. In a test of five leading models answering from memory, only one cited passage came back word-perfect; six quotes had changed or invented wording, including the Bible's version of a parable offered as the UB's.
 
 These free tools let any AI, or any person, pull the book's exact wording and check a draft before it's published. Nothing is sent anywhere: the tools run on your computer, work offline after setup, and need no API keys or accounts.
 
@@ -74,7 +74,7 @@ Paste `prompt.txt` into any assistant, save its reply as a text file with the fi
 node ub-bench/ub-bench.js grade reply.txt
 ```
 
-First results (closed book, 2026-09-23) are in `ub-bench/results/`.
+Results for five models (Claude Opus, Sonnet and Haiku; ChatGPT GPT-6 Sol; Gemini 3.1 Pro) are in `ub-bench/results/`; see `2026-09-24/RESULTS.md`.
 
 ## Credits and licenses
 
