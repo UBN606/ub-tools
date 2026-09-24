@@ -1,0 +1,205 @@
+{
+  "name": "UB quoting accuracy benchmark",
+  "version": "1.0 (2026-09-23)",
+  "about": "Each question has gold paragraph(s) confirmed with ub-search.js --ref. 'expect' is a fact a correct answer must state (matched on words, punctuation and case ignored). Several questions target the exact failure types found in Urantia Book Network articles on 2026-09-23: Bible wording substituted for UB wording, dropped words, wrong paragraph numbers and wrong figures. Q20/Q21 separate two Van and Amadon spans that are easy to conflate: the staff arrived about 500,000 years ago (66:0.2); Van and Amadon were sustained by the tree of life and Melchizedek ministry for over 150,000 years (67:6.4); they stayed until shortly after Adam and Eve arrived (67:6.8), and the whole physical regime lasted more than 450,000 years (76:5.6). accept: equivalent statements of the same fact earn the fact point (the quote point still requires exact wording).",
+  "questions": [
+    {
+      "id": "Q01",
+      "gold": [
+        "180:2.1"
+      ],
+      "expect": "I am the vine, and you are the branches",
+      "question": "In The Urantia Book, what does Jesus say about the vine and the branches in his farewell discourse? Quote the passage."
+    },
+    {
+      "id": "Q02",
+      "gold": [
+        "169:1.9"
+      ],
+      "expect": "while he was yet afar off",
+      "question": "In The Urantia Book's telling of the parable of the lost son, what did the father see and do as the son approached home? Quote the exact words.",
+      "accept": [
+        "afar off"
+      ]
+    },
+    {
+      "id": "Q03",
+      "gold": [
+        "67:3.8"
+      ],
+      "expect": "seven-year struggle",
+      "question": "According to The Urantia Book, how long did Van and his loyal associates resist during the Caligastia rebellion? Quote the passage.",
+      "accept": [
+        "seven years",
+        "7 years"
+      ]
+    },
+    {
+      "id": "Q04",
+      "gold": [
+        "77:7.1"
+      ],
+      "expect": "40,119",
+      "question": "According to The Urantia Book, how many of the original 50,000 primary midwayers joined the Caligastia secession? Quote the passage.",
+      "accept": [
+        "40119"
+      ]
+    },
+    {
+      "id": "Q05",
+      "gold": [
+        "77:8.11"
+      ],
+      "expect": "1,111",
+      "question": "According to The Urantia Book, how many loyal secondary midwayers are there? Quote the passage.",
+      "accept": [
+        "1111"
+      ]
+    },
+    {
+      "id": "Q06",
+      "gold": [
+        "53:3.1"
+      ],
+      "expect": "Lucifer Declaration of Liberty",
+      "question": "What name does The Urantia Book give to the final outbreak of the Lucifer rebellion, and how was the rebels' cause stated? Quote the passage."
+    },
+    {
+      "id": "Q07",
+      "gold": [
+        "120:3.7"
+      ],
+      "expect": "stereotyped systems of Urantia religious beliefs",
+      "question": "What did Immanuel advise Michael about leaving writings or images behind on Urantia, and why? Quote the passage from The Urantia Book."
+    },
+    {
+      "id": "Q08",
+      "gold": [
+        "111:1.1"
+      ],
+      "expect": "upon an intellectual foundation",
+      "question": "According to The Urantia Book, upon what must Thought Adjusters do all their work? Quote the passage."
+    },
+    {
+      "id": "Q09",
+      "gold": [
+        "11:6.4"
+      ],
+      "expect": "a little more than one billion Urantia years",
+      "question": "According to The Urantia Book, how long does each phase of space respiration last? Quote the passage.",
+      "accept": [
+        "one billion",
+        "billion years"
+      ]
+    },
+    {
+      "id": "Q10",
+      "gold": [
+        "53:1.6"
+      ],
+      "expect": "bound the dragon",
+      "question": "According to The Urantia Book, what did Gabriel do upon the triumph of Michael, and who is meant by 'the dragon'? Quote the passage."
+    },
+    {
+      "id": "Q11",
+      "gold": [
+        "49:0.3"
+      ],
+      "expect": "606 of Satania",
+      "question": "What number does The Urantia Book say Urantia was given in the local system of Satania, and what does it mean? Quote the passage.",
+      "accept": [
+        "606"
+      ]
+    },
+    {
+      "id": "Q12",
+      "gold": [
+        "193:2.2"
+      ],
+      "expect": "loving service, unselfish devotion, courageous loyalty",
+      "question": "What does The Urantia Book list as the fruits of the divine spirit? Quote the passage."
+    },
+    {
+      "id": "Q13",
+      "gold": [
+        "58:6.2"
+      ],
+      "expect": "never existed",
+      "question": "What does The Urantia Book say about 'missing links' in evolution? Quote the passage."
+    },
+    {
+      "id": "Q14",
+      "gold": [
+        "95:4.3"
+      ],
+      "expect": "riches take themselves wings and fly away",
+      "question": "What did Amenemope teach about riches, according to The Urantia Book? Quote the passage."
+    },
+    {
+      "id": "Q15",
+      "gold": [
+        "73:3.1"
+      ],
+      "expect": "almost an island",
+      "question": "What three possible locations for the Garden of Eden did the committee on location report, according to The Urantia Book? Quote the passage."
+    },
+    {
+      "id": "Q16",
+      "gold": [
+        "180:2.3"
+      ],
+      "expect": "a stem arising out of the vine",
+      "question": "What Jewish teaching about the Messiah and the vine does The Urantia Book mention in connection with the farewell discourse, and what decorated Herod's temple? Quote the passage."
+    },
+    {
+      "id": "Q17",
+      "gold": [
+        "77:2.6"
+      ],
+      "expect": "certain peculiar and unexpected modifications",
+      "question": "According to The Urantia Book, out of what did the Nodite peoples arise? Quote the passage."
+    },
+    {
+      "id": "Q18",
+      "gold": [
+        "180:2.4"
+      ],
+      "expect": "prayer is not a process of getting your way",
+      "question": "How does The Urantia Book correct the misunderstanding of prayer in Jesus' name? Quote the passage."
+    },
+    {
+      "id": "Q19",
+      "gold": [
+        "194:2.12"
+      ],
+      "expect": "sevenfold appeal of the universe spirit influences",
+      "question": "According to The Urantia Book, mankind is subject to the double influence of what? Quote the passage."
+    },
+    {
+      "id": "Q20",
+      "gold": [
+        "67:6.4"
+      ],
+      "expect": "over one hundred and fifty thousand years",
+      "question": "According to The Urantia Book, by what means were Van and Amadon sustained, and for how long did that sustenance last? Quote the passage.",
+      "accept": [
+        "150,000",
+        "150000",
+        "one hundred and fifty thousand"
+      ]
+    },
+    {
+      "id": "Q21",
+      "gold": [
+        "67:6.8"
+      ],
+      "expect": "shortly after the arrival of Adam and Eve",
+      "question": "According to The Urantia Book, when did Van and Amadon leave Urantia, and where did they go? Quote the passage. (Note: this is not the same span as how long they were sustained by the tree of life.)",
+      "accept": [
+        "after Adam arrived",
+        "after the arrival of Adam",
+        "Jerusem"
+      ]
+    }
+  ]
+}
