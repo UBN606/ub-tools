@@ -12,6 +12,7 @@
 //   ub_get_section     every paragraph of one section, in order
 //   ub_topic_lookup    Urantiapedia topic index entry (people, places, orders, concepts)
 //   ub_verify_text     check a draft: every quote vs its citation, plus dashes in our own words
+//   ub_recall          every paragraph on a place (modern names resolved), or what a draft left unread
 //
 // It reuses ub-search.js and ub-verify.js from this folder, so the server, the CLIs and the
 // skills can never disagree. Dependency-free JSON-RPC 2.0 over newline-delimited stdio.
@@ -29,8 +30,9 @@ const fs = require('fs');
 const path = require('path');
 const { searchUB, getParagraphs } = require('./ub-search.js');
 const V = require('./ub-verify.js');
+const R = require('./ub-recall.js');
 
-const SERVER_INFO = { name: 'ub-tools', version: '1.0.0' };
+const SERVER_INFO = { name: 'ub-tools', version: '1.1.0' };
 const DEFAULT_PROTOCOL = '2024-11-05';
 const PAPERS_DIR = path.join(__dirname, 'source-texts', 'papers');
 const TOPIC_DIR = path.join(__dirname, 'source-texts', 'topic-index');
@@ -91,6 +93,19 @@ const TOOLS = [
         check_dashes: { type: 'boolean', description: 'Also flag dashes in the author\'s own words (default true).' },
       },
       required: ['text'],
+    },
+  },
+  {
+    name: 'ub_recall',
+    description: 'Before saying what the Urantia Book says, or does not say, about a place or people, list EVERY paragraph on it. ub_verify_text proves quotes are exact; this proves nothing was left out. Modern names resolve to the book\'s (Maya -> Mexico, Central America; Rapa Nui -> Easter Island). Give `places` to list paragraphs, or `text` (a draft) to get the paragraphs on its subject that it neither cites nor records as read (`read`: {"64:6.5": "why it does not change the claim"}). Read each listed paragraph in full with ub_get_paragraphs. Papers 57-61 (geology) are skipped unless all_papers is true.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        places: { type: 'array', items: { type: 'string' }, description: 'Places or peoples, e.g. ["Maya", "Peru"].' },
+        text: { type: 'string', description: 'A draft to check for unread paragraphs on its subject.' },
+        read: { type: 'object', description: 'Paragraphs (or whole papers, "94") already read, each with a reason of 20+ characters.' },
+        all_papers: { type: 'boolean', description: 'Include Papers 57-61 (geology). Default false.' },
+      },
     },
   },
 ];
@@ -186,6 +201,30 @@ function toolVerifyText({ text, check_dashes }) {
   });
 }
 
+function toolRecall({ places, text, read, all_papers }) {
+  const allPapers = all_papers === true;
+  if (typeof text === 'string' && text.trim()) {
+    const r = R.checkText(text, { read: { reviewed: read || {} }, terms: Array.isArray(places) && places.length ? places : null, allPapers });
+    return textResult({
+      result: !r.why.size ? 'NO SUBJECT' : r.unread.length ? 'READ MORE' : 'RECALL PASS',
+      triggeredBy: Object.fromEntries(r.why),
+      required: r.required,
+      unread: r.unread.map(p => ({ ref: p.ref, excerpt: R.excerpt(p.text, R.resolve(p.groups[0])) })),
+      weakReasons: r.weak.length ? r.weak : undefined,
+      note: 'Read each unread paragraph in full (ub_get_paragraphs), then cite it or record why it does not change the claim.' + (allPapers ? '' : ' Papers 57-61 skipped.'),
+    });
+  }
+  if (!Array.isArray(places) || !places.length) return errorResult('give places (a list) or text (a draft)');
+  const groups = places.flatMap(t => R.resolve(String(t)));
+  const pars = R.paragraphsFor(groups, { allPapers });
+  return textResult({
+    searched: groups.map(g => `${g.id} ${g.book}`),
+    count: pars.length,
+    paragraphs: pars.map(p => ({ ref: p.ref, excerpt: R.excerpt(p.text, groups) })),
+    note: 'Excerpts are for finding. Read every paragraph in full with ub_get_paragraphs before saying what the book says or does not say.' + (allPapers ? '' : ' Papers 57-61 (geology) skipped.'),
+  });
+}
+
 async function runTool(name, args = {}) {
   try {
     switch (name) {
@@ -194,6 +233,7 @@ async function runTool(name, args = {}) {
       case 'ub_get_section': return toolGetSection(args);
       case 'ub_topic_lookup': return toolTopicLookup(args);
       case 'ub_verify_text': return toolVerifyText(args);
+      case 'ub_recall': return toolRecall(args);
       default: return errorResult(`Unknown tool: ${name}`);
     }
   } catch (e) {
@@ -251,6 +291,8 @@ async function selfTest() {
     ['verify catches a dropped word', async () => parse(await runTool('ub_verify_text', { text: 'He warns against "stereotyped systems of religious beliefs" here (120:3.7).' })).counts.MISMATCH === 1],
     ['verify passes an exact quote', async () => parse(await runTool('ub_verify_text', { text: '"As the Father has loved me, so have I loved you." (180:2.2)' })).result === 'CLEAN'],
     ['verify flags a dash in our words only', async () => parse(await runTool('ub_verify_text', { text: 'Our line — here. "fruit-bearing branches—my friends who love one another" (180:2.1)' })).dashesInOwnWords.length === 1],
+    ['recall resolves Maya and returns 64:7.5', async () => parse(await runTool('ub_recall', { places: ['Maya'] })).paragraphs.some(p => p.ref === '64:7.5')],
+    ['recall tells a Maya draft citing only 79:5.9 to read 64:7.5', async () => parse(await runTool('ub_recall', { text: '# The Maya world tree\n\nThe book places the only Andite trace in Peru (79:5.9), not among the Maya.' })).unread.some(p => p.ref === '64:7.5')],
     ['unknown tool is an error, not a crash', async () => (await runTool('nope', {})).isError === true],
   ];
   let bad = 0;

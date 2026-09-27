@@ -1,0 +1,87 @@
+{
+  "_about": "Places and peoples for ub-recall.js. `article` matches the names writers use (modern ones too: Maya, Aztec, Rapa Nui); `book` matches the names The Urantia Book uses for the same subject. Add a group when you write about a place or people not listed. The Urantia Book Network found the need on 2026-09-27: articles on the Maya passed every quote check, yet nobody had searched \"Central America\", and 64:7.5 and 79:5.8 name the founders of those civilizations. A group may set bookFlags and articleFlags (default \"i\").",
+  "skipPapers": {
+    "papers": [
+      57,
+      58,
+      59,
+      60,
+      61
+    ],
+    "why": "Papers 57 to 61 are the planet's geology and pre-human life; their Mexico, Pacific or Europe mentions are land and sea ages before man. Take a paper off this list if an article writes about that geology."
+  },
+  "groups": [
+    {
+      "id": "mexico-central-america",
+      "article": "\\b(Central America\\w*|Mesoamerica\\w*|Maya\\w*|Aztecs?|Mexic\\w*|Toltecs?|Olmecs?|Teotihuac\\w*|Yucat\\w*|Kukulkan|Quetzalcoatl)\\b",
+      "book": "\\b(Mexico|Central America)\\b"
+    },
+    {
+      "id": "south-america",
+      "article": "\\b(South America\\w*|Peru\\w*|Andes|Andean|Incas?|Tiahuanaco|Tiwanaku|Chile\\w*|Monte Verde|Amazon\\w*|Viracocha)\\b",
+      "book": "\\b(South America|Peru|Andes|Incas?)\\b"
+    },
+    {
+      "id": "north-america-red-race",
+      "article": "\\b(North America\\w*|Native Americans?|Amerindians?|Bering\\w*|Clovis|White Sands|red m[ae]n|red race|Indigenous Americans?|Americas)\\b",
+      "book": "\\b(North America|Americas?|red m[ae]n|red races?|Bering|Western Hemisphere|Amerindian|Eskimos?)\\b"
+    },
+    {
+      "id": "pacific",
+      "article": "\\b(Polynesi\\w*|Pacific|Easter Island|Rapa ?Nui|Maori|Samoa\\w*|Hawai\\w*|Tahiti\\w*|Lapita|Oceania|Micronesi\\w*|Melanesi\\w*)\\b",
+      "book": "\\b(Polynesian?|Pacific|Easter Island)\\b",
+      "bookFlags": "",
+      "note": "Case-sensitive in the book: the adjective pacific (peaceful) is not the ocean."
+    },
+    {
+      "id": "japan",
+      "article": "\\bJapan\\w*\\b",
+      "book": "\\bJapan\\w*\\b"
+    },
+    {
+      "id": "china",
+      "article": "\\b(Chin(a|ese)|Tao\\w*|Lao-?tse|Confuci\\w*|Shang|Zhou)\\b",
+      "book": "\\bChin(a|ese)\\b"
+    },
+    {
+      "id": "tibet",
+      "article": "\\bTibet\\w*\\b",
+      "book": "\\bTibet\\w*\\b"
+    },
+    {
+      "id": "india",
+      "article": "\\b(India\\w*|Hindu\\w*|Vedas?|Vedic|Brahman\\w*|Indus|Harappa\\w*|Dravidian\\w*)\\b",
+      "book": "\\b(India|Hindu\\w*|Indus|Dravidian\\w*)\\b"
+    },
+    {
+      "id": "egypt",
+      "article": "\\bEgypt\\w*\\b",
+      "book": "\\bEgypt\\w*\\b"
+    },
+    {
+      "id": "africa",
+      "article": "\\bAfrica\\w*\\b",
+      "book": "\\bAfrica\\w*\\b"
+    },
+    {
+      "id": "mesopotamia",
+      "article": "\\b(Mesopotamia\\w*|Sumer\\w*|Babylon\\w*|Akkad\\w*|Euphrates|Tigris)\\b",
+      "book": "\\b(Mesopotamia\\w*|Sumerians?|Euphrates|Tigris)\\b"
+    },
+    {
+      "id": "europe",
+      "article": "\\b(Europe\\w*|Celt\\w*|Druid\\w*|Norse|Scandinavi\\w*|British Isles|Britain|Stonehenge)\\b",
+      "book": "\\b(Europe\\w*|British Isles|Scandinavi\\w*|Stonehenge)\\b"
+    },
+    {
+      "id": "orange-race",
+      "article": "\\borange (race|man|men|peoples?|blood)\\b",
+      "book": "\\borange (race|man|men|peoples?)\\b"
+    },
+    {
+      "id": "blue-race",
+      "article": "\\bblue (race|man|men|peoples?|blood)\\b",
+      "book": "\\bblue (race|man|men|peoples?)\\b"
+    }
+  ]
+}
