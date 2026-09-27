@@ -23,8 +23,8 @@
     },
     {
       "id": "north-america-red-race",
-      "article": "\\b(North America\\w*|Native Americans?|Amerindians?|Bering\\w*|Clovis|White Sands|red m[ae]n|red race|Indigenous Americans?|Americas)\\b",
-      "book": "\\b(North America|Americas?|red m[ae]n|red races?|Bering|Western Hemisphere|Amerindian|Eskimos?)\\b"
+      "article": "\\b(North America\\w*|Americans?|Native Americans?|Amerindians?|Bering\\w*|Clovis|White Sands|red m[ae]n|red race|Indigenous Americans?|Americas)\\b",
+      "book": "\\b(North America|Americas?|Americans?|red m[ae]n|red races?|Bering|Western Hemisphere|Amerindian|Eskimos?)\\b"
     },
     {
       "id": "pacific",

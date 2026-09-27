@@ -8,10 +8,11 @@ These free tools let any AI, or any person, pull the book's exact wording and ch
 
 | Tool | What it does |
 |---|---|
-| `ub-mcp.js` | A **Model Context Protocol server** that gives Claude, Codex or any MCP-capable assistant six tools: `ub_search`, `ub_get_paragraphs` (exact text by reference), `ub_get_section`, `ub_topic_lookup`, `ub_verify_text` and `ub_recall` |
+| `ub-mcp.js` | A **Model Context Protocol server** that gives Claude, Codex or any MCP-capable assistant six tools: `ub_search`, `ub_get_paragraphs` (exact text by reference), `ub_get_section`, `ub_topic_lookup`, `ub_verify_text`, `ub_recall` and `ub_check_claims` |
 | `ub-search.js` | Command-line search of the whole book (whole-word matching; `--ref 180:2.1` prints a paragraph's exact text) |
 | `ub-verify.js` | Checks every `"quote" (Paper:Section.Paragraph)` in a draft against the book. Results are PASS, PUNCTUATION (for example, the book's em dash turned into a comma), MISMATCH (reports where the words really are when the citation is wrong) or NOT FOUND |
 | `ub-recall.js` | Before you say what the book says, or does not say, about a place or people, it lists **every** paragraph on it, resolving modern names to the book's (Maya to Mexico and Central America, Rapa Nui to Easter Island). `--check draft.md` reports the paragraphs on the draft's subject that it neither cites nor records as read |
+| `ub-claims.js` | Checks what a draft says the book says, beyond exact quotes: a claim credited to the book with no citation, a date or figure the cited paragraph does not contain (it reads the book's number words, so "eighty-five thousand" matches 85,000), and the book's words in quotation marks with no citation |
 | `ub-bench/` | A 21-question benchmark of how accurately an AI quotes and cites the UB, with first results |
 
 ## Setup (needs [Node.js](https://nodejs.org) 18 or newer)
@@ -72,6 +73,18 @@ A draft is checked for a place when the place is its subject (title or heading, 
 ```
 
 Papers 57 to 61 (the planet's geology) are skipped unless you pass `--all-papers`, and the tool says so. `ub-recall-places.json` holds the place names; add a group when you write about a place it does not list. From an assistant, ask it to "check this with ub_recall" or "list everything the book says about Peru with ub_recall".
+
+## Check what you say the book says
+
+A draft can quote every passage exactly and still credit the book with something it does not say. Ours once said "the UB's dating ... c. 6000-2000 BCE" of a passage that gives no date, and every quote check passed. `ub-claims.js` reads the sentences that speak of the book:
+
+```bash
+node ub-claims.js draft.md
+node ub-claims.js draft.md --allow allow.json
+node ub-claims.js --self-test
+```
+
+It reports three things. A sentence that credits the book (says, dates, places, describes, "according to the UB") with no Paper:Section.Paragraph citation in it, its paragraph or the next. A date or figure in such a sentence that the cited paragraphs do not contain; figures you mark as your own ("by our arithmetic") are left alone, and so is a study's figure in a separate clause. Six or more of the book's words in quotation marks with no citation. A claim that the book never mentions something is left to `ub-recall.js`, which proves it by listing every paragraph.
 
 ## Check your own writing
 

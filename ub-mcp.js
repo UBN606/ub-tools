@@ -13,6 +13,7 @@
 //   ub_topic_lookup    Urantiapedia topic index entry (people, places, orders, concepts)
 //   ub_verify_text     check a draft: every quote vs its citation, plus dashes in our own words
 //   ub_recall          every paragraph on a place (modern names resolved), or what a draft left unread
+//   ub_check_claims    claims credited to the book: cited? figures in the cited paragraph? book words cited?
 //
 // It reuses ub-search.js and ub-verify.js from this folder, so the server, the CLIs and the
 // skills can never disagree. Dependency-free JSON-RPC 2.0 over newline-delimited stdio.
@@ -31,8 +32,9 @@ const path = require('path');
 const { searchUB, getParagraphs } = require('./ub-search.js');
 const V = require('./ub-verify.js');
 const R = require('./ub-recall.js');
+const C = require('./ub-claims.js');
 
-const SERVER_INFO = { name: 'ub-tools', version: '1.1.0' };
+const SERVER_INFO = { name: 'ub-tools', version: '1.2.0' };
 const DEFAULT_PROTOCOL = '2024-11-05';
 const PAPERS_DIR = path.join(__dirname, 'source-texts', 'papers');
 const TOPIC_DIR = path.join(__dirname, 'source-texts', 'topic-index');
@@ -106,6 +108,18 @@ const TOOLS = [
         read: { type: 'object', description: 'Paragraphs (or whole papers, "94") already read, each with a reason of 20+ characters.' },
         all_papers: { type: 'boolean', description: 'Include Papers 57-61 (geology). Default false.' },
       },
+    },
+  },
+  {
+    name: 'ub_check_claims',
+    description: 'Check what a draft says the Urantia Book says, beyond exact quotes. C1 UNCITED: a sentence credits the book (says, dates, places, describes, according to the UB) with no Paper:Section.Paragraph citation in it, its paragraph or the next. C2 NUMBER: a date or quantity credited to the book that the cited paragraphs do not contain (the book writes many figures in words; "eighty-five thousand" = 85000); figures marked as ours are exempt. C3 BOOK WORDS: six or more words of the book in quotation marks with no citation. Run with ub_verify_text and ub_recall before publishing.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: 'The draft text.' },
+        allow: { type: 'object', description: 'Findings that are right as written: {"<first 60 characters of the sentence>": "why (20+ characters)"}.' },
+      },
+      required: ['text'],
     },
   },
 ];
@@ -225,6 +239,17 @@ function toolRecall({ places, text, read, all_papers }) {
   });
 }
 
+function toolCheckClaims({ text, allow }) {
+  if (typeof text !== 'string' || !text.trim()) return errorResult('text is required');
+  if (text.length > 400000) return errorResult('Text too long (max 400,000 characters); check one article at a time.');
+  const found = C.checkDraft(text, { allow: allow || {} });
+  return textResult({
+    result: found.length ? 'FIX NEEDED' : 'CLAIMS PASS',
+    findings: found.map(f => ({ kind: f.kind, line: f.line, detail: f.detail, sentence: f.text.length > 240 ? f.text.slice(0, 240) + '...' : f.text })),
+    note: found.length ? 'Cite the paragraph, quote the book\'s own figure, mark a figure as ours, or pass an allow entry with the reason.' : undefined,
+  });
+}
+
 async function runTool(name, args = {}) {
   try {
     switch (name) {
@@ -234,6 +259,7 @@ async function runTool(name, args = {}) {
       case 'ub_topic_lookup': return toolTopicLookup(args);
       case 'ub_verify_text': return toolVerifyText(args);
       case 'ub_recall': return toolRecall(args);
+      case 'ub_check_claims': return toolCheckClaims(args);
       default: return errorResult(`Unknown tool: ${name}`);
     }
   } catch (e) {
@@ -293,6 +319,8 @@ async function selfTest() {
     ['verify flags a dash in our words only', async () => parse(await runTool('ub_verify_text', { text: 'Our line — here. "fruit-bearing branches—my friends who love one another" (180:2.1)' })).dashesInOwnWords.length === 1],
     ['recall resolves Maya and returns 64:7.5', async () => parse(await runTool('ub_recall', { places: ['Maya'] })).paragraphs.some(p => p.ref === '64:7.5')],
     ['recall tells a Maya draft citing only 79:5.9 to read 64:7.5', async () => parse(await runTool('ub_recall', { text: '# The Maya world tree\n\nThe book places the only Andite trace in Peru (79:5.9), not among the Maya.' })).unread.some(p => p.ref === '64:7.5')],
+    ['claims catches a date the cited paragraph does not give', async () => parse(await runTool('ub_check_claims', { text: "The UB's dating (late Andite migrations, c. 6000-2000 BCE) comes from 78:5.7." })).findings.some(f => f.kind === 'C2 NUMBER')],
+    ['claims passes a figure the book gives in words', async () => parse(await runTool('ub_check_claims', { text: 'The book says the red race crossed about 85,000 years ago (64:6.5).' })).result === 'CLAIMS PASS'],
     ['unknown tool is an error, not a crash', async () => (await runTool('nope', {})).isError === true],
   ];
   let bad = 0;

@@ -122,6 +122,32 @@ function covers(key, ref) {
   return r ? paper >= Number(r[1]) && paper <= Number(r[2]) : key === ref;
 }
 
+// Rare names: the places list cannot hold every person and place the book names. When a
+// sentence about the book makes a limiting claim about a capitalized name that is not on the
+// list ("the book never connects Quetzalcoatl with Onamonalonton"), and the book uses that name
+// in 1 to MAX_NAME_PARAGRAPHS paragraphs and never in lowercase, all of them are required.
+const MAX_NAME_PARAGRAPHS = 40;
+const NOT_NAMES = new Set(['The', 'This', 'That', 'These', 'Those', 'It', 'Its', 'In', 'Of', 'On', 'At', 'As', 'By', 'For', 'From', 'And', 'But', 'Or', 'Nor', 'If', 'When', 'While', 'We', 'Our', 'Us', 'He', 'She', 'They', 'His', 'Her', 'Their', 'No', 'Not', 'Never', 'Only', 'None', 'Nothing', 'Book', 'Urantia', 'Paper', 'Papers', 'Section', 'God', 'Father', 'Son', 'Spirit', 'Jesus', 'Michael', 'Adam', 'Eve', 'Andite', 'Andites', 'Nodite', 'Nodites', 'Sangik', 'Salem']);
+function nameGroups(text, P = places()) {
+  const out = [], seen = new Set();
+  for (const s of bookSentences(text)) {
+    if (!LIMITING.test(s)) continue;
+    for (const m of s.replace(/"[^"]*"/g, ' ').matchAll(/(?<=\s)([A-Z][a-z]{3,}(?:[- ][A-Z][a-z]+)*)/g)) {
+      const name = m[1];
+      if (seen.has(name) || NOT_NAMES.has(name) || NOT_NAMES.has(name.split(/[- ]/)[0])) continue;
+      seen.add(name);
+      if (P.groups.some((g) => g.article.test(name) || g.book.test(name))) continue;
+      const re = new RegExp(`\\b${name.replace(/-/g, '[- ]')}\\b`);
+      const lower = new RegExp(`\\b${name.toLowerCase().replace(/-/g, '[- ]')}\\b`);
+      if (corpus().some((p) => lower.test(p.text))) continue;
+      let n = 0;
+      for (const p of corpus()) if (re.test(p.text) && ++n > MAX_NAME_PARAGRAPHS) break;
+      if (n >= 1 && n <= MAX_NAME_PARAGRAPHS) out.push({ id: `name:${name}`, article: re, book: re, why: `limiting claim names ${name} (${n} paragraphs in the book)` });
+    }
+  }
+  return out;
+}
+
 function checkText(text, { read = {}, terms = null, allPapers = false } = {}) {
   const P = places();
   let groups, why;
@@ -131,6 +157,7 @@ function checkText(text, { read = {}, terms = null, allPapers = false } = {}) {
   } else {
     why = triggers(text, P);
     groups = P.groups.filter((g) => why.has(g.id));
+    for (const g of nameGroups(text, P)) { why.set(g.id, g.why); groups.push(g); }
   }
   const cited = citedRefs(text);
   const reviewed = read.reviewed || {};
@@ -166,11 +193,14 @@ function selfTest() {
   ok(checkText(draft, { read }).unread.length === 0, 'recording every paragraph as read, with reasons, clears the draft');
   ok(checkText(draft, { read: { reviewed: { 64: 'n/a' } } }).weak.includes('64'), `a reason under ${MIN_REASON} characters does not count`);
   ok(!paragraphsFor(maya).some((p) => p.ref.startsWith('59:')), 'Paper 59 (geology) is skipped by default');
+  const ona = checkText('# Returning teachers\n\nThe book never connects Quetzalcoatl with Onamonalonton (92:5.6).\n');
+  ok(ona.why.has('name:Onamonalonton') && ona.unread.some((p) => p.ref === '64:6.7'), 'a limiting claim about a rare name (Onamonalonton) requires its paragraphs, 64:6.7 among them');
+  ok(!checkText('# Trees\n\nThe book never speaks of the Old World that way (85:2.4).\n').why.has('name:World'), 'a common word capitalized in a phrase ("Old World") is not treated as a name');
   console.log(bad ? `\n${bad} self-test case(s) FAILED` : '\nAll self-test cases passed');
   return bad ? 1 : 0;
 }
 
-module.exports = { resolve, paragraphsFor, checkText, triggers, citedRefs, excerpt, MIN_REASON };
+module.exports = { resolve, paragraphsFor, checkText, triggers, nameGroups, citedRefs, excerpt, MIN_REASON };
 
 if (require.main === module) {
   const args = process.argv.slice(2);
