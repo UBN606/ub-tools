@@ -64,7 +64,12 @@ function places() {
 // A name the writer typed -> the book patterns to search. Known places resolve through the
 // list; anything else is searched as a whole word, and that is said.
 function resolve(term, P = places()) {
-  const hits = P.groups.filter((g) => g.article.test(term) || g.book.test(term));
+  // A group id resolves to itself. Otherwise the writer's names decide first: "Central America"
+  // is the Mexico group, even though the North America group's book pattern also matches "America".
+  const byId = P.groups.find((g) => g.id === term);
+  if (byId) return [{ id: byId.id, book: byId.book }];
+  let hits = P.groups.filter((g) => g.article.test(term));
+  if (!hits.length) hits = P.groups.filter((g) => g.book.test(term));
   if (hits.length) return hits.map((g) => ({ id: g.id, book: g.book }));
   const esc = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return [{ id: `"${term}" (not in the places list; searched as a whole word)`, book: new RegExp(`\\b${esc}\\b`, 'i') }];

@@ -15,6 +15,16 @@ These free tools let any AI, or any person, pull the book's exact wording and ch
 | `ub-claims.js` | Checks what a draft says the book says, beyond exact quotes: a claim credited to the book with no citation, a date or figure the cited paragraph does not contain (it reads the book's number words, so "eighty-five thousand" matches 85,000), and the book's words in quotation marks with no citation |
 | `ub-bench/` | A 21-question benchmark of how accurately an AI quotes and cites the UB, with first results |
 
+## UB Tools Studio: the same tools in your browser
+
+`app/` is a web app over these tools: search the book, read every paragraph on a place, and check a draft's quotes, its claims about the book and what it left unread. It runs the same `ub-search.js`, `ub-verify.js`, `ub-recall.js` and `ub-claims.js` files, so it gives the same answers as the command line and the MCP server. Nothing you type leaves your computer.
+
+```bash
+node app/serve.mjs
+```
+
+Then open the address it prints. If you ran `node fetch-data.js`, the app reads the book from `source-texts/`; otherwise it loads it once from Urantiapedia and keeps it in the browser.
+
 ## Setup (needs [Node.js](https://nodejs.org) 18 or newer)
 
 ```bash
