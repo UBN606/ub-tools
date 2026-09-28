@@ -62,6 +62,21 @@ fetch(new URL('./pronounce.json', import.meta.url)).then((r) => r.json()).then((
   SAY = { re: new RegExp(`\\b(${terms.map(escRe).join('|')})\\b`, 'g'), map: j.say }
 }).catch(() => {})
 export const spoken = (text) => (SAY ? text.replace(SAY.re, (m) => SAY.map[m] || m) : text)
+// English voices, most natural first: Microsoft Natural/Online, then Google and premium voices.
+const rank = (v) => (/Microsoft.*(Natural|Online)/i.test(v.name) ? 0 : /natural|neural|premium|enhanced|siri/i.test(v.name) ? 1 : /google/i.test(v.name) ? 2 : 3)
+export function englishVoices() {
+  if (typeof speechSynthesis === 'undefined') return []
+  return speechSynthesis.getVoices().filter((v) => /^en/i.test(v.lang)).sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name))
+}
+// Voices arrive a moment after the page opens; call back when they are known.
+export function whenVoices(cb) {
+  if (typeof speechSynthesis === 'undefined') return
+  if (speechSynthesis.getVoices().length) cb()
+  speechSynthesis.addEventListener?.('voiceschanged', cb)
+}
+let chosen = null
+try { chosen = localStorage.getItem('voice') } catch {}
+export function chooseVoice(name) { chosen = name; try { localStorage.setItem('voice', name) } catch {} }
 export const speech = {
   ok: typeof speechSynthesis !== 'undefined',
   say(text, onEnd) {
@@ -69,8 +84,8 @@ export const speech = {
     speechSynthesis.cancel()
     const u = new SpeechSynthesisUtterance(spoken(text))
     u.rate = 0.92
-    const en = speechSynthesis.getVoices().filter((v) => /^en/i.test(v.lang))
-    u.voice = en.find((v) => /Microsoft.*(Natural|Online)/i.test(v.name)) || en.find((v) => /natural|premium|enhanced|google/i.test(v.name)) || en[0] || null
+    const en = englishVoices()
+    u.voice = en.find((v) => v.name === chosen) || en[0] || null
     if (onEnd) u.onend = onEnd
     speechSynthesis.speak(u)
   },

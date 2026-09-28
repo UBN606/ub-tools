@@ -1,6 +1,6 @@
 // UB Tools Studio: the interface. The engine (engine.js) runs the repository's own tools.
 import { loadEngine } from './engine.js'
-import { answer, speech, listener } from './ask.js'
+import { answer, speech, listener, englishVoices, whenVoices, chooseVoice } from './ask.js'
 
 const $ = (id) => document.getElementById(id)
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
@@ -85,6 +85,17 @@ tabs.forEach((t) => {
 })
 const mic = listener((text) => { $('q').value = text; submit() }, (on) => $('mic').classList.toggle('listening', on))
 $('mic').addEventListener('click', () => { try { mic.start() } catch { mic.stop() } })
+whenVoices(() => {
+  const list = englishVoices()
+  if (!list.length) return
+  let saved = null
+  try { saved = localStorage.getItem('voice') } catch {}
+  const sel = $('voice')
+  sel.innerHTML = list.map((v) => `<option value="${esc(v.name)}">${esc(v.name.replace(/^Microsoft /, '').replace(/ Online \(Natural\).*$/, ' (natural)').replace(/ - English.*$/, ''))}</option>`).join('')
+  sel.value = list.some((v) => v.name === saved) ? saved : list[0].name
+  $('voice-wrap').hidden = false
+})
+$('voice').addEventListener('change', (e) => { chooseVoice(e.target.value); speech.say('This is how I will read to you.') })
 const bigger = $('bigger')
 const setBig = (on) => { document.documentElement.classList.toggle('big', on); bigger.setAttribute('aria-pressed', String(on)); store.set('big', on); placeThumb() }
 bigger.addEventListener('click', () => setBig(!document.documentElement.classList.contains('big')))

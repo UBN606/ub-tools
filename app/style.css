@@ -289,3 +289,7 @@ html.big .modes button, html.big .go, html.big .soft { font-size: 17px; }
   .well-actions .go { flex: 1; }
   .answer li { padding: 20px 18px 16px; }
 }
+.voice-pick select { font: 500 14px/1 var(--sans); color: var(--ink); border: 0; padding: 10px 12px; border-radius: 12px; max-width: 220px; cursor: pointer;
+  background: linear-gradient(160deg, #F9F8F6, #ECEAE6); box-shadow: 4px 5px 10px var(--lift-dark), -3px -3px 8px var(--lift-light); }
+html.big .voice-pick select { font-size: 17px; }
+@media (max-width: 560px) { .voice-pick select { max-width: 150px; } }
