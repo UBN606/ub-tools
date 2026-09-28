@@ -14,6 +14,7 @@
 //   ub_verify_text     check a draft: every quote vs its citation, plus dashes in our own words
 //   ub_recall          every paragraph on a place (modern names resolved), or what a draft left unread
 //   ub_check_claims    claims credited to the book: cited? figures in the cited paragraph? book words cited?
+//   ub_ask             a plain question answered in the book's own words (the same answers as the Studio app)
 //
 // It reuses ub-search.js and ub-verify.js from this folder, so the server, the CLIs and the
 // skills can never disagree. Dependency-free JSON-RPC 2.0 over newline-delimited stdio.
@@ -34,7 +35,7 @@ const V = require('./ub-verify.js');
 const R = require('./ub-recall.js');
 const C = require('./ub-claims.js');
 
-const SERVER_INFO = { name: 'ub-tools', version: '1.2.0' };
+const SERVER_INFO = { name: 'ub-tools', version: '1.3.0' };
 const DEFAULT_PROTOCOL = '2024-11-05';
 const PAPERS_DIR = path.join(__dirname, 'source-texts', 'papers');
 const TOPIC_DIR = path.join(__dirname, 'source-texts', 'topic-index');
@@ -108,6 +109,18 @@ const TOOLS = [
         read: { type: 'object', description: 'Paragraphs (or whole papers, "94") already read, each with a reason of 20+ characters.' },
         all_papers: { type: 'boolean', description: 'Include Papers 57-61 (geology). Default false.' },
       },
+    },
+  },
+  {
+    name: 'ub_ask',
+    description: 'Answer a plain-English question from The Urantia Book in its own words, exactly as UB Tools Studio does: everyday words are mapped to the book\'s terms (heaven -> mansion worlds, conscience -> Thought Adjuster), the best passages are returned whole with citations, each with why it was chosen, and a notice when the book is silent (a word it uses three times or fewer, or never). Nothing is paraphrased. When you answer a person, quote only these passages, keep their citations, and say plainly where the book is silent; add your own reading only when asked and label it as yours.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        question: { type: 'string', description: 'The question in plain English, e.g. "What happens to a child who dies before the Adjuster comes?"' },
+        max: { type: 'integer', description: 'How many passages (default 5, max 15).' },
+      },
+      required: ['question'],
     },
   },
   {
@@ -250,6 +263,23 @@ function toolCheckClaims({ text, allow }) {
   });
 }
 
+let askModule = null
+async function toolAsk({ question, max }) {
+  if (!question || !String(question).trim()) return errorResult('question is required')
+  if (!askModule) askModule = await import(require('url').pathToFileURL(path.join(__dirname, 'app', 'ask.js')).href)
+  const n = Math.min(Math.max(Number(max) || 5, 1), 15)
+  const r = askModule.answer({ search: { searchUB } }, String(question), { max: n })
+  const pars = getParagraphs(r.refs).filter(p => !p.error)
+  return textResult({
+    question,
+    silence: r.quiet.length ? r.quiet.map(x => x.total === 0 ? `The book never uses the word "${x.word}".` : `The book uses the word "${x.word}" only ${x.total} time(s): ${x.refs.join(', ')}.`).join(' ') + ' The passages below are the closest to the question; they may not answer it.' : undefined,
+    passages: pars.map(p => ({ ref: p.ref, where: `${p.paperTitle}. ${p.section}.`, text: String(p.text).replace(/<[^>]+>/g, ''), foundBecauseItSpeaksOf: [...(r.why.get(p.ref) || [])] })),
+    morePassages: r.more,
+    bookTermsUsed: r.mapped,
+    note: QUOTE_RULE,
+  })
+}
+
 async function runTool(name, args = {}) {
   try {
     switch (name) {
@@ -260,6 +290,7 @@ async function runTool(name, args = {}) {
       case 'ub_verify_text': return toolVerifyText(args);
       case 'ub_recall': return toolRecall(args);
       case 'ub_check_claims': return toolCheckClaims(args);
+      case 'ub_ask': return await toolAsk(args);
       default: return errorResult(`Unknown tool: ${name}`);
     }
   } catch (e) {
@@ -321,6 +352,8 @@ async function selfTest() {
     ['recall tells a Maya draft citing only 79:5.9 to read 64:7.5', async () => parse(await runTool('ub_recall', { text: '# The Maya world tree\n\nThe book places the only Andite trace in Peru (79:5.9), not among the Maya.' })).unread.some(p => p.ref === '64:7.5')],
     ['claims catches a date the cited paragraph does not give', async () => parse(await runTool('ub_check_claims', { text: "The UB's dating (late Andite migrations, c. 6000-2000 BCE) comes from 78:5.7." })).findings.some(f => f.kind === 'C2 NUMBER')],
     ['claims passes a figure the book gives in words', async () => parse(await runTool('ub_check_claims', { text: 'The book says the red race crossed about 85,000 years ago (64:6.5).' })).result === 'CLAIMS PASS'],
+    ['ask answers a guardian angel question from Paper 113', async () => parse(await runTool('ub_ask', { question: 'Do I have a guardian angel?' })).passages[0].ref.startsWith('113:')],
+    ['ask says where the book is silent (abortion, once, 68:6.9)', async () => /only 1 time\(s\): 68:6\.9/.test(parse(await runTool('ub_ask', { question: 'What does the book say about abortion?' })).silence)],
     ['unknown tool is an error, not a crash', async () => (await runTool('nope', {})).isError === true],
   ];
   let bad = 0;

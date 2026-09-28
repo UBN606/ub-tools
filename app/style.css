@@ -404,3 +404,6 @@ html.big .a-why { font-size: 16px; }
   body.print-study .study-items .a-text { font: 15pt/1.6 Georgia, serif; color: #000; }
   body.print-study #study::after { content: "From The Urantia Book, as found by UB Tools Studio: https://ubn606.github.io/ub-tools/app/  URANTIA BOOK NETWORK, urantiabooknetwork.com"; display: block; margin-top: 16pt; font: 10pt Arial, sans-serif; color: #444; }
 }
+
+.deeper { margin: 26px 6px 0; font-size: 16px; color: var(--graphite); }
+@media print { .deeper { display: none !important; } }

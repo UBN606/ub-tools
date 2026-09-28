@@ -20,7 +20,24 @@ const LABELS = {
 const label = (id) => LABELS[id] || id.replace(/^name:/, '').replace(/^"(.+)".*$/, '$1')
 
 // Where "Didn't find it?" sends the question. Derek sets this address.
-const FEEDBACK_EMAIL = ''
+const FEEDBACK_EMAIL = 'discosteed8@gmail.com'
+// "Go deeper" links to Urantia Book Network articles: at most one quiet line, only when an article
+// cites a paragraph of the answer. OFF until the corrected site is deployed (Derek, 2026-09-28):
+// the live site still carries errors fixed on the w1-receipts branch.
+const UBN_LINKS_LIVE = false
+let UBN = null
+fetch(new URL('./ubn-articles.json', import.meta.url)).then((r) => r.json()).then((j) => { UBN = j }).catch(() => {})
+function goDeeper(refs) {
+  if (!UBN_LINKS_LIVE || !UBN) return ''
+  let best = null, n = 0
+  for (const a of UBN.articles) {
+    const hit = refs.filter((r) => a.refs.includes(r)).length
+    if (hit > n) { best = a; n = hit }
+  }
+  if (!best) return ''
+  const cited = refs.filter((r) => best.refs.includes(r))
+  return `<p class="deeper">Go deeper: the Urantia Book Network article <a href="${UBN.site}${encodeURIComponent(best.slug)}" target="_blank" rel="noopener">${esc(best.title)}</a> discusses ${cited.slice(0, 3).map(esc).join(', ')}.</p>`
+}
 let E = null
 let mode = 'ask'
 let current = null // ref shown in the tablet
@@ -203,6 +220,7 @@ function runAsk(q, max = 5) {
 <p class="print-question">Question: ${esc(q)}</p>${silence}${index}
 <ol class="answer">${pars.map((p, i) => `<li><p class="a-ref">${esc(p.ref)}</p><p class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</p><p class="a-text">${esc(plain(p.text))}</p><p class="a-why">Found because it speaks of: ${[...(r.why.get(p.ref) || [])].map(esc).join(', ')}</p><div class="a-actions">${speech.ok ? `<button type="button" class="soft" data-say="${i}">Listen</button>` : ''}<button type="button" class="soft" data-open="${esc(p.ref)}">See it in the book</button><button type="button" class="soft" data-study="${i}">Add to study list</button></div>${shareRowHTML()}<p class="a-note" aria-live="polite"></p></li>`).join('')}</ol>
 ${r.more.length ? `<button type="button" class="soft more" id="more">Show more passages</button>` : ''}
+${goDeeper(pars.map((p) => p.ref))}
 ${missed}
 <p class="print-foot">From The Urantia Book, as found by UB Tools Studio: https://ubn606.github.io/ub-tools/app/ . URANTIA BOOK NETWORK, urantiabooknetwork.com</p>`
   $('more')?.addEventListener('click', () => { runAsk(q, max + 10); $('results').querySelectorAll('.answer li')[max]?.scrollIntoView({ block: 'start' }) })
