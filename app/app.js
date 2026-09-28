@@ -1,6 +1,6 @@
 // UB Tools Studio: the interface. The engine (engine.js) runs the repository's own tools.
 import { loadEngine } from './engine.js'
-import { citeLine, copyText, shareQuote, quotePicture } from './share.js'
+import { citeLine, copyText, shareQuote, quotePicture, shareRowHTML, shareTo } from './share.js'
 import { answer, speech, listener, englishVoices, whenVoices, chooseVoice } from './ask.js'
 
 const $ = (id) => document.getElementById(id)
@@ -193,7 +193,7 @@ function runAsk(q) {
   const plain = (t) => t.replace(/<[^>]+>/g, '')
   box.innerHTML = `<div class="answer-head"><h2>What the book says</h2><div class="head-actions">${speech.ok ? '<button type="button" class="soft strong" id="read-all">Listen to the answer</button>' : ''}<button type="button" class="soft" id="print">Print the answer</button><button type="button" class="soft" id="copy-all">Copy the answer</button></div></div>
 <p class="print-question">Question: ${esc(q)}</p>
-<ol class="answer">${pars.map((p, i) => `<li><p class="a-ref">${esc(p.ref)}</p><p class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</p><p class="a-text">${esc(plain(p.text))}</p><div class="a-actions">${speech.ok ? `<button type="button" class="soft" data-say="${i}">Listen</button>` : ''}<button type="button" class="soft" data-open="${esc(p.ref)}">See it in the book</button><button type="button" class="soft" data-copy="${i}">Copy</button><button type="button" class="soft" data-share="${i}">Share</button><button type="button" class="soft" data-pic="${i}">Quote picture</button></div><p class="a-note" aria-live="polite"></p></li>`).join('')}</ol>
+<ol class="answer">${pars.map((p, i) => `<li><p class="a-ref">${esc(p.ref)}</p><p class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</p><p class="a-text">${esc(plain(p.text))}</p><div class="a-actions">${speech.ok ? `<button type="button" class="soft" data-say="${i}">Listen</button>` : ''}<button type="button" class="soft" data-open="${esc(p.ref)}">See it in the book</button></div>${shareRowHTML()}<p class="a-note" aria-live="polite"></p></li>`).join('')}</ol>
 <p class="print-foot">From The Urantia Book, as found by UB Tools Studio: https://ubn606.github.io/ub-tools/app/ . URANTIA BOOK NETWORK, urantiabooknetwork.com</p>`
   const cards = [...box.querySelectorAll('.answer li')]
   const items = pars.map((p, i) => ({ ref: p.ref, el: cards[i], text: `${plain(p.text)} Paper ${p.ref.replace(':', ', section ').replace('.', ', paragraph ')}.` }))
@@ -202,9 +202,8 @@ function runAsk(q) {
   $('read-all')?.addEventListener('click', () => startReading(items))
   const quotes = pars.map((p) => ({ ref: p.ref, text: plain(p.text) }))
   const note = (i, msg) => { const n = cards[i].querySelector('.a-note'); n.textContent = msg; setTimeout(() => { if (n.textContent === msg) n.textContent = '' }, 4000) }
-  box.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', async () => { const i = Number(b.dataset.copy); note(i, (await copyText(citeLine(quotes[i]))) ? 'Copied, with its citation. Paste it anywhere.' : 'Copy was blocked. Select the words and copy them.') }))
-  box.querySelectorAll('[data-share]').forEach((b) => b.addEventListener('click', () => { const i = Number(b.dataset.share); shareQuote(quotes[i], q, (m) => showShareMenu(cards[i], m)) }))
-  box.querySelectorAll('[data-pic]').forEach((b) => b.addEventListener('click', async () => { const i = Number(b.dataset.pic); note(i, 'Making the picture...'); const r = await quotePicture(quotes[i]); note(i, r === 'saved' ? 'Picture saved to your downloads. Post it on Instagram or anywhere.' : r === 'shared' ? 'Shared.' : '') }))
+  cards.forEach((card, i) => card.querySelectorAll('.share-btn').forEach((btn) => btn.addEventListener('click', () =>
+    shareTo(btn.dataset.to, quotes[i], q, (msg) => note(i, msg), () => printOnly(card)))))
   $('print').addEventListener('click', () => { stopReading(); print() })
   $('copy-all').addEventListener('click', async (e) => { const btn = e.currentTarget; const ok = await copyText([q, ...quotes.map(citeLine)].join('\n\n')); btn.textContent = ok ? 'Copied' : 'Copy blocked'; setTimeout(() => { $('copy-all') && ($('copy-all').textContent = 'Copy the answer') }, 2500) })
 }
@@ -218,6 +217,41 @@ function showShareMenu(card, m) {
   d.querySelector('[data-m="copy"]').addEventListener('click', async (e) => { const btn = e.currentTarget; btn.textContent = (await m.copy()) ? 'Copied' : 'Copy blocked' })
   d.querySelector('[data-m="close"]').addEventListener('click', () => d.remove())
 }
+
+function printOnly(el) {
+  stopReading()
+  el.classList.add('print-this'); document.body.classList.add('print-this-only')
+  print()
+  el.classList.remove('print-this'); document.body.classList.remove('print-this-only')
+}
+
+// ---------- highlight to share: select words in the book and a bar pops up ----------
+const selBar = document.createElement('div')
+selBar.className = 'sel-bar'; selBar.hidden = true
+selBar.innerHTML = `<button type="button" data-to="copy">Copy</button><button type="button" data-to="facebook">Facebook</button><button type="button" data-to="email">Email</button>${matchMedia('(pointer: coarse)').matches ? '<button type="button" data-to="text">Text</button>' : ''}<span class="sel-note" aria-live="polite"></span>`
+document.body.appendChild(selBar)
+let selQuote = null
+function checkSelection() {
+  const sel = getSelection()
+  const text = sel && !sel.isCollapsed ? sel.toString().replace(/\s+/g, ' ').trim() : ''
+  const node = sel?.anchorNode && (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement)
+  const holder = node?.closest?.('.a-text, #t-text, .row .txt')
+  if (!text || text.split(' ').length < 3 || !holder) { selBar.hidden = true; selQuote = null; return }
+  const ref = holder.id === 't-text' ? $('t-ref').textContent.trim() : holder.closest('li')?.querySelector('.a-ref, .ref')?.textContent?.trim()
+  if (!ref) { selBar.hidden = true; return }
+  selQuote = { ref, text }
+  const r = sel.getRangeAt(0).getBoundingClientRect()
+  selBar.hidden = false; selBar.querySelector('.sel-note').textContent = ''
+  const top = r.top + scrollY - selBar.offsetHeight - 12
+  selBar.style.top = `${top < scrollY + 8 ? r.bottom + scrollY + 12 : top}px`
+  selBar.style.left = `${Math.max(8, Math.min(innerWidth - selBar.offsetWidth - 8, r.left + r.width / 2 - selBar.offsetWidth / 2))}px`
+}
+let selTimer = null
+document.addEventListener('selectionchange', () => { clearTimeout(selTimer); selTimer = setTimeout(checkSelection, 250) })
+selBar.addEventListener('mousedown', (e) => e.preventDefault())
+selBar.querySelectorAll('[data-to]').forEach((b) => b.addEventListener('click', () => {
+  if (selQuote) shareTo(b.dataset.to, selQuote, $('q').value.trim() || selQuote.ref, (msg) => { selBar.querySelector('.sel-note').textContent = msg })
+}))
 
 // ---------- search ----------
 function highlight(text, res) {
@@ -328,7 +362,6 @@ function openRef(ref) {
   const inner = document.querySelector('.tablet-inner')
   inner.style.animation = 'none'; void inner.offsetWidth; inner.style.animation = ''
   $('t-note').textContent = ''
-  $('t-menu').innerHTML = ''
   if (exact.error) {
     $('t-ref').textContent = ref
     $('t-where').textContent = ''
@@ -357,8 +390,9 @@ $('t-prev').addEventListener('click', () => { const i = E.order.indexOf(current)
 $('t-next').addEventListener('click', () => { const i = E.order.indexOf(current); if (i >= 0 && i < E.order.length - 1) openRef(E.order[i + 1]) })
 const currentQuote = () => { const x = E.search.getParagraphs([current])[0]; return x.error ? null : { ref: x.ref, text: x.text.replace(/<[^>]+>/g, '') } }
 const tNote = (msg) => { $('t-note').textContent = msg }
-$('t-copy').addEventListener('click', async () => { const p = currentQuote(); if (p) tNote((await copyText(citeLine(p))) ? `Copied ${p.ref} with its citation. Paste it anywhere.` : 'Copy was blocked. Select the words and copy them.') })
-$('t-sharebtn').addEventListener('click', () => { const p = currentQuote(); if (p) shareQuote(p, $('q').value.trim() || p.ref, (m) => showShareMenu($('t-menu'), m)) })
-$('t-pic').addEventListener('click', async () => { const p = currentQuote(); if (!p) return; tNote('Making the picture...'); const r = await quotePicture(p); tNote(r === 'saved' ? 'Picture saved to your downloads.' : r === 'shared' ? 'Shared.' : '') })
-$('t-print').addEventListener('click', () => { stopReading(); document.body.classList.add('print-one'); print(); document.body.classList.remove('print-one') })
+$('t-share').innerHTML = shareRowHTML()
+$('t-share').querySelectorAll('.share-btn').forEach((btn) => btn.addEventListener('click', () => {
+  const p = currentQuote(); if (!p) return
+  shareTo(btn.dataset.to, p, $('q').value.trim() || p.ref, tNote, () => { stopReading(); document.body.classList.add('print-one'); print(); document.body.classList.remove('print-one') })
+}))
 addEventListener('afterprint', () => document.body.classList.remove('print-one'))

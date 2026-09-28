@@ -78,3 +78,29 @@ export async function quotePicture(p) {
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000)
   return 'saved'
 }
+
+// ---------- one tap per place: Facebook, Email, Text, WhatsApp, Instagram, Print, Copy ----------
+const touch = () => matchMedia('(pointer: coarse)').matches
+export function shareRowHTML({ print = true } = {}) {
+  const b = (to, label) => `<button type="button" class="share-btn s-${to}" data-to="${to}">${label}</button>`
+  return `<div class="share-row">${b('facebook', 'Facebook')}${b('email', 'Email')}${touch() ? b('text', 'Text message') : ''}${b('whatsapp', 'WhatsApp')}${b('instagram', 'Instagram')}${print ? b('print', 'Print') : ''}${b('copy', 'Copy')}</div>`
+}
+export async function shareTo(to, p, question, note, printFn) {
+  const quote = citeLine(p)
+  const full = `${quote}\n\nAsk the book yourself: ${answerLink(question)}`
+  if (to === 'copy') return note((await copyText(quote)) ? 'Copied with its citation. Now paste it anywhere.' : 'Copy was blocked. Select the words and copy them.')
+  if (to === 'facebook') {
+    await copyText(quote)
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(answerLink(question))}`, '_blank', 'noopener,width=640,height=600')
+    return note('Your quote is copied. In Facebook, tap the post box and choose Paste.')
+  }
+  if (to === 'email') { location.href = `mailto:?subject=${encodeURIComponent(`The Urantia Book, ${p.ref}`)}&body=${encodeURIComponent(full)}`; return note('Opening your email with the quote written in.') }
+  if (to === 'text') { location.href = `sms:?&body=${encodeURIComponent(full)}`; return note('Opening your messages with the quote written in.') }
+  if (to === 'whatsapp') { window.open(`https://wa.me/?text=${encodeURIComponent(full)}`, '_blank', 'noopener'); return note('Opening WhatsApp with the quote written in.') }
+  if (to === 'instagram') {
+    note('Making the picture...')
+    const r = await quotePicture(p)
+    return note(r === 'shared' ? 'Shared.' : r === 'saved' ? 'Picture saved. Open Instagram and post it from your photos or downloads.' : '')
+  }
+  if (to === 'print') return printFn?.()
+}

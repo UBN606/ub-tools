@@ -350,3 +350,21 @@ a.soft { text-decoration: none; display: inline-flex; align-items: center; }
   body.print-one .t-text { box-shadow: none !important; background: none !important; padding: 0 !important; max-height: none !important; overflow: visible !important; font: 400 15pt/1.6 Georgia, serif; color: #000; }
   body.print-one .tablet-inner::after { content: "From The Urantia Book, as found by UB Tools Studio: https://ubn606.github.io/ub-tools/app/  URANTIA BOOK NETWORK, urantiabooknetwork.com"; display: block; margin-top: 16pt; font: 10pt Arial, sans-serif; color: #444; }
 }
+
+/* ---------- named share buttons ---------- */
+.share-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.share-btn { border: 0; cursor: pointer; font: 600 15px/1 var(--sans); padding: 12px 15px; border-radius: 14px; color: #fff; box-shadow: 4px 5px 10px var(--lift-dark), -3px -3px 8px var(--lift-light); }
+.s-facebook { background: #3F63A8; } .s-email { background: #5B6B7D; } .s-text { background: #3E8A5B; } .s-whatsapp { background: #2E8F6A; }
+.s-instagram { background: linear-gradient(135deg, #8B4FB0, #C24A6A 55%, #D08A3E); } .s-print, .s-copy { background: linear-gradient(160deg, #F9F8F6, #ECEAE6); color: var(--ink); }
+html.big .share-btn { font-size: 18px; padding: 14px 17px; }
+.sel-bar { position: absolute; z-index: 50; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px; border-radius: 16px; background: #2B2E33; box-shadow: 0 10px 28px rgba(0,0,0,.28); max-width: calc(100vw - 16px); }
+.sel-bar button { border: 0; cursor: pointer; font: 600 15px/1 var(--sans); color: #fff; background: rgba(255,255,255,.12); padding: 11px 13px; border-radius: 11px; }
+.sel-note { color: #CFE0CF; font-size: 13px; padding: 0 6px; }
+@media print {
+  .share-row, .sel-bar { display: none !important; }
+  body.print-this-only .answer li:not(.print-this), body.print-this-only .answer-head, body.print-this-only .print-question { display: none !important; }
+}
+@media (max-width: 560px) {
+  .modes-thumb { display: none; }
+  .modes button[aria-selected="true"] { background: linear-gradient(160deg, #FBFAF8, #EFEDE9); box-shadow: 4px 5px 10px var(--lift-dark), -3px -3px 7px var(--lift-light); }
+}
