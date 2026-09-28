@@ -64,7 +64,7 @@ function setMode(m) {
   $('q').placeholder = ask ? 'Ask a question, like: What happens after we die?' : m === 'places' ? 'A place or people, like Maya, Peru or Easter Island' : 'Words, a phrase, or a reference like 180:2.1'
   $('go').textContent = check ? 'Check draft' : ask ? 'Ask the book' : m === 'places' ? 'Show every paragraph' : 'Search'
   $('hint').textContent = ask
-    ? 'The book answers in its own words, with where to find them. Tap the microphone to speak, or Read aloud to listen.'
+    ? 'The book answers in its own words, with where to find them. Tap the microphone to speak your question. Press Listen to hear the answer.'
     : check
     ? 'Checks each quote against its citation, every claim credited to the book, and whether the draft left paragraphs on its subject unread.'
     : m === 'places'
@@ -162,8 +162,8 @@ function runAsk(q) {
   if (!r.refs.length) { box.innerHTML = `<p class="empty">The book does not speak to that in these words. Try asking with other words.</p>`; return }
   const pars = E.search.getParagraphs(r.refs).filter((p) => !p.error)
   const plain = (t) => t.replace(/<[^>]+>/g, '')
-  box.innerHTML = `<div class="answer-head"><h2>What the book says</h2>${speech.ok ? '<button type="button" class="soft strong" id="read-all">Read all aloud</button>' : ''}</div>
-<ol class="answer">${pars.map((p, i) => `<li><p class="a-ref">${esc(p.ref)}</p><p class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</p><p class="a-text">${esc(plain(p.text))}</p><div class="a-actions">${speech.ok ? `<button type="button" class="soft" data-say="${i}">Read aloud</button>` : ''}<button type="button" class="soft" data-open="${esc(p.ref)}">Read around it</button></div></li>`).join('')}</ol>`
+  box.innerHTML = `<div class="answer-head"><h2>What the book says</h2>${speech.ok ? '<button type="button" class="soft strong" id="read-all">Listen to the answer</button>' : ''}</div>
+<ol class="answer">${pars.map((p, i) => `<li><p class="a-ref">${esc(p.ref)}</p><p class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</p><p class="a-text">${esc(plain(p.text))}</p><div class="a-actions">${speech.ok ? `<button type="button" class="soft" data-say="${i}">Listen</button>` : ''}<button type="button" class="soft" data-open="${esc(p.ref)}">See it in the book</button></div></li>`).join('')}</ol>`
   box.querySelectorAll('[data-say]').forEach((b) => b.addEventListener('click', () => { const p = pars[Number(b.dataset.say)]; readWith(b, `${plain(p.text)} Paper ${p.ref.replace(':', ', section ').replace('.', ', paragraph ')}.`) }))
   box.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openRef(b.dataset.open)))
   $('read-all')?.addEventListener('click', (e) => readWith(e.currentTarget, pars.map((p) => plain(p.text)).join(' ')))
