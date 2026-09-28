@@ -52,16 +52,25 @@ export function answer(E, question, { max = 5 } = {}) {
   return { refs: ranked, words, mapped }
 }
 
-// ---------- reading aloud (the browser's own voice; free, offline on most computers) ----------
+// ---------- reading aloud (the browser's own voice; free) ----------
+// Book terms are spoken from the Urantia Foundation's pronunciation guide (pronounce.json:
+// Nebadon -> "Nehbuhdahn"). Microsoft's neural "Natural" voices (Edge on Windows) are preferred.
+let SAY = null
+fetch(new URL('./pronounce.json', import.meta.url)).then((r) => r.json()).then((j) => {
+  const terms = Object.keys(j.say).sort((a, b) => b.length - a.length)
+  const escRe = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  SAY = { re: new RegExp(`\\b(${terms.map(escRe).join('|')})\\b`, 'g'), map: j.say }
+}).catch(() => {})
+export const spoken = (text) => (SAY ? text.replace(SAY.re, (m) => SAY.map[m] || m) : text)
 export const speech = {
   ok: typeof speechSynthesis !== 'undefined',
   say(text, onEnd) {
     if (!this.ok) return
     speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(text)
-    u.rate = 0.9
+    const u = new SpeechSynthesisUtterance(spoken(text))
+    u.rate = 0.92
     const en = speechSynthesis.getVoices().filter((v) => /^en/i.test(v.lang))
-    u.voice = en.find((v) => /natural|premium|enhanced|google/i.test(v.name)) || en[0] || null
+    u.voice = en.find((v) => /Microsoft.*(Natural|Online)/i.test(v.name)) || en.find((v) => /natural|premium|enhanced|google/i.test(v.name)) || en[0] || null
     if (onEnd) u.onend = onEnd
     speechSynthesis.speak(u)
   },
