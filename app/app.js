@@ -328,6 +328,7 @@ function openRef(ref) {
   const inner = document.querySelector('.tablet-inner')
   inner.style.animation = 'none'; void inner.offsetWidth; inner.style.animation = ''
   $('t-note').textContent = ''
+  $('t-menu').innerHTML = ''
   if (exact.error) {
     $('t-ref').textContent = ref
     $('t-where').textContent = ''
@@ -354,11 +355,10 @@ $('tablet').addEventListener('click', (e) => { if (e.target === $('tablet')) clo
 addEventListener('keydown', (e) => { if (e.key === 'Escape' && current) closeTablet() })
 $('t-prev').addEventListener('click', () => { const i = E.order.indexOf(current); if (i > 0) openRef(E.order[i - 1]) })
 $('t-next').addEventListener('click', () => { const i = E.order.indexOf(current); if (i >= 0 && i < E.order.length - 1) openRef(E.order[i + 1]) })
-$('t-copy').addEventListener('click', async () => {
-  const exact = E.search.getParagraphs([current])[0]
-  if (exact.error) return
-  const plain = exact.text.replace(/<[^>]+>/g, '')
-  const line = `"${plain}" (${exact.ref})`
-  try { await navigator.clipboard.writeText(line); $('t-note').textContent = `Copied with its citation, ${exact.ref}.` }
-  catch { $('t-note').textContent = 'Copy was blocked by the browser. Select the text and copy it.' }
-})
+const currentQuote = () => { const x = E.search.getParagraphs([current])[0]; return x.error ? null : { ref: x.ref, text: x.text.replace(/<[^>]+>/g, '') } }
+const tNote = (msg) => { $('t-note').textContent = msg }
+$('t-copy').addEventListener('click', async () => { const p = currentQuote(); if (p) tNote((await copyText(citeLine(p))) ? `Copied ${p.ref} with its citation. Paste it anywhere.` : 'Copy was blocked. Select the words and copy them.') })
+$('t-sharebtn').addEventListener('click', () => { const p = currentQuote(); if (p) shareQuote(p, $('q').value.trim() || p.ref, (m) => showShareMenu($('t-menu'), m)) })
+$('t-pic').addEventListener('click', async () => { const p = currentQuote(); if (!p) return; tNote('Making the picture...'); const r = await quotePicture(p); tNote(r === 'saved' ? 'Picture saved to your downloads.' : r === 'shared' ? 'Shared.' : '') })
+$('t-print').addEventListener('click', () => { stopReading(); document.body.classList.add('print-one'); print(); document.body.classList.remove('print-one') })
+addEventListener('afterprint', () => document.body.classList.remove('print-one'))

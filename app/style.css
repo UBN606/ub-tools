@@ -340,3 +340,13 @@ a.soft { text-decoration: none; display: inline-flex; align-items: center; }
   .answer .a-text { font: 400 15pt/1.6 Georgia, "Newsreader", serif; color: #000; }
   .print-foot { display: block; font-size: 10pt; color: #444; margin-top: 18pt; }
 }
+.t-share { margin-top: 10px; }
+@media print {
+  body.print-one .work > .results { display: none !important; }
+  body.print-one .tablet, body.print-one .tablet-inner { display: block !important; position: static !important; box-shadow: none !important; background: none !important; padding: 0 !important; animation: none !important; }
+  body.print-one .tablet .close, body.print-one .t-actions, body.print-one .t-note, body.print-one #t-menu { display: none !important; }
+  body.print-one .t-ref { font: 500 22pt/1.2 Georgia, serif; color: #000; }
+  body.print-one .t-where { color: #444; font-size: 11pt; }
+  body.print-one .t-text { box-shadow: none !important; background: none !important; padding: 0 !important; max-height: none !important; overflow: visible !important; font: 400 15pt/1.6 Georgia, serif; color: #000; }
+  body.print-one .tablet-inner::after { content: "From The Urantia Book, as found by UB Tools Studio: https://ubn606.github.io/ub-tools/app/  URANTIA BOOK NETWORK, urantiabooknetwork.com"; display: block; margin-top: 16pt; font: 10pt Arial, sans-serif; color: #444; }
+}
