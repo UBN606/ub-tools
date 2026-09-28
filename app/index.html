@@ -30,13 +30,17 @@
     </svg>
     <span>UB Tools Studio</span>
   </a>
-  <p class="status" id="status" role="status">Opening the book</p>
+  <div class="bar-right">
+    <button type="button" class="soft size" id="bigger" aria-pressed="false">Larger text</button>
+    <p class="status" id="status" role="status">Opening the book</p>
+  </div>
 </header>
 
 <main>
   <section class="slab" aria-label="Ask the book">
     <div class="modes" role="tablist" aria-label="What to do">
-      <button role="tab" id="tab-search" aria-selected="true" aria-controls="panel" data-mode="search">Search</button>
+      <button role="tab" id="tab-ask" aria-selected="true" aria-controls="panel" data-mode="ask">Ask</button>
+      <button role="tab" id="tab-search" aria-selected="false" aria-controls="panel" data-mode="search">Search</button>
       <button role="tab" id="tab-places" aria-selected="false" aria-controls="panel" data-mode="places">Places</button>
       <button role="tab" id="tab-check" aria-selected="false" aria-controls="panel" data-mode="check">Check a draft</button>
       <span class="modes-thumb" aria-hidden="true"></span>
@@ -46,7 +50,12 @@
       <label class="sr" for="q" id="q-label">Search the book</label>
       <input id="q" name="q" type="search" placeholder="Words, a phrase, or a reference like 180:2.1" disabled>
       <textarea id="draft" name="draft" rows="9" placeholder="Paste a draft that quotes the book. Quotes need a citation after them, like &quot;...&quot; (180:2.1)." hidden disabled></textarea>
-      <button class="go" type="submit" id="go" disabled>Search</button>
+      <div class="well-actions">
+        <button class="mic" type="button" id="mic" aria-label="Speak your question" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4M8.5 21h7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+        </button>
+        <button class="go" type="submit" id="go" disabled>Ask the book</button>
+      </div>
     </form>
 
     <div class="groove" id="groove" aria-hidden="true"><span id="groove-fill"></span></div>
@@ -54,7 +63,7 @@
     <div class="chips" id="chips" hidden></div>
   </section>
 
-  <div class="work" id="panel" role="tabpanel" aria-labelledby="tab-search">
+  <div class="work" id="panel" role="tabpanel" aria-labelledby="tab-ask">
     <section class="results" id="results" aria-live="polite"></section>
     <aside class="tablet" id="tablet" aria-label="Paragraph" hidden>
       <div class="tablet-inner">

@@ -1,5 +1,6 @@
 // UB Tools Studio: the interface. The engine (engine.js) runs the repository's own tools.
 import { loadEngine } from './engine.js'
+import { answer, speech, listener } from './ask.js'
 
 const $ = (id) => document.getElementById(id)
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
@@ -17,7 +18,7 @@ const LABELS = {
 const label = (id) => LABELS[id] || id.replace(/^name:/, '').replace(/^"(.+)".*$/, '$1')
 
 let E = null
-let mode = 'search'
+let mode = 'ask'
 let current = null // ref shown in the tablet
 let lastList = []  // refs in the result list, for highlighting the open one
 
@@ -35,7 +36,7 @@ loadEngine((done, total, source) => {
   for (const el of [$('q'), $('draft'), $('go')]) el.disabled = false
   $('q').focus()
   const u = new URL(location.href)
-  if (u.searchParams.get('q')) { $('q').value = u.searchParams.get('q'); setMode(u.searchParams.get('mode') || 'search'); submit() }
+  if (u.searchParams.get('q')) { $('q').value = u.searchParams.get('q'); setMode(u.searchParams.get('mode') || 'ask'); submit() }
 }).catch((err) => {
   status.textContent = 'The book could not be loaded'
   $('hint').innerHTML = `The book text did not load (${esc(err.message)}). Check your connection and reload. If you run the tools from a copy of the repository, run <code>node fetch-data.js</code> there first.`
@@ -56,10 +57,14 @@ function setMode(m) {
   const check = m === 'check'
   $('q').hidden = check
   $('draft').hidden = !check
-  $('q-label').textContent = check ? 'Paste a draft' : m === 'places' ? 'A place or people' : 'Search the book'
-  $('q').placeholder = m === 'places' ? 'A place or people, like Maya, Peru or Easter Island' : 'Words, a phrase, or a reference like 180:2.1'
-  $('go').textContent = check ? 'Check draft' : m === 'places' ? 'Show every paragraph' : 'Search'
-  $('hint').textContent = check
+  const ask = m === 'ask'
+  $('mic').hidden = !ask || !mic
+  $('q-label').textContent = check ? 'Paste a draft' : ask ? 'Ask a question' : m === 'places' ? 'A place or people' : 'Search the book'
+  $('q').placeholder = ask ? 'Ask a question, like: What happens after we die?' : m === 'places' ? 'A place or people, like Maya, Peru or Easter Island' : 'Words, a phrase, or a reference like 180:2.1'
+  $('go').textContent = check ? 'Check draft' : ask ? 'Ask the book' : m === 'places' ? 'Show every paragraph' : 'Search'
+  $('hint').textContent = ask
+    ? 'The book answers in its own words, with where to find them. Tap the microphone to speak, or Read aloud to listen.'
+    : check
     ? 'Checks each quote against its citation, every claim credited to the book, and whether the draft left paragraphs on its subject unread.'
     : m === 'places'
       ? 'Modern names find the book\'s own: Maya finds Mexico and Central America. Read every paragraph before saying what the book says.'
@@ -78,6 +83,13 @@ tabs.forEach((t) => {
     if (j >= 0) { e.preventDefault(); tabs[j].focus(); setMode(tabs[j].dataset.mode) }
   })
 })
+const mic = listener((text) => { $('q').value = text; submit() }, (on) => $('mic').classList.toggle('listening', on))
+$('mic').addEventListener('click', () => { try { mic.start() } catch { mic.stop() } })
+const bigger = $('bigger')
+const setBig = (on) => { document.documentElement.classList.toggle('big', on); bigger.setAttribute('aria-pressed', String(on)); store.set('big', on); placeThumb() }
+bigger.addEventListener('click', () => setBig(!document.documentElement.classList.contains('big')))
+setBig(store.get('big', true))
+setMode('ask')
 tabs.forEach((t) => { t.tabIndex = t.getAttribute('aria-selected') === 'true' ? 0 : -1 })
 addEventListener('resize', placeThumb)
 document.fonts?.ready.then(placeThumb)
@@ -101,12 +113,28 @@ function submit() {
   const q = $('q').value.trim()
   if (!q) return
   if (mode === 'places') return runPlaces(q)
+  if (mode === 'ask' && !REF_ONLY.test(q)) return runAsk(q)
   if (REF_ONLY.test(q)) {
     const refs = q.match(/\d{1,3}:\d{1,2}\.\d{1,3}/g)
     renderList(refs.map((r) => ({ ref: r })), { title: refs.length === 1 ? 'Reference' : `${refs.length} references`, sub: '' })
     return openRef(refs[0])
   }
   runSearch(q)
+}
+
+// ---------- ask ----------
+function runAsk(q) {
+  speech.stop()
+  const r = answer(E, q)
+  const box = $('results')
+  if (!r.refs.length) { box.innerHTML = `<p class="empty">The book does not speak to that in these words. Try asking with other words.</p>`; return }
+  const pars = E.search.getParagraphs(r.refs).filter((p) => !p.error)
+  const plain = (t) => t.replace(/<[^>]+>/g, '')
+  box.innerHTML = `<div class="answer-head"><h2>What the book says</h2>${speech.ok ? '<button type="button" class="soft strong" id="read-all">Read all aloud</button>' : ''}</div>
+<ol class="answer">${pars.map((p, i) => `<li><p class="a-ref">${esc(p.ref)}</p><p class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</p><p class="a-text">${esc(plain(p.text))}</p><div class="a-actions">${speech.ok ? `<button type="button" class="soft" data-say="${i}">Read aloud</button>` : ''}<button type="button" class="soft" data-open="${esc(p.ref)}">Read around it</button></div></li>`).join('')}</ol>`
+  box.querySelectorAll('[data-say]').forEach((b) => b.addEventListener('click', () => { const p = pars[Number(b.dataset.say)]; speech.say(`${plain(p.text)} Paper ${p.ref.replace(':', ', section ').replace('.', ', paragraph ')}.`) }))
+  box.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openRef(b.dataset.open)))
+  $('read-all')?.addEventListener('click', () => speech.say(pars.map((p) => plain(p.text)).join(' ')))
 }
 
 // ---------- search ----------

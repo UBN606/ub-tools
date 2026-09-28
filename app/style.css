@@ -256,3 +256,36 @@ mark { background: linear-gradient(transparent 55%, rgba(70, 97, 138, .2) 55%); 
   .chips { gap: 8px; }
   .chip { font-size: 13px; padding: 9px 12px; }
 }
+
+/* ---------- Ask: made for older readers ---------- */
+.modes { grid-template-columns: repeat(4, auto); }
+.bar-right { display: flex; align-items: center; gap: 12px; }
+.size { padding: 9px 14px; }
+.size[aria-pressed="true"] { color: var(--lapis); font-weight: 600; }
+.well-actions { display: flex; align-items: center; gap: 10px; justify-self: end; }
+.mic { width: 52px; height: 52px; border: 0; border-radius: 50%; cursor: pointer; color: var(--lapis); display: grid; place-items: center;
+  background: linear-gradient(160deg, #F9F8F6, #ECEAE6); box-shadow: 5px 6px 12px var(--lift-dark), -3px -3px 8px var(--lift-light); }
+.mic svg { width: 24px; height: 24px; }
+.mic.listening { color: #fff; background: radial-gradient(circle at 35% 30%, #B8864A, var(--fix)); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 8px rgba(138, 90, 31, .18), 5px 6px 12px var(--lift-dark); } }
+.answer { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; }
+.answer li { padding: 26px 28px 22px; border-radius: 28px; background: var(--chalk); box-shadow: 14px 16px 34px var(--lift-dark), -10px -10px 24px var(--lift-light); }
+.answer .a-ref { font: 500 24px/1.2 var(--serif); color: var(--lapis); margin: 0; }
+.answer .a-where { font-size: 14px; color: var(--graphite); margin: 4px 0 14px; }
+.answer .a-text { font: 400 21px/1.7 var(--serif); margin: 0; }
+.answer .a-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.answer-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin: 0 6px 18px; }
+.answer-head h2 { margin: 0; font: 600 22px/1.3 var(--sans); }
+html.big body { font-size: 19px; }
+html.big .well input { font-size: 30px; }
+html.big .answer .a-text { font-size: 25px; }
+html.big .answer .a-ref { font-size: 28px; }
+html.big .hint, html.big .answer .a-where { font-size: 17px; }
+html.big .modes button, html.big .go, html.big .soft { font-size: 17px; }
+@media (max-width: 560px) {
+  .bar { flex-wrap: wrap; }
+  .modes { grid-template-columns: repeat(2, 1fr); }
+  .well-actions { width: 100%; }
+  .well-actions .go { flex: 1; }
+  .answer li { padding: 20px 18px 16px; }
+}
