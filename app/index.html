@@ -32,6 +32,7 @@
   </a>
   <div class="bar-right">
     <label class="voice-pick" id="voice-wrap" hidden><span class="sr">Reading voice</span><select id="voice" aria-label="Reading voice"></select></label>
+    <button type="button" class="soft size help-btn" id="help-open">How to use</button>
     <button type="button" class="soft size" id="bigger" aria-pressed="false">Larger text</button>
     <p class="status" id="status" role="status">Opening the book</p>
   </div>
@@ -94,6 +95,26 @@
     <button type="button" id="p-next" aria-label="Next paragraph">Next</button>
   </div>
 </div>
+
+<dialog class="help" id="help" aria-labelledby="help-title">
+  <h2 id="help-title" tabindex="-1">How to use this</h2>
+  <ol class="help-steps">
+    <li><strong>Ask a question.</strong> Type it in the big box, or tap the microphone and say it. Then press <strong>Ask the book</strong>.</li>
+    <li><strong>Read the answer.</strong> You will see the book's own words, with the Paper, Section and Paragraph number, such as 113:2.7, so you can find them in your own book.</li>
+    <li><strong>Listen.</strong> Press <strong>Listen to the answer</strong>. A panel at the bottom shows which paragraph is being read, and that paragraph is outlined in gold. Use <strong>Back</strong>, <strong>Pause</strong>, <strong>Next</strong> or <strong>Stop</strong>. To hear one paragraph, press <strong>Listen</strong> under it.</li>
+    <li><strong>Share.</strong> Under every paragraph are buttons for <strong>Facebook</strong>, <strong>Email</strong>, <strong>Text message</strong>, <strong>WhatsApp</strong> and <strong>Instagram</strong>. The words and where to find them go with it. For Facebook, the words are copied for you: tap the post box and choose Paste.</li>
+    <li><strong>Share a few words.</strong> Highlight words with your finger or mouse, and a small bar appears to share only those words.</li>
+    <li><strong>Print or copy.</strong> <strong>Print</strong> prints a paragraph. <strong>Print the answer</strong> prints them all. <strong>Copy</strong> lets you paste the words anywhere.</li>
+    <li><strong>See more of the book.</strong> <strong>See it in the book</strong> shows the paragraphs before and after.</li>
+    <li><strong>Make it easier to see and hear.</strong> <strong>Larger text</strong> makes the words bigger. The voice menu at the top picks the reading voice; the most natural voices are in Microsoft Edge.</li>
+    <li><strong>More tools.</strong> <strong>Search</strong> finds any word or phrase in the book. <strong>Places</strong> shows everything the book says about a place. <strong>Check a draft</strong> checks quotes in something you wrote.</li>
+  </ol>
+  <p class="help-free">This is free, needs no account, and your questions stay on your own computer.</p>
+  <div class="help-actions">
+    <button type="button" class="go" id="help-listen">Listen to these instructions</button>
+    <button type="button" class="soft" id="help-close">Close</button>
+  </div>
+</dialog>
 
 <footer class="foot">
   <p>Book text from <a href="https://urantiapedia.org">Urantiapedia</a> (CC BY-SA 4.0). The same checks as ub-verify.js and ub-recall.js in <a href="https://github.com/UBN606/ub-tools">UB Tools</a>, by the <a href="https://urantiabooknetwork.com">Urantia Book Network</a>.</p>

@@ -253,6 +253,14 @@ selBar.querySelectorAll('[data-to]').forEach((b) => b.addEventListener('click', 
   if (selQuote) shareTo(b.dataset.to, selQuote, $('q').value.trim() || selQuote.ref, (msg) => { selBar.querySelector('.sel-note').textContent = msg })
 }))
 
+// ---------- How to use ----------
+function openHelp() { const d = $('help'); d.showModal(); d.scrollTop = 0; $('help-title').focus() }
+$('help-open').addEventListener('click', () => { stopReading(); openHelp() })
+$('help-close').addEventListener('click', () => { speech.stop(); $('help').close() })
+$('help').addEventListener('close', () => speech.stop())
+$('help-listen').addEventListener('click', () => speech.say([...document.querySelectorAll('.help-steps li')].map((li) => li.textContent).join(' ')))
+try { if (!localStorage.getItem('seen-help')) { localStorage.setItem('seen-help', '1'); addEventListener('load', () => openHelp()) } } catch {}
+
 // ---------- search ----------
 function highlight(text, res) {
   let out = esc(text)
