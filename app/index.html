@@ -85,10 +85,15 @@
   </div>
 </main>
 
-<button type="button" class="stop-bar" id="stop-bar" hidden>
-  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>
-  Stop reading
-</button>
+<div class="player" id="player" role="region" aria-label="Reading aloud" hidden>
+  <div class="p-now"><span class="p-dot" aria-hidden="true"></span><span id="p-label">Reading</span> <strong id="p-ref"></strong></div>
+  <div class="p-controls">
+    <button type="button" id="p-prev" aria-label="Back to the previous paragraph">Back</button>
+    <button type="button" id="p-pause">Pause</button>
+    <button type="button" id="p-stop" class="p-stop">Stop</button>
+    <button type="button" id="p-next" aria-label="Next paragraph">Next</button>
+  </div>
+</div>
 
 <footer class="foot">
   <p>Book text from <a href="https://urantiapedia.org">Urantiapedia</a> (CC BY-SA 4.0). The same checks as ub-verify.js and ub-recall.js in <a href="https://github.com/UBN606/ub-tools">UB Tools</a>, by the <a href="https://urantiabooknetwork.com">Urantia Book Network</a>.</p>

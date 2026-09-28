@@ -21,6 +21,7 @@ let E = null
 let mode = 'ask'
 let current = null // ref shown in the tablet
 let lastList = []  // refs in the result list, for highlighting the open one
+const player = { items: [], i: 0, gen: 0, paused: false } // the reading-aloud queue
 
 // ---------- boot ----------
 const status = $('status')
@@ -51,7 +52,7 @@ function placeThumb() {
   thumb.style.transform = `translateX(${on.offsetLeft - 5}px)`
 }
 function setMode(m) {
-  speech.stop()
+  stopReading()
   mode = m
   for (const t of tabs) { const on = t.dataset.mode === m; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1 }
   $('panel').setAttribute('aria-labelledby', `tab-${m}`)
@@ -134,29 +135,56 @@ function submit() {
   runSearch(q)
 }
 
-// ---------- reading aloud: always easy to stop ----------
-let readingBtn = null
-speech.onchange = (on) => {
-  $('stop-bar').hidden = !on
-  if (!on && readingBtn) { readingBtn.textContent = readingBtn.dataset.label; readingBtn.classList.remove('reading'); readingBtn = null }
+// ---------- reading aloud: one player, always visible while reading ----------
+// A queue of paragraphs, read one at a time. The player at the bottom shows which one is being
+// read ("Reading 2 of 5"), with Previous, Pause, Stop and Next; the paragraph itself is lit up.
+function lightUp() {
+  document.querySelectorAll('.now-reading').forEach((el) => el.classList.remove('now-reading'))
+  const it = player.items[player.i]
+  if (!it) return
+  it.el?.classList.add('now-reading')
+  it.el?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' })
+  $('p-label').textContent = player.items.length > 1 ? `Reading ${player.i + 1} of ${player.items.length}` : 'Reading'
+  $('p-ref').textContent = it.ref
+  $('p-prev').disabled = player.i === 0
+  $('p-next').disabled = player.i >= player.items.length - 1
+  $('p-pause').textContent = 'Pause'
+  player.paused = false
 }
-function readWith(btn, text) {
-  if (readingBtn === btn) { speech.stop(); return }
+function playAt(i) {
+  const gen = ++player.gen
+  player.i = i
+  lightUp()
+  $('player').hidden = false
+  const it = player.items[i]
+  speech.say(it.text, () => {
+    if (gen !== player.gen) return // stopped or skipped: this reading is over
+    if (player.i < player.items.length - 1) playAt(player.i + 1)
+    else stopReading()
+  })
+}
+function startReading(items, i = 0) { speech.stop(); player.items = items; playAt(i) }
+function stopReading() {
+  player.gen++
   speech.stop()
-  readingBtn = btn
-  btn.dataset.label = btn.dataset.label || btn.textContent
-  btn.textContent = 'Stop'
-  btn.classList.add('reading')
-  speech.say(text)
+  player.items = []
+  $('player').hidden = true
+  document.querySelectorAll('.now-reading').forEach((el) => el.classList.remove('now-reading'))
 }
-$('stop-bar').addEventListener('click', () => speech.stop())
-addEventListener('keydown', (e) => { if (e.key === 'Escape') speech.stop() })
-addEventListener('pagehide', () => speech.stop())
-document.addEventListener('visibilitychange', () => { if (document.hidden) speech.stop() })
+$('p-stop').addEventListener('click', stopReading)
+$('p-prev').addEventListener('click', () => { if (player.i > 0) { player.gen++; speech.stop(); playAt(player.i - 1) } })
+$('p-next').addEventListener('click', () => { if (player.i < player.items.length - 1) { player.gen++; speech.stop(); playAt(player.i + 1) } })
+$('p-pause').addEventListener('click', () => {
+  if (player.paused) { speechSynthesis.resume(); player.paused = false; $('p-pause').textContent = 'Pause' }
+  else { speechSynthesis.pause(); player.paused = true; $('p-pause').textContent = 'Resume' }
+})
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && player.items.length) stopReading() })
+addEventListener('pagehide', stopReading)
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopReading() })
 
 // ---------- ask ----------
 function runAsk(q) {
-  speech.stop()
+  stopReading()
   const r = answer(E, q)
   const box = $('results')
   if (!r.refs.length) { box.innerHTML = `<p class="empty">The book does not speak to that in these words. Try asking with other words.</p>`; return }
@@ -164,9 +192,11 @@ function runAsk(q) {
   const plain = (t) => t.replace(/<[^>]+>/g, '')
   box.innerHTML = `<div class="answer-head"><h2>What the book says</h2>${speech.ok ? '<button type="button" class="soft strong" id="read-all">Listen to the answer</button>' : ''}</div>
 <ol class="answer">${pars.map((p, i) => `<li><p class="a-ref">${esc(p.ref)}</p><p class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</p><p class="a-text">${esc(plain(p.text))}</p><div class="a-actions">${speech.ok ? `<button type="button" class="soft" data-say="${i}">Listen</button>` : ''}<button type="button" class="soft" data-open="${esc(p.ref)}">See it in the book</button></div></li>`).join('')}</ol>`
-  box.querySelectorAll('[data-say]').forEach((b) => b.addEventListener('click', () => { const p = pars[Number(b.dataset.say)]; readWith(b, `${plain(p.text)} Paper ${p.ref.replace(':', ', section ').replace('.', ', paragraph ')}.`) }))
+  const cards = [...box.querySelectorAll('.answer li')]
+  const items = pars.map((p, i) => ({ ref: p.ref, el: cards[i], text: `${plain(p.text)} Paper ${p.ref.replace(':', ', section ').replace('.', ', paragraph ')}.` }))
+  box.querySelectorAll('[data-say]').forEach((b) => b.addEventListener('click', () => { const i = Number(b.dataset.say); startReading([items[i]]) }))
   box.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openRef(b.dataset.open)))
-  $('read-all')?.addEventListener('click', (e) => readWith(e.currentTarget, pars.map((p) => plain(p.text)).join(' ')))
+  $('read-all')?.addEventListener('click', () => startReading(items))
 }
 
 // ---------- search ----------
