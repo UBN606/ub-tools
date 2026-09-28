@@ -296,3 +296,10 @@ html.big .voice-pick select { font-size: 17px; }
 
 /* the phone sheet must stay gone while hidden (display:flex above would override [hidden]) */
 [hidden] { display: none !important; }
+/* one big, always-visible way to stop reading */
+.stop-bar { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 40; display: inline-flex; align-items: center; gap: 12px;
+  border: 0; cursor: pointer; padding: 18px 30px; border-radius: 999px; font: 600 19px/1 var(--sans); color: #fff;
+  background: radial-gradient(circle at 35% 30%, #B8864A, var(--fix)); box-shadow: 8px 10px 22px rgba(120, 80, 30, .4), -4px -4px 10px var(--lift-light); }
+.stop-bar svg { width: 22px; height: 22px; }
+html.big .stop-bar { font-size: 22px; padding: 20px 34px; }
+.soft.reading { color: var(--fix); font-weight: 700; box-shadow: inset 2px 2px 5px var(--press-dark), inset -2px -2px 5px var(--press-light); }

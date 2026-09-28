@@ -51,6 +51,7 @@ function placeThumb() {
   thumb.style.transform = `translateX(${on.offsetLeft - 5}px)`
 }
 function setMode(m) {
+  speech.stop()
   mode = m
   for (const t of tabs) { const on = t.dataset.mode === m; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1 }
   $('panel').setAttribute('aria-labelledby', `tab-${m}`)
@@ -133,6 +134,26 @@ function submit() {
   runSearch(q)
 }
 
+// ---------- reading aloud: always easy to stop ----------
+let readingBtn = null
+speech.onchange = (on) => {
+  $('stop-bar').hidden = !on
+  if (!on && readingBtn) { readingBtn.textContent = readingBtn.dataset.label; readingBtn.classList.remove('reading'); readingBtn = null }
+}
+function readWith(btn, text) {
+  if (readingBtn === btn) { speech.stop(); return }
+  speech.stop()
+  readingBtn = btn
+  btn.dataset.label = btn.dataset.label || btn.textContent
+  btn.textContent = 'Stop'
+  btn.classList.add('reading')
+  speech.say(text)
+}
+$('stop-bar').addEventListener('click', () => speech.stop())
+addEventListener('keydown', (e) => { if (e.key === 'Escape') speech.stop() })
+addEventListener('pagehide', () => speech.stop())
+document.addEventListener('visibilitychange', () => { if (document.hidden) speech.stop() })
+
 // ---------- ask ----------
 function runAsk(q) {
   speech.stop()
@@ -143,9 +164,9 @@ function runAsk(q) {
   const plain = (t) => t.replace(/<[^>]+>/g, '')
   box.innerHTML = `<div class="answer-head"><h2>What the book says</h2>${speech.ok ? '<button type="button" class="soft strong" id="read-all">Read all aloud</button>' : ''}</div>
 <ol class="answer">${pars.map((p, i) => `<li><p class="a-ref">${esc(p.ref)}</p><p class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</p><p class="a-text">${esc(plain(p.text))}</p><div class="a-actions">${speech.ok ? `<button type="button" class="soft" data-say="${i}">Read aloud</button>` : ''}<button type="button" class="soft" data-open="${esc(p.ref)}">Read around it</button></div></li>`).join('')}</ol>`
-  box.querySelectorAll('[data-say]').forEach((b) => b.addEventListener('click', () => { const p = pars[Number(b.dataset.say)]; speech.say(`${plain(p.text)} Paper ${p.ref.replace(':', ', section ').replace('.', ', paragraph ')}.`) }))
+  box.querySelectorAll('[data-say]').forEach((b) => b.addEventListener('click', () => { const p = pars[Number(b.dataset.say)]; readWith(b, `${plain(p.text)} Paper ${p.ref.replace(':', ', section ').replace('.', ', paragraph ')}.`) }))
   box.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openRef(b.dataset.open)))
-  $('read-all')?.addEventListener('click', () => speech.say(pars.map((p) => plain(p.text)).join(' ')))
+  $('read-all')?.addEventListener('click', (e) => readWith(e.currentTarget, pars.map((p) => plain(p.text)).join(' ')))
 }
 
 // ---------- search ----------

@@ -86,10 +86,16 @@ export const speech = {
     u.rate = 0.92
     const en = englishVoices()
     u.voice = en.find((v) => v.name === chosen) || en[0] || null
-    if (onEnd) u.onend = onEnd
+    const done = () => { this.speaking = false; this.onchange?.(false); onEnd?.() }
+    u.onend = done
+    u.onerror = done
+    this.speaking = true
+    this.onchange?.(true)
     speechSynthesis.speak(u)
   },
-  stop() { if (this.ok) speechSynthesis.cancel() },
+  stop() { if (this.ok) speechSynthesis.cancel(); if (this.speaking) { this.speaking = false; this.onchange?.(false) } },
+  speaking: false,
+  onchange: null,
 }
 
 // ---------- listening (the browser's speech recognition, where the browser has it) ----------
