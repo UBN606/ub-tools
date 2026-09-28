@@ -33,6 +33,7 @@
   <div class="bar-right">
     <label class="voice-pick" id="voice-wrap" hidden><span class="sr">Reading voice</span><select id="voice" aria-label="Reading voice"></select></label>
     <button type="button" class="soft size help-btn" id="help-open">How to use</button>
+    <button type="button" class="soft size" id="study-open">Study list (<span id="study-count">0</span>)</button>
     <button type="button" class="soft size" id="bigger" aria-pressed="false">Larger text</button>
     <p class="status" id="status" role="status">Opening the book</p>
   </div>
@@ -114,6 +115,20 @@
     <button type="button" class="go" id="help-listen">Listen to these instructions</button>
     <button type="button" class="soft" id="help-close">Close</button>
   </div>
+</dialog>
+
+<dialog class="help study" id="study" aria-labelledby="study-title">
+  <h2 id="study-title" tabindex="-1">Your study list</h2>
+  <p class="help-free" id="study-empty">Nothing here yet. Press <strong>Add to study list</strong> under any paragraph to collect it here.</p>
+  <ol class="study-items" id="study-items"></ol>
+  <div class="help-actions">
+    <button type="button" class="go" id="study-print">Print the list</button>
+    <button type="button" class="soft" id="study-copy">Copy the list</button>
+    <button type="button" class="soft" id="study-email">Email the list</button>
+    <button type="button" class="soft" id="study-clear">Clear the list</button>
+    <button type="button" class="soft" id="study-close">Close</button>
+  </div>
+  <p class="a-note" id="study-note" aria-live="polite"></p>
 </dialog>
 
 <footer class="foot">

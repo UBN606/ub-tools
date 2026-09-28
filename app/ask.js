@@ -17,6 +17,7 @@ export const BOOK_TERMS = {
   satan: ['Satan', 'Lucifer'], forgive: ['forgiveness'], forgiveness: ['forgiveness'], suffering: ['suffering', 'adversity'],
   pain: ['suffering'], grief: ['sorrow'], love: ['love'], marriage: ['marriage'], children: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], kids: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], family: ['family'],
   reincarnation: ['reincarnation'], animals: ['animals'], pets: ['animals'], adam: ['Adam and Eve'], eve: ['Adam and Eve'],
+  abortion: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], embryo: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], conception: ['Adjusterless children', 'first moral decision'], unborn: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'],
   fetus: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], unborn: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], miscarriage: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], baby: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], babies: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], infant: ['Adjusterless children', 'infant-receiving schools'], infants: ['Adjusterless children', 'infant-receiving schools'], child: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], adjusterless: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], 'thought adjuster': ['Thought Adjuster'], adjuster: ['Thought Adjuster'],
   universe: ['universe'], purpose: ['purpose of life', 'perfection'], meaning: ['meaning of life', 'values'], happiness: ['happiness', 'joy'],
   fear: ['fear'], worry: ['anxiety', 'worry'], healing: ['healing'], miracle: ['miracles'], miracles: ['miracles'],
@@ -39,21 +40,29 @@ export function toBookTerms(question) {
 export function answer(E, question, { max = 5 } = {}) {
   const { words, mapped } = toBookTerms(question)
   const queries = []
-  if (words.length) queries.push({ q: words.join(' '), weight: 1 })
+  if (words.length) queries.push({ q: words.join(' '), weight: 1, label: words.join(' ') })
   // Specific subjects outrank general ones: a question about a child who dies is about the
   // probationary nursery first, the mansion worlds second.
   const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools'])
-  for (const t of mapped) queries.push({ q: t, weight: SPECIFIC.has(t) ? 3 : 1.2 })
-  const score = new Map()
-  for (const { q, weight } of queries) {
-    const r = E.search.searchUB({ query: q, limit: 25 })
+  for (const t of mapped) queries.push({ q: t, weight: SPECIFIC.has(t) ? 3 : 1.2, label: t })
+  const score = new Map(), why = new Map()
+  for (const { q, weight, label } of queries) {
+    const r = E.search.searchUB({ query: q, limit: 40 })
     r.results.forEach((x, i) => {
-      const s = (x.score / 100 + (25 - i) / 100) * weight
+      const s = (x.score / 100 + (40 - i) / 160) * weight
       score.set(x.ref, (score.get(x.ref) || 0) + s)
+      if (!why.has(x.ref)) why.set(x.ref, new Set())
+      why.get(x.ref).add(label)
     })
   }
-  const ranked = [...score.entries()].sort((a, b) => b[1] - a[1]).slice(0, max).map(([ref]) => ref)
-  return { refs: ranked, words, mapped }
+  const all = [...score.entries()].sort((a, b) => b[1] - a[1]).map(([ref]) => ref)
+  // Where the book is silent: a word of the question that the book uses rarely or never.
+  const quiet = []
+  for (const w of words) {
+    const r = E.search.searchUB({ query: w, limit: 3 })
+    if (r.total <= 3) quiet.push({ word: w, total: r.total, refs: r.results.map((x) => x.ref) })
+  }
+  return { refs: all.slice(0, max), more: all.slice(max, max + 10), why, words, mapped, quiet }
 }
 
 // ---------- reading aloud (the browser's own voice; free) ----------

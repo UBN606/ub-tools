@@ -381,3 +381,26 @@ html.big .share-btn { font-size: 18px; padding: 14px 17px; }
 .help-actions .soft { font-size: 18px; padding: 15px 22px; }
 html.big .help-steps { font-size: 22px; }
 @media (max-width: 560px) { .help { padding: 22px 18px; } .help-steps { font-size: 18px; } }
+
+/* ---------- honest answers, index, more, missed, study list ---------- */
+.silence { margin: 0 6px 18px; padding: 16px 20px; border-radius: 18px; background: #F6EFE3; color: #5A4520; font-size: 17px; line-height: 1.55; box-shadow: inset 2px 2px 5px rgba(160,130,80,.25); }
+.index-hint { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 6px 18px; }
+.a-why { margin: 10px 0 0; font-size: 14px; color: var(--faint); }
+.more { display: block; margin: 22px auto 0; font-size: 17px; padding: 14px 24px; }
+.missed { margin: 30px 6px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; color: var(--graphite); font-size: 16px; }
+.missed p { margin: 0; }
+.study-items { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 14px; max-height: 55vh; overflow: auto; }
+.study-items li { padding: 16px 18px; border-radius: 18px; background: var(--chalk); box-shadow: 6px 8px 16px var(--lift-dark), -4px -4px 10px var(--lift-light); }
+.study-items .a-text { font-size: 18px; margin: 6px 0 10px; }
+.study-add { margin-top: 10px; }
+html.big .a-why { font-size: 16px; }
+@media print {
+  .silence, .index-hint, .a-why, .more, .missed { display: none !important; }
+  body.print-study > *:not(#study) { display: none !important; }
+  body.print-study #study { display: block !important; position: static !important; box-shadow: none !important; background: none !important; max-height: none !important; width: auto !important; padding: 0 !important; }
+  body.print-study .help-actions, body.print-study .study-items button, body.print-study #study-note { display: none !important; }
+  body.print-study .study-items { max-height: none; overflow: visible; }
+  body.print-study .study-items li { box-shadow: none; background: none; border-bottom: 1px solid #bbb; border-radius: 0; break-inside: avoid; }
+  body.print-study .study-items .a-text { font: 15pt/1.6 Georgia, serif; color: #000; }
+  body.print-study #study::after { content: "From The Urantia Book, as found by UB Tools Studio: https://ubn606.github.io/ub-tools/app/  URANTIA BOOK NETWORK, urantiabooknetwork.com"; display: block; margin-top: 16pt; font: 10pt Arial, sans-serif; color: #444; }
+}
