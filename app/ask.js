@@ -15,8 +15,9 @@ export const BOOK_TERMS = {
   jesus: ['Jesus'], christ: ['Michael', 'Jesus'], pray: ['prayer'], prayer: ['prayer'], praying: ['prayer'],
   worship: ['worship'], faith: ['faith'], believe: ['faith'], sin: ['sin'], evil: ['evil'], devil: ['Lucifer', 'Caligastia'],
   satan: ['Satan', 'Lucifer'], forgive: ['forgiveness'], forgiveness: ['forgiveness'], suffering: ['suffering', 'adversity'],
-  pain: ['suffering'], grief: ['sorrow'], love: ['love'], marriage: ['marriage'], children: ['children'], family: ['family'],
+  pain: ['suffering'], grief: ['sorrow'], love: ['love'], marriage: ['marriage'], children: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], kids: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], family: ['family'],
   reincarnation: ['reincarnation'], animals: ['animals'], pets: ['animals'], adam: ['Adam and Eve'], eve: ['Adam and Eve'],
+  fetus: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], unborn: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], miscarriage: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], baby: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], babies: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], infant: ['Adjusterless children', 'infant-receiving schools'], infants: ['Adjusterless children', 'infant-receiving schools'], child: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], adjusterless: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], 'thought adjuster': ['Thought Adjuster'], adjuster: ['Thought Adjuster'],
   universe: ['universe'], purpose: ['purpose of life', 'perfection'], meaning: ['meaning of life', 'values'], happiness: ['happiness', 'joy'],
   fear: ['fear'], worry: ['anxiety', 'worry'], healing: ['healing'], miracle: ['miracles'], miracles: ['miracles'],
 }
@@ -39,7 +40,10 @@ export function answer(E, question, { max = 5 } = {}) {
   const { words, mapped } = toBookTerms(question)
   const queries = []
   if (words.length) queries.push({ q: words.join(' '), weight: 1 })
-  for (const t of mapped) queries.push({ q: t, weight: 1.2 })
+  // Specific subjects outrank general ones: a question about a child who dies is about the
+  // probationary nursery first, the mansion worlds second.
+  const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools'])
+  for (const t of mapped) queries.push({ q: t, weight: SPECIFIC.has(t) ? 3 : 1.2 })
   const score = new Map()
   for (const { q, weight } of queries) {
     const r = E.search.searchUB({ query: q, limit: 25 })
