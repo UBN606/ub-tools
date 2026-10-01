@@ -5,7 +5,7 @@
 // when the shell changes.
 'use strict'
 
-const VERSION = 'ub-tools-v4'
+const VERSION = 'ub-tools-v5'
 const SHELL_CACHE = VERSION + '-shell'
 const TEXT_CACHE = VERSION + '-text'
 const MAX_TEXT_ENTRIES = 250

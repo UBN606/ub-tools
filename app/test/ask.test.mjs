@@ -44,6 +44,19 @@ test('Jesus age question leads with the birth paragraph', () => {
   assert.ok(r.refs.slice(0, 5).includes('122:8.1'), `top 5 were: ${r.refs.join(',')}`)
 })
 
+test('morontia-at-the-resurrection question leads with the assembled-hosts paragraphs', () => {
+  const r = answer(E, 'Why were there morontia creatures on earth at the time of Jesus resurrection?')
+  assert.equal(r.refs[0], '189:0.1')
+  assert.equal(r.refs[1], '189:0.2')
+})
+
+test('everyday Jesus questions are untouched by the distinctive-words search', () => {
+  const teach = answer(E, 'What did Jesus teach?')
+  assert.deepEqual(teach.refs, ['163:2.4', '147:0.2', '151:1.1', '183:2.3', '196:2.1'])
+  const pray = answer(E, 'How did Jesus pray?')
+  assert.deepEqual(pray.refs, ['126:3.3', '144:1.10', '144:3.13', '196:0.10', '146:2.14'])
+})
+
 test('broad questions still answer through the term mappings', () => {
   const heaven = answer(E, 'where is heaven?')
   assert.deepEqual(heaven.refs, ['48:6.23', '15:7.5', '105:3.4', '45:1.2', '45:6.3'])

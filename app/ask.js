@@ -23,6 +23,7 @@ export const BOOK_TERMS = {
   universe: ['universe'], purpose: ['purpose of life', 'perfection'], meaning: ['meaning of life', 'values'], happiness: ['happiness', 'joy'],
   fear: ['fear'], worry: ['anxiety', 'worry'], healing: ['healing'], miracle: ['miracles'], miracles: ['miracles'],
   'how old': ['birth', 'born'],
+  earth: ['Urantia'],
 }
 const QUESTION_WORDS = new Set('what whats who whom whose when where why how which does do did is are was were will would can could should shall may might the a an of to in on for from with about into and or but if then than that this these those it its be been being have has had i me my we our you your they them their he him his she her there here say says said tell book urantia ub please'.split(' '))
 
@@ -46,8 +47,26 @@ export function answer(E, question, { max = 5 } = {}) {
   // and favor the book's birth sections about that subject.
   const ageQ = /\bhow old\b/i.test(question)
   const subjects = ageQ ? [...new Set(mapped.filter((t) => /^[A-Z][a-z]+$/.test(t)))] : []
+  // The question's most distinctive words (longer words are rarely glue like "at the time
+  // of"), with book-term substitutions where the book says it differently ("earth" ->
+  // "Urantia"): where they co-occur often names the passage ("morontia ... resurrection").
+  // (Age questions have their own machinery below; this would only add noise there.)
+  const distinctive = ageQ ? [] : words.filter((w) => w.length >= 5).map((w) => {
+    const m = BOOK_TERMS[w.toLowerCase()]
+    return m && m.length === 1 ? m[0] : w
+  })
+  // Only for questions with a genuinely rare word ("morontia", "resurrection"): on everyday
+  // questions ("what did Jesus teach?") the ordinary searches already do the right thing.
+  const distinctiveOn = distinctive.length >= 2 && distinctive.join(' ') !== words.join(' ') &&
+    distinctive.some((w) => w.length >= 8)
+  // A mapped term inside the distinctive set is covered by the distinctive query, which is
+  // strictly more specific ("Urantia" alone also matches mansion-world procedure).
+  const distinctiveSet = new Set(distinctive.map((w) => w.toLowerCase()))
   const queries = []
   if (words.length) queries.push({ q: words.join(' '), weight: 1, label: words.join(' '), ownWords: true })
+  if (distinctiveOn) {
+    queries.push({ q: distinctive.join(' '), weight: 1.5, label: distinctive.join(' '), ownWords: true })
+  }
   // Specific subjects outrank general ones: a question about a child who dies is about the
   // probationary nursery first, the mansion worlds second.
   const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools'])
@@ -55,6 +74,7 @@ export function answer(E, question, { max = 5 } = {}) {
   const skipBirth = ageQ && subjects.length > 0
   for (const t of mapped) {
     if (skipBirth && (t === 'birth' || t === 'born')) continue
+    if (distinctiveOn && distinctiveSet.has(t.toLowerCase())) continue
     queries.push({ q: t, weight: SPECIFIC.has(t) ? 3 : 1.2, label: t })
   }
   if (subjects.length) {
