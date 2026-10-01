@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UB Quote Verifier</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<main>
+  <h1>UB Quote Verifier</h1>
+  <p class="sub">Check an alleged quotation against the book's exact text.</p>
+
+  <div id="setup" hidden>
+    <p>First run: downloading the book's text from Urantiapedia (once, ~14&nbsp;MB). After that it works fully offline.</p>
+    <div class="progress"><div id="bar"></div></div>
+    <p id="progtext" class="muted">starting…</p>
+  </div>
+
+  <div id="form">
+    <label for="quote">Quoted words</label>
+    <textarea id="quote" rows="5" placeholder="Paste the alleged quotation here…"></textarea>
+    <div class="row">
+      <div class="citewrap">
+        <label for="citation">Citation</label>
+        <input id="citation" type="text" placeholder="180:2.1" spellcheck="false">
+      </div>
+      <button id="useSelection" type="button" title="Fill from the current page selection">Use page selection</button>
+    </div>
+    <button id="check" type="button">Check quote</button>
+    <p id="hint" class="muted">Tip: select text on any page, right-click → <b>Verify UB quote</b>.</p>
+  </div>
+
+  <section id="result" hidden aria-live="polite">
+    <div id="badge"></div>
+    <p id="detail"></p>
+    <div id="changes"></div>
+    <div id="context"></div>
+  </section>
+
+  <footer class="muted">Text: Urantiapedia (CC BY-SA 4.0), cached on this computer. Nothing you check is sent anywhere.</footer>
+</main>
+<script src="js/ext.js"></script>
+<script src="js/verify-core.js"></script>
+<script src="js/text-source.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

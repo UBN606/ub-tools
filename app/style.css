@@ -7,8 +7,8 @@
   --chalk: #F2F1EE;       /* raised surfaces */
   --basin: #E1DED9;       /* pressed-in surfaces */
   --ink: #2B2E33;         /* slate */
-  --graphite: #6A6D72;
-  --faint: #8E9095;
+  --graphite: #5F6267;
+  --faint: #64676D;
   --lapis: #46618A;       /* focus and selection only */
   --lapis-soft: rgba(70, 97, 138, .14);
   --pass: #4F6F5B;
@@ -407,3 +407,138 @@ html.big .a-why { font-size: 16px; }
 
 .deeper { margin: 26px 6px 0; font-size: 16px; color: var(--graphite); }
 @media print { .deeper { display: none !important; } }
+
+/* ---------- top-level Studio nav: one clean view per feature ---------- */
+.topnav {
+  position: relative; display: inline-grid; grid-auto-flow: column; gap: 2px;
+  padding: 5px; border-radius: 16px; background: var(--basin); margin: 2px 0 18px;
+  box-shadow: inset 3px 3px 6px var(--press-dark), inset -3px -3px 6px var(--press-light);
+}
+.topnav button {
+  position: relative; z-index: 1; border: 0; background: none; cursor: pointer;
+  font: 600 14.5px/1 var(--sans); color: var(--graphite); padding: 11px 20px; border-radius: 12px;
+  transition: color .25s;
+}
+.topnav button[aria-current="true"] { color: var(--ink); }
+.topnav-thumb {
+  position: absolute; z-index: 0; top: 5px; bottom: 5px; left: 5px; width: 0; border-radius: 12px;
+  background: linear-gradient(160deg, #FBFAF8, #EFEDE9);
+  box-shadow: 4px 5px 10px var(--lift-dark), -3px -3px 7px var(--lift-light);
+  transition: transform .35s cubic-bezier(.3, .9, .3, 1), width .35s cubic-bezier(.3, .9, .3, 1);
+}
+.slab-title { margin: 2px 6px 14px; font: 600 20px/1.3 var(--sans); letter-spacing: -.015em; }
+
+/* ---------- explore: visuals + quote cards ---------- */
+.x-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin: 0 2px 8px; }
+.x-card {
+  display: block; padding: 18px; border-radius: 20px; text-decoration: none; color: var(--ink);
+  background: var(--chalk); box-shadow: 8px 10px 20px var(--lift-dark), -5px -5px 12px var(--lift-light);
+}
+.x-card strong { display: block; font: 600 16px/1.3 var(--sans); margin-bottom: 6px; }
+.x-card span { display: block; font-size: 13.5px; color: var(--graphite); }
+.x-card .x-open { margin-top: 10px; color: var(--lapis); font-weight: 600; }
+.x-card.x-soon { opacity: .65; }
+.x-quote blockquote { margin: 0 0 10px; font: 400 17px/1.5 var(--serif); }
+.x-quote figcaption { font-size: 13.5px; color: var(--lapis); font-weight: 600; margin-bottom: 10px; }
+.x-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip.on { box-shadow: inset 2px 2px 5px var(--press-dark), inset -2px -2px 5px var(--press-light); color: var(--ink); }
+
+/* ---------- read-along ---------- */
+.ra-why { color: var(--graphite); font-size: 15px; margin: 0 0 4px; }
+.ra-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 12px 0; }
+.ra-label { display: inline-flex; align-items: center; gap: 8px; font: 600 14px/1 var(--sans); color: var(--ink); }
+.ra-select, #ra-file { font: 500 15px/1.2 var(--sans); color: var(--ink); padding: 10px 12px; border-radius: var(--r-control); border: 0; background: linear-gradient(160deg, #FBFAF8, #ECEAE6); box-shadow: 3px 4px 8px var(--lift-dark), -2px -2px 6px var(--lift-light); }
+.ra-select { max-width: 320px; }
+.ra-status { min-height: 1.4em; color: var(--graphite); font-size: 15px; margin: 6px 0; }
+.ra-audio { width: 100%; margin: 4px 0 8px; }
+.ra-text { margin-top: 8px; }
+.ra-para { margin: 18px 0; padding: 14px 16px; border-radius: 16px; }
+.ra-para.ra-now-para { outline: 3px solid var(--fix); outline-offset: 5px; background: #FBF7F0; }
+.ra-ref { font: 700 14px/1.4 var(--sans); color: var(--fix); margin: 0 0 8px; }
+.ra-text-line { font: 400 19px/1.75 var(--serif); color: var(--ink); margin: 0; }
+.ra-word { border-radius: 3px; padding: 0 1px; }
+.ra-word.ra-now { background: #F6E7C1; box-shadow: inset 0 -3px 0 var(--fix); }
+.ra-word[data-x="0"].ra-now { background: #F1EAD9; box-shadow: inset 0 -3px 0 rgba(138,90,31,.35); }
+.ra-fallback p { color: var(--graphite); font-size: 16px; max-width: 60ch; }
+html.big .ra-text-line { font-size: 24px; }
+html.big .ra-select, html.big .ra-label { font-size: 18px; }
+
+/* ---------- plans & quiz ---------- */
+.plan { padding: 20px; border-radius: 20px; background: var(--chalk); box-shadow: 8px 10px 20px var(--lift-dark), -5px -5px 12px var(--lift-light); margin-bottom: 18px; }
+.plan h3 { margin: 0 0 6px; font: 600 17px/1.3 var(--sans); }
+.plan-blurb { margin: 0 0 8px; font-size: 14px; color: var(--graphite); }
+.plan-meta { display: flex; gap: 12px; font-size: 13.5px; color: var(--graphite); margin-bottom: 6px; }
+.plan-bar { background: var(--basin); border-radius: 999px; height: 10px; margin: 8px 0; overflow: hidden; box-shadow: inset 2px 2px 4px var(--press-dark); }
+.plan-fill { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--lapis), #6E8AB5); transition: width .3s; }
+.plan-actions { display: flex; gap: 10px; margin: 10px 0 4px; }
+.plan-days { margin-top: 10px; }
+.plan-days .row { display: flex; align-items: center; gap: 8px; }
+.plan-days .row > button { flex: 1; text-align: left; }
+.resume-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px 18px; border-radius: 18px; background: var(--basin); box-shadow: inset 3px 3px 6px var(--press-dark), inset -3px -3px 6px var(--press-light); margin-bottom: 18px; font-size: 14.5px; }
+.quiz-bar { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+.quiz-body { max-width: 720px; }
+.quiz-quote { font: 400 21px/1.6 var(--serif) !important; margin: 14px 2px 18px !important; }
+.quiz-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin: 6px 0 4px; }
+.quiz-typein { display: flex; gap: 10px; margin: 6px 0 4px; flex-wrap: wrap; }
+.quiz-typein input { flex: 1; min-width: 200px; font: 500 16px/1.2 var(--sans); color: var(--ink); padding: 12px 14px; border-radius: var(--r-control); border: 0; background: var(--basin); box-shadow: inset 3px 3px 6px var(--press-dark), inset -3px -3px 6px var(--press-light); }
+.quiz-actions { display: flex; gap: 10px; margin-top: 14px; }
+.quiz .soft[data-pick].quiz-right { outline: 3px solid var(--pass); }
+.quiz .soft[data-pick].quiz-wrong { outline: 3px solid #A4442F; }
+html.big .quiz-quote { font-size: 25px !important; }
+@media print { .topnav { display: none !important; } }
+
+/* ---------- text size: compact (A−) and extra large (A+) ----------
+   Level 2 reuses the existing html.big rules; level 1 is the default. */
+html.compact body{font-size:15px}
+html.compact .answer .a-text{font-size:19px}
+html.compact .answer .a-ref{font-size:25px}
+html.compact .t-text{font-size:17px}
+html.compact .well input{font-size:26px}
+html.compact .ra-text-line{font-size:20px}
+html.bigger body{font-size:21px}
+html.bigger .well input{font-size:34px}
+html.bigger .answer .a-text{font-size:28px}
+html.bigger .answer .a-ref{font-size:31px}
+html.bigger .t-text{font-size:23px}
+html.bigger .ra-text-line{font-size:27px}
+html.bigger .quiz-quote{font-size:28px !important}
+html.bigger .help-steps{font-size:24px}
+html.bigger .help-steps li{padding-left:56px}
+html.bigger .modes button,html.bigger .topnav button{font-size:19px}
+
+/* ---------- dark mode (html[data-theme="dark"]) ---------- */
+html[data-theme="dark"]{color-scheme:dark;--ground:#24262B;--chalk:#2E3138;--basin:#2A2C32;--ink:#ECE9E2;--graphite:#B9B5AA;--faint:#94918A;--lapis:#9DB6DC;--lapis-soft:rgba(157,182,220,.18);--pass:#93B89E;--fix:#D9A55C;--lift-dark:rgba(0,0,0,.55);--lift-light:rgba(255,255,255,.07);--press-dark:rgba(0,0,0,.5);--press-light:rgba(255,255,255,.06)}
+html[data-theme="dark"] body{background:radial-gradient(1200px 700px at 15% -10%,#30333A 0%,transparent 60%),radial-gradient(900px 600px at 110% 110%,#1D1F24 0%,transparent 55%),var(--ground)}
+html[data-theme="dark"] .slab{background:linear-gradient(155deg,#35383F,#2F3239 45%,#2B2E35)}
+html[data-theme="dark"] .modes-thumb,html[data-theme="dark"] .topnav-thumb{background:linear-gradient(160deg,#3B3E45,#33363D)}
+@media (max-width:680px){html[data-theme="dark"] .modes .soft[aria-selected="true"]{background:linear-gradient(160deg,#3B3E45,#33363D)}}
+html[data-theme="dark"] .well{background:linear-gradient(160deg,#202227,#26282E 60%,#2A2C33)}
+html[data-theme="dark"] .chip{background:linear-gradient(160deg,#3B3E45,#33363D)}
+html[data-theme="dark"] .tablet-inner{background:linear-gradient(165deg,#34373D,#2D3036)}
+html[data-theme="dark"] .player{background:linear-gradient(160deg,#36393F,#2E3138)}
+html[data-theme="dark"] .player .p-wrap{box-shadow:12px 16px 36px rgba(0,0,0,.5)}
+html[data-theme="dark"] .soft,html[data-theme="dark"] .close,html[data-theme="dark"] .mic,html[data-theme="dark"] .p-controls button,html[data-theme="dark"] .ra-select,html[data-theme="dark"] .voice-pick select,html[data-theme="dark"] .s-print,html[data-theme="dark"] .s-copy{background:linear-gradient(160deg,#3B3E45,#32353C)}
+html[data-theme="dark"] .help{background:linear-gradient(165deg,#34373D,#2C2F35)}
+html[data-theme="dark"] .help{box-shadow:20px 24px 50px rgba(0,0,0,.5)}
+html[data-theme="dark"] .help::backdrop{background:rgba(8,9,12,.7)}
+html[data-theme="dark"] .tablet .tablet-inner{background:linear-gradient(165deg,#34373D,#2D3036)}
+@media (max-width:820px){html[data-theme="dark"] .tablet.open .tablet-backdrop{background:rgba(10,11,14,.6)}}
+html[data-theme="dark"] .answer li.now-reading,html[data-theme="dark"] .ra-para.ra-now-para{background:#33302A}
+html[data-theme="dark"] .ra-word.ra-now{background:#4A3F28}
+html[data-theme="dark"] .ra-word[data-x="0"].ra-now{background:#3A352B;box-shadow:inset 0 -3px 0 rgba(217,165,92,.6)}
+html[data-theme="dark"] .silence{background:#35301F;color:#E3C98F}
+html[data-theme="dark"] .row > button:hover{background:rgba(255,255,255,.07)}
+html[data-theme="dark"] mark{background:linear-gradient(transparent 55%,rgba(157,182,220,.28) 55%)}
+/* white text would fail on the lighter dark-mode button greens/ambers: use dark text */
+html[data-theme="dark"] .verdict .seal{color:#23262B}
+html[data-theme="dark"] .stop-bar,html[data-theme="dark"] .p-stop,html[data-theme="dark"] .mic.listening{color:#2A2013}
+
+/* ---------- accessible tap targets (44px) ---------- */
+.soft,.go,.chip,.topnav button,.modes button,.mic,.p-controls button,.share-btn,.quiz-typein input,.voice-pick select,.ra-select,.sel-bar button,.row > button{min-height:44px}
+.close{width:44px;height:44px}
+.quiz .soft[data-pick]{min-height:44px}
+.read-toggle{position:relative}
+.read-toggle::before{content:"";position:absolute;inset:-12px}
+.soft:disabled{opacity:.45;cursor:default}
+.a11y-btns{display:flex;gap:8px;align-items:center}
+.size-group{display:flex;gap:6px;align-items:center}

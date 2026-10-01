@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+/* Shared display prefs with UB Tools Studio (localStorage). Runs pre-paint to avoid a flash. */
+try{
+var g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
+var t=g('ub-tools-theme');try{t=JSON.parse(t)}catch(e){}
+if(t!=='dark'&&t!=='light'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
+document.documentElement.setAttribute('data-theme',t);
+var s=g('ub-tools-text-size');try{s=JSON.parse(s)}catch(e){}
+var n=(typeof s==='number'&&isFinite(s))?Math.max(0,Math.min(3,Math.floor(s))):1;
+document.documentElement.style.fontSize=[90,100,112,125][n]+'%';
+}catch(e){}
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family Trees — The Urantia Book Genealogies</title>
+<meta name="description" content="Clickable SVG family trees of the lineages traced in The Urantia Book. Every relationship verified against the book text.">
+<style>
+  :root{
+    --bg:#0f1116; --panel:#161821; --panel2:#1b1e29; --line:#2a2e3b;
+    --ink:#e9e6dc; --muted:#a09a8b; --faint:#7b8494;
+    --gold:#c9a44a; --gold-soft:rgba(201,164,74,.16); --gold-dim:#8a7134;
+    --node:#1d2029; --node-line:#3a4052;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;
+  }
+  header.bar{
+    display:flex; align-items:center; gap:14px;
+    padding:18px 26px; border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#14161d,#0f1116);
+  }
+  .mark{width:34px;height:34px;flex:none}
+  header.bar h1{
+    font-family:Georgia,"Times New Roman",serif; font-weight:500; font-size:1.45rem;
+    margin:0; letter-spacing:.02em; color:var(--ink);
+  }
+  header.bar h1 .g{color:var(--gold)}
+  header.bar p{margin:2px 0 0; color:var(--muted); font-size:.86rem}
+  nav.tabs{
+    display:flex; gap:8px; padding:16px 26px 0; flex-wrap:wrap;
+  }
+  nav.tabs button{
+    appearance:none; border:1px solid var(--line); background:var(--panel);
+    color:var(--muted); padding:9px 18px; border-radius:999px; cursor:pointer;
+    font-size:.92rem; letter-spacing:.01em; transition:all .15s ease;
+  }
+  nav.tabs button:hover{color:var(--ink); border-color:var(--gold-dim)}
+  nav.tabs button[aria-selected="true"]{
+    background:var(--gold-soft); border-color:var(--gold); color:var(--gold);
+    font-weight:600;
+  }
+  main.layout{
+    display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:18px;
+    padding:16px 26px 8px; align-items:start;
+  }
+  @media (max-width:980px){ main.layout{grid-template-columns:1fr} }
+  section.canvas{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    overflow:hidden; min-height:420px;
+  }
+  .intro{padding:16px 20px 4px; color:var(--muted); font-size:.9rem}
+  .intro strong{color:var(--ink); font-weight:600}
+  #tree{width:100%; height:auto; display:block}
+  .legend{
+    display:flex; gap:18px; flex-wrap:wrap; padding:10px 20px 16px;
+    color:var(--faint); font-size:.8rem; align-items:center;
+  }
+  .legend svg{vertical-align:-3px; margin-right:6px}
+  aside.panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:20px; position:sticky; top:16px;
+  }
+  aside.panel h2{
+    font-family:Georgia,serif; font-weight:500; font-size:1.25rem; margin:0 0 4px; color:var(--gold);
+  }
+  aside.panel .rel{color:var(--muted); font-size:.9rem; margin:0 0 12px}
+  aside.panel .refs{display:flex; flex-wrap:wrap; gap:6px; margin:0 0 12px}
+  aside.panel .refs span{
+    font-size:.75rem; color:var(--gold); border:1px solid var(--gold-dim);
+    border-radius:6px; padding:2px 8px; background:var(--gold-soft);
+  }
+  aside.panel blockquote{
+    margin:0 0 12px; padding:10px 14px; border-left:3px solid var(--gold);
+    background:var(--panel2); border-radius:0 8px 8px 0;
+    font-family:Georgia,serif; font-style:italic; color:#d8d4c6; font-size:.94rem;
+  }
+  aside.panel .note{font-size:.85rem; color:var(--muted); margin:0 0 12px}
+  aside.panel .kin{font-size:.85rem; color:var(--faint); margin:0}
+  aside.panel .kin b{color:var(--muted); font-weight:600}
+  aside.panel .hint{color:var(--faint); font-size:.88rem}
+  footer.notes{
+    margin:14px 26px 40px; padding:18px 22px;
+    border:1px solid var(--line); border-radius:14px; background:#12141b;
+    color:var(--muted); font-size:.85rem;
+  }
+  footer.notes h3{margin:0 0 8px; font-size:.95rem; color:var(--gold); font-family:Georgia,serif; font-weight:500}
+  footer.notes ul{margin:0; padding-left:20px}
+  footer.notes li{margin:5px 0}
+  footer.notes .src{color:var(--faint); font-size:.8rem; margin-top:10px}
+  .node{cursor:pointer}
+  .node rect.body{fill:var(--node); stroke:var(--node-line); stroke-width:1.5}
+  .node:hover rect.body{stroke:var(--gold-dim)}
+  .node.selected rect.body{stroke:var(--gold); stroke-width:2.5}
+  .node text{fill:var(--ink); font-size:13px; font-weight:600}
+  .node .reftag{fill:var(--faint); font-size:10px; font-weight:400}
+  .node.unlinked rect.body{stroke-dasharray:6 4}
+  .edge{fill:none; stroke:var(--gold-dim); stroke-width:1.6}
+  .edge.adoptive{stroke-dasharray:7 5}
+  .edge-label{fill:var(--gold); font-size:10px; font-style:italic}
+  .band-label{fill:var(--faint); font-size:12px; font-style:italic}
+
+/* display-settings pill (theme + text size; prefs shared with Studio via localStorage) */
+.ub-a11y{position:fixed;top:10px;right:10px;z-index:60;display:flex;gap:6px;align-items:center;padding:6px;border-radius:999px;border:1px solid var(--line);background:var(--panel);box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.ub-a11y button{min-width:44px;min-height:44px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink,var(--text,#ece9e1));font:600 14px/1 system-ui,sans-serif;cursor:pointer;padding:0 10px}
+.ub-a11y button:hover{border-color:var(--gold)}
+.ub-a11y button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.ub-a11y button:disabled{opacity:.4;cursor:default}
+.ub-a11y button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+:root{color-scheme:dark}
+[data-theme="light"]{color-scheme:light}
+/* light mode (default on this page is dark); tree nodes are already 150x62px tap targets */
+nav.tabs button{min-height:44px}
+.node:focus-visible{outline:none}
+.node:focus-visible .body{stroke:var(--gold);stroke-width:2.5}
+[data-theme="light"]{--bg:#f5f1e8;--panel:#fbf8f1;--panel2:#f3edde;--line:#ddd3c0;--ink:#2b2620;--muted:#6b6257;--faint:#9a9084;--gold:#8a5a1f;--gold-soft:rgba(138,90,31,.12);--gold-dim:#b08a3a;--node:#fdfbf5;--node-line:#c9bfa9}
+[data-theme="light"] nav.tabs button:hover{border-color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="ub-a11y" role="group" aria-label="Display settings">
+<button type="button" id="ub-theme" aria-pressed="false">☀ Light</button>
+<button type="button" id="ub-sdec" aria-label="Smaller text">A−</button>
+<button type="button" id="ub-sreset" aria-label="Default text size" aria-pressed="true">A</button>
+<button type="button" id="ub-sinc" aria-label="Larger text">A+</button>
+</div>
+<header class="bar">
+  <svg class="mark" viewBox="0 0 40 40" aria-hidden="true">
+    <circle cx="20" cy="20" r="17" fill="none" stroke="#c9a44a" stroke-width="2"/>
+    <circle cx="20" cy="20" r="6.5" fill="#c9a44a"/>
+    <circle cx="14" cy="14" r="2.5" fill="#c9a44a" opacity=".55"/>
+    <circle cx="26" cy="14" r="2.5" fill="#c9a44a" opacity=".55"/>
+    <circle cx="20" cy="29" r="2.5" fill="#c9a44a" opacity=".55"/>
+  </svg>
+  <div>
+    <h1>Family <span class="g">Trees</span></h1>
+    <p>Genealogies traced in The Urantia Book — every name, link, and citation verified against the text.</p>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Family trees" id="tabs"></nav>
+
+<main class="layout">
+  <section class="canvas" aria-label="Family tree diagram">
+    <p class="intro" id="intro"></p>
+    <svg id="tree" role="img" aria-label="Family tree"></svg>
+    <div class="legend" id="legend">
+      <span><svg width="34" height="10"><line x1="0" y1="5" x2="34" y2="5" stroke="#8a7134" stroke-width="2"/></svg>parent → child</span>
+      <span><svg width="34" height="10"><line x1="0" y1="5" x2="34" y2="5" stroke="#8a7134" stroke-width="2" stroke-dasharray="5 4"/></svg>adoptive link</span>
+      <span><svg width="34" height="14"><rect x="1" y="1" width="32" height="12" rx="3" fill="none" stroke="#3a4052" stroke-width="1.5" stroke-dasharray="5 3"/></svg>named in text, relationship/order not stated</span>
+    </div>
+  </section>
+  <aside class="panel" id="panel" aria-live="polite"></aside>
+</main>
+
+<footer class="notes">
+  <h3>What the text does not say (doctrinal review notes)</h3>
+  <ul>
+    <li><b>Joseph's parents</b> are never named in the book (122:7.4 mentions only that his father "had been recently disabled"). Joseph therefore stands without a parent link — the dashed gold line from <b>Zadoc</b> marks the one stated connection: Zadoc adopted Joseph's paternal orphan ancestor six generations back (122:4.3).</li>
+    <li><b>Mary's siblings</b>: "two brothers and two sisters" (122:3.3); only <b>Salome</b> is named. The other three are omitted rather than invented.</li>
+    <li><b>Mary's ancestral women</b> (Annon, Tamar, Ruth, Bathsheba, Ansie, Cloa, Eve, Enta, Ratta — 122:1.2): the text gives no order or parent–child chain, so they are shown unlinked below the tree.</li>
+    <li><b>Amosad's</b> descent from Seth's line is not stated (78:5.1, 92:5.9); he is shown unlinked under the Sethite tree.</li>
+    <li><b>Adamson and Ratta's sixty-seven children</b> (77:5.6) are unnamed in the text — including the unique children who originated the secondary midwayers — so no nodes are drawn for them.</li>
+    <li>Joseph's deep ancestry "back to the days of Abraham ... to Andon and Fonta" (122:1.1) refers to racial stocks, not named individuals; it is recorded in his panel, not drawn. The book explicitly corrects the biblical genealogies: David and Solomon are <i>not</i> in Joseph's direct line, and his lineage does <i>not</i> go directly back to Adam (122:1.1).</li>
+  </ul>
+  <p class="src">Quotations are short exact excerpts from The Urantia Book with paragraph citations (paper:section.paragraph). Verify any doctrinal question against the full text with the repo's <i>ub-search.js</i>.</p>
+</footer>
+
+<script id="genealogy-data" type="application/json">
+{
+  "trees": [
+    {
+      "id": "adam",
+      "title": "Adam's Descendants",
+      "papers": "Papers 74–78",
+      "intro": "The children of Adam and Eve <strong>named</strong> in the text. Only explicitly stated parent–child links are drawn — Adamson and Ratta's sixty-seven children are unnamed in the text and do not appear."
+    },
+    {
+      "id": "seth",
+      "title": "The Sethite Priesthood",
+      "papers": "Papers 76, 78, 92",
+      "intro": "The priesthood founded by Seth, Adam's son. The chain Seth → Enos → Kenan is the only multi-generation succession the text names; Amosad, who regenerated the order about 15,000 B.C., is shown unlinked because his descent is not stated."
+    },
+    {
+      "id": "jesus",
+      "title": "The Family of Jesus",
+      "papers": "Paper 122 and related",
+      "intro": "The Nazareth family. Joseph's parents are never named in the book; the dashed line from Zadoc marks the one stated link — an adoption six generations back. Mary's nine named ancestral women are listed unlinked because the text gives no order."
+    }
+  ],
+  "persons": [
+    {"id":"adam-adam","name":"Adam","tree":"adam","refs":["76:4.1"],
+     "rel":"Founder of the violet race, with Eve; father of the line below.",
+     "quote":"Adam and Eve were the founders of the violet race of men, the ninth human race to appear on Urantia."},
+    {"id":"adam-eve","name":"Eve","tree":"adam","refs":["74:6.2"],
+     "rel":"Mother of Adam's children.",
+     "quote":"She bore sixty-three children, thirty-two daughters and thirty-one sons, before the default."},
+    {"id":"adam-adamson","name":"Adamson","tree":"adam","refs":["76:3.3","77:5.2"],
+     "rel":"First (eldest) son of Adam and Eve.",
+     "quote":"Adam's first son, Adamson (Adam ben Adam), founded a secondary center of the violet race to the north of the second Eden.",
+     "note":"Adamson and Ratta had sixty-seven children (77:5.6), none named in the text — including the unique children who originated the secondary midwayers. They are not drawn."},
+    {"id":"adam-ratta","name":"Ratta","tree":"adam","refs":["77:5.5"],
+     "rel":"Wife of Adamson; last pure-line descendant of the Prince's staff.",
+     "quote":"This woman, Ratta, said that her ancestors were all descendants of two of the fallen staff of the Prince."},
+    {"id":"adam-eveson","name":"Eveson","tree":"adam","refs":["76:3.3"],
+     "rel":"Second son of Adam and Eve.",
+     "quote":"Adam's second son, Eveson, became a masterly leader and administrator; he was the great helper of his father."},
+    {"id":"adam-jansad","name":"Jansad","tree":"adam","refs":["76:3.3"],
+     "rel":"Eldest son of Eveson; successor of Adam as head of the Adamite tribes.",
+     "quote":"his eldest son, Jansad, became the successor of Adam as the head of the Adamite tribes."},
+    {"id":"adam-abel","name":"Abel","tree":"adam","refs":["76:2.1","76:2.4"],
+     "rel":"Son of both Adam and Eve; slain by his brother Cain.",
+     "quote":"Abel was born, the first child of Adam and Eve to be born in the second garden."},
+    {"id":"adam-cain","name":"Cain","tree":"adam","refs":["76:2.4","75:5.3"],
+     "rel":"Son of Eve and Cano the Nodite — Adam was not his father.",
+     "quote":"Abel knew he was the son of both Adam and Eve and never failed to impress upon Cain that Adam was not his father.",
+     "note":"The book departs from the Genesis account here: Cain's father was Cano, a Nodite leader (75:3.7, 75:5.3), not Adam."},
+    {"id":"adam-cano","name":"Cano","tree":"adam","refs":["75:3.7","75:5.3"],
+     "rel":"Nodite leader; father of Cain.",
+     "quote":"Cano, the most brilliant mind and active leader of the near-by colony of friendly Nodites."},
+    {"id":"adam-remona","name":"Remona","tree":"adam","refs":["76:2.9"],
+     "rel":"Wife of Cain; his distant cousin.",
+     "quote":"Cain married Remona, his distant cousin, and their first son, Enoch, became the head of the Elamite Nodites."},
+    {"id":"adam-enoch","name":"Enoch","tree":"adam","refs":["76:2.9"],
+     "rel":"First son of Cain and Remona; head of the Elamite Nodites.",
+     "quote":"their first son, Enoch, became the head of the Elamite Nodites."},
+    {"id":"adam-seth","name":"Seth","tree":"adam","refs":["76:3.4"],
+     "rel":"Eldest surviving son of Adam and Eve born in the second garden.",
+     "quote":"Seth, the eldest surviving son of Adam and Eve born in the second garden."},
+
+    {"id":"seth-adam","name":"Adam","tree":"seth","refs":["76:4.1"],
+     "rel":"Father of Seth.",
+     "quote":"Adam and Eve were the founders of the violet race of men, the ninth human race to appear on Urantia."},
+    {"id":"seth-eve","name":"Eve","tree":"seth","refs":["74:6.2"],
+     "rel":"Mother of Seth.",
+     "quote":"She bore sixty-three children, thirty-two daughters and thirty-one sons, before the default."},
+    {"id":"seth-seth","name":"Seth","tree":"seth","refs":["76:3.4"],
+     "rel":"Eldest surviving son of Adam and Eve born in the second garden; founder of the priesthood.",
+     "quote":"becoming the head of the new priesthood of the second garden."},
+    {"id":"seth-enos","name":"Enos","tree":"seth","refs":["76:3.4"],
+     "rel":"Son of Seth.",
+     "quote":"His son, Enos, founded the new order of worship"},
+    {"id":"seth-kenan","name":"Kenan","tree":"seth","refs":["76:3.4"],
+     "rel":"Grandson of Seth — son of Enos.",
+     "quote":"his grandson, Kenan, instituted the foreign missionary service to the surrounding tribes, near and far."},
+    {"id":"seth-amosad","name":"Amosad","tree":"seth","refs":["78:5.1","92:5.9"],"unlinked":true,
+     "rel":"Leader of the regeneration of the Sethite priesthood about 15,000 B.C. The text does not state his descent from Seth.",
+     "quote":"the regeneration of the Sethite priesthood and the leadership of Amosad inaugurated a brilliant era.",
+     "note":"The regenerated Sethites 'have continued to the present time as the Brahmans of the Hindu faith' (92:5.9)."},
+
+    {"id":"jesus-joachim","name":"Joachim","tree":"jesus","refs":["122:3.3"],
+     "rel":"Mary's father.",
+     "quote":"Mary went to visit her parents, Joachim and Hannah."},
+    {"id":"jesus-hannah","name":"Hannah","tree":"jesus","refs":["122:3.3"],
+     "rel":"Mary's mother.",
+     "quote":"Mary went to visit her parents, Joachim and Hannah."},
+    {"id":"jesus-joseph","name":"Joseph","tree":"jesus","refs":["122:1.1","122:4.3"],
+     "rel":"Human father of Jesus (Joshua ben Joseph). His own parents are never named in the text.",
+     "quote":"Joseph, the human father of Jesus (Joshua ben Joseph), was a Hebrew of the Hebrews",
+     "note":"Per 122:1.1 his ancestry 'went back to the days of Abraham and through this venerable patriarch to the earlier lines of inheritance leading to the Sumerians and Nodites and, through the southern tribes of the ancient blue man, to Andon and Fonta' — racial stocks, not named individuals, so they are not drawn. David and Solomon were NOT in his direct line, and his lineage did not go directly back to Adam."},
+    {"id":"jesus-mary","name":"Mary","tree":"jesus","refs":["122:1.2","122:3.3"],
+     "rel":"Earth mother of Jesus; daughter of Joachim and Hannah.",
+     "quote":"Mary, the earth mother of Jesus, was a descendant of a long line of unique ancestors",
+     "note":"Racially 'a composite of Syrian, Hittite, Phoenician, Greek, and Egyptian stocks' (122:1.2). She had two brothers and two sisters; only her sister Salome is named (122:3.3)."},
+    {"id":"jesus-salome","name":"Salome","tree":"jesus","refs":["122:3.3"],
+     "rel":"Mary's sister (one of two sisters and two brothers; the other three are unnamed).",
+     "quote":"But Mary did confide to her sister Salome that she thought her son was destined to become a great teacher."},
+    {"id":"jesus-zadoc","name":"Zadoc","tree":"jesus","refs":["122:4.3"],
+     "rel":"Direct descendant of David who adopted Joseph's paternal orphan ancestor six generations back; hence Joseph is reckoned of the 'house of David'.",
+     "quote":"Joseph's paternal ancestor of that generation, being an orphan, was adopted by one Zadoc, who was a direct descendant of David"},
+    {"id":"jesus-jesus","name":"Jesus","tree":"jesus","refs":["122:1.1","122:1.3"],
+     "rel":"Son of Joseph and Mary — the bestowal of Michael.",
+     "quote":"It was the plan of Michael to appear on earth as an average man, that the common people might understand him and receive him"},
+    {"id":"jesus-james","name":"James","tree":"jesus","refs":["137:3.3"],
+     "rel":"Brother of Jesus.",
+     "quote":"Jude was present at Jesus' baptism and, with his brother James, had become a firm believer in Jesus' mission on earth."},
+    {"id":"jesus-miriam","name":"Miriam","tree":"jesus","refs":["123:2.3"],
+     "rel":"Sister of Jesus.",
+     "quote":"Jesus was made very happy by the coming of his sister Miriam"},
+    {"id":"jesus-joseph2","name":"Joseph","tree":"jesus","refs":["134:1.3"],
+     "rel":"Brother of Jesus (named for his father).",
+     "quote":"spent some time at the repair shop with his brother Joseph"},
+    {"id":"jesus-simon","name":"Simon","tree":"jesus","refs":["128:3.7"],
+     "rel":"Brother of Jesus.",
+     "quote":"He had always loved Jesus, but now he felt that he had begun to know his father-brother."},
+    {"id":"jesus-martha","name":"Martha","tree":"jesus","refs":["124:1.7"],
+     "rel":"Second sister of Jesus.",
+     "quote":"Jesus' second sister, Martha, was born Thursday night, September 13."},
+    {"id":"jesus-jude","name":"Jude","tree":"jesus","refs":["137:3.3"],
+     "rel":"Brother of Jesus.",
+     "quote":"Jude was present at Jesus' baptism and, with his brother James, had become a firm believer in Jesus' mission on earth."},
+    {"id":"jesus-amos","name":"Amos","tree":"jesus","refs":["124:4.3"],
+     "rel":"Younger brother of Jesus.",
+     "quote":"the two younger children, Amos and Ruth"},
+    {"id":"jesus-ruth","name":"Ruth","tree":"jesus","refs":["186:0.3"],
+     "rel":"Youngest sister of Jesus.",
+     "quote":"his sister Ruth refused to remain behind"},
+
+    {"id":"jesus-annon","name":"Annon","tree":"jesus","refs":["122:1.2"],"unlinked":true,
+     "rel":"One of Mary's named ancestors; her exact place in the line is not given in the text.",
+     "quote":"she reckoned among her ancestors such well-known women as Annon, Tamar, Ruth, Bathsheba, Ansie, Cloa, Eve, Enta, and Ratta."},
+    {"id":"jesus-tamar","name":"Tamar","tree":"jesus","refs":["122:1.2"],"unlinked":true,
+     "rel":"One of Mary's named ancestors; her exact place in the line is not given in the text.",
+     "quote":"she reckoned among her ancestors such well-known women as Annon, Tamar, Ruth, Bathsheba, Ansie, Cloa, Eve, Enta, and Ratta."},
+    {"id":"jesus-ruth-m","name":"Ruth","tree":"jesus","refs":["122:1.2"],"unlinked":true,
+     "rel":"One of Mary's named ancestors (not Jesus' sister); her exact place in the line is not given in the text.",
+     "quote":"she reckoned among her ancestors such well-known women as Annon, Tamar, Ruth, Bathsheba, Ansie, Cloa, Eve, Enta, and Ratta."},
+    {"id":"jesus-bathsheba","name":"Bathsheba","tree":"jesus","refs":["122:1.2"],"unlinked":true,
+     "rel":"One of Mary's named ancestors; her exact place in the line is not given in the text.",
+     "quote":"she reckoned among her ancestors such well-known women as Annon, Tamar, Ruth, Bathsheba, Ansie, Cloa, Eve, Enta, and Ratta."},
+    {"id":"jesus-ansie","name":"Ansie","tree":"jesus","refs":["122:1.2"],"unlinked":true,
+     "rel":"One of Mary's named ancestors; her exact place in the line is not given in the text.",
+     "quote":"she reckoned among her ancestors such well-known women as Annon, Tamar, Ruth, Bathsheba, Ansie, Cloa, Eve, Enta, and Ratta."},
+    {"id":"jesus-cloa","name":"Cloa","tree":"jesus","refs":["122:1.2"],"unlinked":true,
+     "rel":"One of Mary's named ancestors; her exact place in the line is not given in the text.",
+     "quote":"she reckoned among her ancestors such well-known women as Annon, Tamar, Ruth, Bathsheba, Ansie, Cloa, Eve, Enta, and Ratta."},
+    {"id":"jesus-eve-m","name":"Eve","tree":"jesus","refs":["122:1.2"],"unlinked":true,
+     "rel":"One of Mary's named ancestors; her exact place in the line is not given in the text.",
+     "quote":"she reckoned among her ancestors such well-known women as Annon, Tamar, Ruth, Bathsheba, Ansie, Cloa, Eve, Enta, and Ratta."},
+    {"id":"jesus-enta","name":"Enta","tree":"jesus","refs":["122:1.2"],"unlinked":true,
+     "rel":"One of Mary's named ancestors; her exact place in the line is not given in the text.",
+     "quote":"she reckoned among her ancestors such well-known women as Annon, Tamar, Ruth, Bathsheba, Ansie, Cloa, Eve, Enta, and Ratta."},
+    {"id":"jesus-ratta-m","name":"Ratta","tree":"jesus","refs":["122:1.2"],"unlinked":true,
+     "rel":"One of Mary's named ancestors; her exact place in the line is not given in the text.",
+     "quote":"she reckoned among her ancestors such well-known women as Annon, Tamar, Ruth, Bathsheba, Ansie, Cloa, Eve, Enta, and Ratta."}
+  ],
+  "edges": [
+    {"from":"adam-adam","to":"adam-eve","kind":"spouse"},
+    {"from":"adam-adam","to":"adam-adamson","kind":"parent"},
+    {"from":"adam-eve","to":"adam-adamson","kind":"parent"},
+    {"from":"adam-adamson","to":"adam-ratta","kind":"spouse"},
+    {"from":"adam-adam","to":"adam-eveson","kind":"parent"},
+    {"from":"adam-eve","to":"adam-eveson","kind":"parent"},
+    {"from":"adam-eveson","to":"adam-jansad","kind":"parent"},
+    {"from":"adam-adam","to":"adam-abel","kind":"parent"},
+    {"from":"adam-eve","to":"adam-abel","kind":"parent"},
+    {"from":"adam-eve","to":"adam-cain","kind":"parent"},
+    {"from":"adam-cano","to":"adam-cain","kind":"parent"},
+    {"from":"adam-cain","to":"adam-remona","kind":"spouse"},
+    {"from":"adam-cain","to":"adam-enoch","kind":"parent"},
+    {"from":"adam-remona","to":"adam-enoch","kind":"parent"},
+    {"from":"adam-adam","to":"adam-seth","kind":"parent"},
+    {"from":"adam-eve","to":"adam-seth","kind":"parent"},
+
+    {"from":"seth-adam","to":"seth-eve","kind":"spouse"},
+    {"from":"seth-adam","to":"seth-seth","kind":"parent"},
+    {"from":"seth-eve","to":"seth-seth","kind":"parent"},
+    {"from":"seth-seth","to":"seth-enos","kind":"parent"},
+    {"from":"seth-enos","to":"seth-kenan","kind":"parent"},
+
+    {"from":"jesus-joachim","to":"jesus-hannah","kind":"spouse"},
+    {"from":"jesus-joachim","to":"jesus-mary","kind":"parent"},
+    {"from":"jesus-hannah","to":"jesus-mary","kind":"parent"},
+    {"from":"jesus-joachim","to":"jesus-salome","kind":"parent"},
+    {"from":"jesus-hannah","to":"jesus-salome","kind":"parent"},
+    {"from":"jesus-joseph","to":"jesus-mary","kind":"spouse"},
+    {"from":"jesus-zadoc","to":"jesus-joseph","kind":"adoptive","label":"adopted ancestor"},
+    {"from":"jesus-joseph","to":"jesus-jesus","kind":"parent"},
+    {"from":"jesus-mary","to":"jesus-jesus","kind":"parent"},
+    {"from":"jesus-joseph","to":"jesus-james","kind":"parent"},
+    {"from":"jesus-mary","to":"jesus-james","kind":"parent"},
+    {"from":"jesus-joseph","to":"jesus-miriam","kind":"parent"},
+    {"from":"jesus-mary","to":"jesus-miriam","kind":"parent"},
+    {"from":"jesus-joseph","to":"jesus-joseph2","kind":"parent"},
+    {"from":"jesus-mary","to":"jesus-joseph2","kind":"parent"},
+    {"from":"jesus-joseph","to":"jesus-simon","kind":"parent"},
+    {"from":"jesus-mary","to":"jesus-simon","kind":"parent"},
+    {"from":"jesus-joseph","to":"jesus-martha","kind":"parent"},
+    {"from":"jesus-mary","to":"jesus-martha","kind":"parent"},
+    {"from":"jesus-joseph","to":"jesus-jude","kind":"parent"},
+    {"from":"jesus-mary","to":"jesus-jude","kind":"parent"},
+    {"from":"jesus-joseph","to":"jesus-amos","kind":"parent"},
+    {"from":"jesus-mary","to":"jesus-amos","kind":"parent"},
+    {"from":"jesus-joseph","to":"jesus-ruth","kind":"parent"},
+    {"from":"jesus-mary","to":"jesus-ruth","kind":"parent"}
+  ]
+}
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var DATA = JSON.parse(document.getElementById("genealogy-data").textContent);
+  var NW = 150, NH = 62, GAPX = 24, GAPY = 96, M = 40;
+
+  var byId = {};
+  DATA.persons.forEach(function(p){ byId[p.id] = p; });
+
+  function edgesFor(treeId){
+    return DATA.edges.filter(function(e){
+      var f = byId[e.from], t = byId[e.to];
+      return f && t && f.tree === treeId && t.tree === treeId;
+    });
+  }
+  function childrenOf(treeId, id){
+    return edgesFor(treeId).filter(function(e){
+      return e.from === id && (e.kind === "parent" || e.kind === "adoptive");
+    }).map(function(e){ return e.to; });
+  }
+  function parentsOf(treeId, id){
+    return edgesFor(treeId).filter(function(e){
+      return e.to === id && (e.kind === "parent" || e.kind === "adoptive");
+    }).map(function(e){ return e.from; });
+  }
+  function spousesOf(treeId, id){
+    return edgesFor(treeId).filter(function(e){
+      return (e.from === id || e.to === id) && e.kind === "spouse";
+    }).map(function(e){ return e.from === id ? e.to : e.from; });
+  }
+
+  function layout(treeId){
+    var persons = DATA.persons.filter(function(p){ return p.tree === treeId; });
+    var edges = edgesFor(treeId);
+    var hier = edges.filter(function(e){ return e.kind === "parent" || e.kind === "adoptive"; });
+    var pOf = {};
+    hier.forEach(function(e){ (pOf[e.to] = pOf[e.to] || []).push(e.from); });
+    var depth = {};
+    function dep(id, seen){
+      if (depth[id] !== undefined) return depth[id];
+      if (seen[id]) return 0;
+      seen[id] = true;
+      var ps = pOf[id] || [];
+      var d = ps.length ? 1 + Math.max.apply(null, ps.map(function(x){ return dep(x, seen); })) : 0;
+      delete seen[id];
+      depth[id] = d;
+      return d;
+    }
+    persons.forEach(function(p){ dep(p.id, {}); });
+
+    var linked = persons.filter(function(p){ return !p.unlinked; });
+    var unlinked = persons.filter(function(p){ return !!p.unlinked; });
+    var rows = {};
+    linked.forEach(function(p){
+      var d = depth[p.id];
+      (rows[d] = rows[d] || []).push(p);
+    });
+    var maxRow = 0, maxDepth = -1;
+    Object.keys(rows).forEach(function(d){
+      d = +d; if (d > maxDepth) maxDepth = d;
+      maxRow = Math.max(maxRow, rows[d].length);
+    });
+    var unlinkedW = unlinked.length ? unlinked.length * (NW + GAPX) - GAPX : 0;
+    var svgW = Math.max(maxRow * (NW + GAPX) - GAPX, unlinkedW) + M * 2;
+    var svgH = (maxDepth + 1) * (NH + GAPY) + M * 2 + (unlinked.length ? 150 : 0);
+
+    var pos = {};
+    Object.keys(rows).forEach(function(d){
+      d = +d;
+      var row = rows[d], w = row.length * (NW + GAPX) - GAPX;
+      var x = (svgW - w) / 2, y = M + d * (NH + GAPY);
+      row.forEach(function(p, i){ pos[p.id] = { x: x + i * (NW + GAPX), y: y }; });
+    });
+    if (unlinked.length){
+      var w2 = unlinkedW, x2 = (svgW - w2) / 2;
+      var y2 = M + (maxDepth + 1) * (NH + GAPY) + 60;
+      unlinked.forEach(function(p, i){ pos[p.id] = { x: x2 + i * (NW + GAPX), y: y2, unlinked: true }; });
+    }
+    return { persons: persons, edges: edges, pos: pos, svgW: svgW, svgH: svgH,
+             bandY: M + (maxDepth + 1) * (NH + GAPY) + 28, hasUnlinked: unlinked.length > 0 };
+  }
+
+  function esc(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  function wrapName(name){
+    var words = name.split(" "), lines = [""];
+    words.forEach(function(w){
+      var last = lines[lines.length - 1];
+      if ((last + " " + w).trim().length > 13 && last) lines.push(w);
+      else lines[lines.length - 1] = (last + " " + w).trim();
+    });
+    return lines.slice(0, 2);
+  }
+
+  function edgePath(a, b){
+    var x1 = a.x + NW / 2, y1 = a.y + NH;
+    var x2 = b.x + NW / 2, y2 = b.y;
+    var my = (y1 + y2) / 2;
+    return "M " + x1 + " " + y1 + " C " + x1 + " " + my + ", " + x2 + " " + my + ", " + x2 + " " + y2;
+  }
+
+  function renderTree(treeId){
+    var L = layout(treeId), parts = [], i;
+    var defs = '<defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" ' +
+      'markerWidth="7" markerHeight="7" orient="auto-start-reverse">' +
+      '<path d="M 0 0 L 10 5 L 0 10 z" fill="#8a7134"/></marker></defs>';
+    parts.push(defs);
+
+    L.edges.forEach(function(e){
+      var a = L.pos[e.from], b = L.pos[e.to];
+      if (!a || !b) return;
+      if (e.kind === "spouse"){
+        var y = a.y + NH / 2;
+        var x1 = a.x < b.x ? a.x + NW : a.x, x2 = a.x < b.x ? b.x : b.x + NW;
+        parts.push('<line class="edge" x1="'+x1+'" y1="'+y+'" x2="'+x2+'" y2="'+y+'"/>');
+      } else {
+        var cls = e.kind === "adoptive" ? "edge adoptive" : "edge";
+        parts.push('<path class="'+cls+'" d="'+edgePath(a,b)+'" marker-end="url(#arr)"/>');
+        if (e.label){
+          var mx = (a.x + b.x) / 2 + NW / 2;
+          var myy = (a.y + NH + b.y) / 2;
+          parts.push('<text class="edge-label" x="'+(mx+8)+'" y="'+myy+'" text-anchor="start">'+esc(e.label)+'</text>');
+        }
+      }
+    });
+
+    if (L.hasUnlinked){
+      parts.push('<text class="band-label" x="'+(L.svgW/2)+'" y="'+L.bandY+'" text-anchor="middle">' +
+        'Named in the text — relationship or order not stated (not linked)</text>');
+    }
+
+    L.persons.forEach(function(p){
+      var a = L.pos[p.id];
+      var cls = "node" + (p.unlinked ? " unlinked" : "");
+      var s = '<g class="'+cls+'" data-id="'+esc(p.id)+'" tabindex="0" role="button" aria-label="'+esc(p.name)+'">';
+      s += '<rect class="body" x="'+a.x+'" y="'+a.y+'" width="'+NW+'" height="'+NH+'" rx="10"/>';
+      var lines = wrapName(p.name);
+      lines.forEach(function(ln, li){
+        s += '<text x="'+(a.x + NW/2)+'" y="'+(a.y + 24 + li*16)+'" text-anchor="middle">'+esc(ln)+'</text>';
+      });
+      s += '<text class="reftag" x="'+(a.x + NW/2)+'" y="'+(a.y + NH - 9)+'" text-anchor="middle">'+esc(p.refs[0])+'</text>';
+      s += '</g>';
+      parts.push(s);
+    });
+
+    var svg = document.getElementById("tree");
+    svg.setAttribute("viewBox", "0 0 " + L.svgW + " " + L.svgH);
+    svg.setAttribute("width", L.svgW);
+    svg.setAttribute("height", L.svgH);
+    svg.innerHTML = parts.join("");
+
+    svg.querySelectorAll(".node").forEach(function(g){
+      function pick(){
+        svg.querySelectorAll(".node.selected").forEach(function(n){ n.classList.remove("selected"); });
+        g.classList.add("selected");
+        showPanel(treeId, g.getAttribute("data-id"));
+      }
+      g.addEventListener("click", pick);
+      g.addEventListener("keydown", function(ev){
+        if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); pick(); }
+      });
+    });
+  }
+
+  function showPanel(treeId, id){
+    var p = byId[id], panel = document.getElementById("panel");
+    if (!p){ panel.innerHTML = ""; return; }
+    var names = function(ids){ return ids.map(function(x){ return esc(byId[x].name); }); };
+    var par = names(parentsOf(treeId, id)), spo = names(spousesOf(treeId, id)), chi = names(childrenOf(treeId, id));
+    var s = '<h2>' + esc(p.name) + '</h2>';
+    s += '<p class="rel">' + esc(p.rel) + '</p>';
+    s += '<div class="refs">' + p.refs.map(function(r){ return '<span>' + esc(r) + '</span>'; }).join("") + '</div>';
+    s += '<blockquote>&ldquo;' + esc(p.quote) + '&rdquo;</blockquote>';
+    if (p.note) s += '<p class="note">' + esc(p.note) + '</p>';
+    var kin = [];
+    if (par.length) kin.push("<b>Parents:</b> " + par.join(", "));
+    if (spo.length) kin.push("<b>Spouse:</b> " + spo.join(", "));
+    if (chi.length) kin.push("<b>Children:</b> " + chi.join(", "));
+    if (kin.length) s += '<p class="kin">' + kin.join("<br>") + '</p>';
+    panel.innerHTML = s;
+  }
+
+  function showTree(treeId){
+    var t = DATA.trees.filter(function(x){ return x.id === treeId; })[0];
+    document.querySelectorAll("#tabs button").forEach(function(b){
+      b.setAttribute("aria-selected", b.dataset.tree === treeId ? "true" : "false");
+    });
+    document.getElementById("intro").innerHTML = "<strong>" + esc(t.title) + "</strong> · " + esc(t.papers) + " — " + t.intro;
+    renderTree(treeId);
+    var first = DATA.persons.filter(function(p){ return p.tree === treeId && !p.unlinked; })[0];
+    document.getElementById("panel").innerHTML = '<p class="hint">Click any person to see their relationship note, citations, and an exact quote from the text.</p>';
+    if (first){
+      var svg = document.getElementById("tree");
+      var g = svg.querySelector('[data-id="' + first.id + '"]');
+      if (g) g.classList.add("selected");
+      showPanel(treeId, first.id);
+    }
+  }
+
+  var tabs = document.getElementById("tabs");
+  DATA.trees.forEach(function(t){
+    var b = document.createElement("button");
+    b.type = "button"; b.setAttribute("role", "tab");
+    b.dataset.tree = t.id; b.textContent = t.title;
+    b.addEventListener("click", function(){ showTree(t.id); });
+    tabs.appendChild(b);
+  });
+  showTree(DATA.trees[0].id);
+})();
+</script>
+<script>
+/* Display-settings pill: theme + text size, synced with UB Tools Studio via localStorage. */
+(function(){
+var root=document.documentElement,PCTS=[90,100,112,125];
+function getN(){var s=null;try{s=JSON.parse(localStorage.getItem('ub-tools-text-size'))}catch(e){}return (typeof s==='number'&&isFinite(s))?Math.max(0,Math.min(3,Math.floor(s))):1}
+function paint(){
+var light=root.getAttribute('data-theme')==='light',tb=document.getElementById('ub-theme');
+tb.setAttribute('aria-pressed',String(light));
+tb.textContent=light?'\u263E Dark':'\u2600 Light';
+var n=getN();
+document.getElementById('ub-sreset').setAttribute('aria-pressed',String(n===1));
+document.getElementById('ub-sdec').disabled=n<=0;
+document.getElementById('ub-sinc').disabled=n>=3;
+}
+function setN(n){try{localStorage.setItem('ub-tools-text-size',JSON.stringify(n))}catch(e){}root.style.fontSize=PCTS[n]+'%';paint()}
+document.getElementById('ub-theme').addEventListener('click',function(){
+var next=root.getAttribute('data-theme')==='light'?'dark':'light';
+try{localStorage.setItem('ub-tools-theme',JSON.stringify(next))}catch(e){}
+root.setAttribute('data-theme',next);paint();
+});
+document.getElementById('ub-sdec').addEventListener('click',function(){setN(Math.max(0,getN()-1))});
+document.getElementById('ub-sreset').addEventListener('click',function(){setN(1)});
+document.getElementById('ub-sinc').addEventListener('click',function(){setN(Math.min(3,getN()+1))});
+paint();
+})();
+</script>
+</body>
+</html>

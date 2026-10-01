@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UB API demo — zero-cost Urantia Book client</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+  input, button { font-size: 1rem; padding: .5rem; }
+  input { width: 16rem; }
+  #out { white-space: pre-wrap; background: #f6f6f6; padding: 1rem; border-radius: 8px; margin-top: 1rem; }
+  .badge { font-weight: bold; }
+</style>
+</head>
+<body>
+<h1>UB API demo</h1>
+<p>Zero-server client for The Urantia Book's exact text. First lookup downloads that paper's JSON (~14&nbsp;MB total if you read the whole book); nothing is bundled.</p>
+<p>
+  <input id="ref" value="180:2.1" placeholder="Paper:Section.Paragraph">
+  <button id="go">Read paragraph</button>
+  <button id="verify">Verify a quote</button>
+</p>
+<div id="out">Results appear here.</div>
+<script src="ub-api.js"></script>
+<script>
+  const out = (t) => { document.getElementById('out').textContent = t; };
+  document.getElementById('go').onclick = async () => {
+    const ref = document.getElementById('ref').value.trim();
+    out('loading…');
+    const r = await UBApi.getParagraph(ref);
+    out(r.error ? 'Error: ' + r.error
+      : `${r.ref} — ${r.paperTitle} / ${r.sectionTitle}\n\n${r.textPlain}\n\n(exact source text available as .text)`);
+  };
+  document.getElementById('verify').onclick = async () => {
+    const quote = prompt('Paste the alleged quote:', 'I am the true vine, and my Father is the husbandman.');
+    if (!quote) return;
+    const cite = prompt('Citation (Paper:Section.Paragraph):', document.getElementById('ref').value.trim());
+    if (!cite) return;
+    out('checking…');
+    const v = await UBApi.verifyQuote(quote, cite);
+    out(`[${v.status}] ${v.detail || 'exact match'}`);
+  };
+</script>
+</body>
+</html>

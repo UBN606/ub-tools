@@ -1,0 +1,586 @@
+[
+  {
+    "name": "Alexandria",
+    "kind": "place",
+    "refs": [
+      "130:0.2",
+      "130:3.2",
+      "130:3.8"
+    ],
+    "note": "The Egyptian city visited on the Mediterranean tour."
+  },
+  {
+    "name": "Antioch",
+    "kind": "place",
+    "refs": [
+      "133:7.13",
+      "133:8.1",
+      "133:8.2"
+    ],
+    "note": "The Syrian city, later a center of gentile Christianity."
+  },
+  {
+    "name": "Athens",
+    "kind": "place",
+    "refs": [
+      "133:4.13",
+      "133:4.14",
+      "133:5.12"
+    ],
+    "note": "The Greek city where Jesus reasoned with the philosophers."
+  },
+  {
+    "name": "Babylon",
+    "kind": "place",
+    "refs": [
+      "97:6.4",
+      "97:7.1",
+      "97:9.27"
+    ],
+    "note": "The Mesopotamian city of the Jewish captivity."
+  },
+  {
+    "name": "Bethany",
+    "kind": "place",
+    "refs": [
+      "172:0.1",
+      "172:0.2",
+      "172:3.1"
+    ],
+    "note": "The village near Jerusalem, home of Lazarus, Martha, and Mary."
+  },
+  {
+    "name": "Bethlehem",
+    "kind": "place",
+    "refs": [
+      "122:4.3",
+      "122:8.7",
+      "122:10.1"
+    ],
+    "note": "The city of David, birthplace of Jesus."
+  },
+  {
+    "name": "Bethsaida",
+    "kind": "place",
+    "refs": [
+      "148:0.1",
+      "148:3.2",
+      "148:8.1"
+    ],
+    "note": "The fishing town, home of several apostles."
+  },
+  {
+    "name": "Caesarea-Philippi",
+    "kind": "place",
+    "refs": [
+      "130:0.2",
+      "130:2.1",
+      "130:2.5"
+    ],
+    "note": "The northern city where Peter confessed Jesus as the Son of God."
+  },
+  {
+    "name": "Cana",
+    "kind": "place",
+    "refs": [
+      "137:2.3",
+      "137:3.1",
+      "137:3.6"
+    ],
+    "note": "The Galilean town of the wedding feast attended by Jesus."
+  },
+  {
+    "name": "Capernaum",
+    "kind": "place",
+    "refs": [
+      "137:1.1",
+      "137:3.4",
+      "137:6.1"
+    ],
+    "note": "The lakeside city that became Jesus' headquarters in Galilee."
+  },
+  {
+    "name": "Carthage",
+    "kind": "place",
+    "refs": [
+      "130:0.2",
+      "130:6.6",
+      "130:7.1"
+    ],
+    "note": "The North African city visited on the Mediterranean tour."
+  },
+  {
+    "name": "China",
+    "kind": "place",
+    "refs": [
+      "94:5.1",
+      "94:5.7",
+      "94:6.9"
+    ],
+    "note": "The Far Eastern land discussed in the book's racial and religious history."
+  },
+  {
+    "name": "Corinth",
+    "kind": "place",
+    "refs": [
+      "133:2.5",
+      "133:3.12",
+      "133:4.13"
+    ],
+    "note": "The Greek city visited on the Mediterranean tour."
+  },
+  {
+    "name": "Cyrene",
+    "kind": "place",
+    "refs": [
+      "130:0.2",
+      "130:6.6"
+    ],
+    "note": "The North African city on the Mediterranean tour; Simon of Cyrene came from here."
+  },
+  {
+    "name": "Dalamatia",
+    "kind": "place",
+    "refs": [
+      "66:3.1",
+      "66:3.3",
+      "66:7.4"
+    ],
+    "note": "The headquarters city of the Planetary Prince on Urantia."
+  },
+  {
+    "name": "Damascus",
+    "kind": "place",
+    "refs": [
+      "128:3.3",
+      "128:4.1",
+      "128:4.4"
+    ],
+    "note": "The Syrian city on Jesus' Mediterranean route."
+  },
+  {
+    "name": "Dead Sea",
+    "kind": "place",
+    "refs": [
+      "124:1.9",
+      "124:6.5",
+      "124:6.8"
+    ],
+    "note": "The salt sea at the Jordan's mouth."
+  },
+  {
+    "name": "Decapolis",
+    "kind": "place",
+    "refs": [
+      "144:0.2",
+      "144:0.3",
+      "144:6.13"
+    ],
+    "note": "The league of ten gentile cities east of Galilee."
+  },
+  {
+    "name": "Eden",
+    "kind": "place",
+    "refs": [
+      "73:1.4",
+      "73:4.1",
+      "73:5.1"
+    ],
+    "note": "The prepared garden home of Adam and Eve on Urantia."
+  },
+  {
+    "name": "Edentia",
+    "kind": "place",
+    "refs": [
+      "43:0.2",
+      "43:4.7",
+      "43:7.1"
+    ],
+    "note": "The capital of the constellation Norlatiadek."
+  },
+  {
+    "name": "Egypt",
+    "kind": "place",
+    "refs": [
+      "95:0.1",
+      "95:2.2",
+      "95:3.5"
+    ],
+    "note": "The ancient land prominent in Hebrew history and in Jesus' youth."
+  },
+  {
+    "name": "Emmaus",
+    "kind": "place",
+    "refs": [
+      "190:5.1",
+      "190:5.2"
+    ],
+    "note": "The village where the risen Jesus appeared to two believers."
+  },
+  {
+    "name": "Gadara",
+    "kind": "place",
+    "refs": [
+      "138:2.5",
+      "138:9.3"
+    ],
+    "note": "A city of the Decapolis visited by Jesus."
+  },
+  {
+    "name": "Galilee",
+    "kind": "place",
+    "refs": [
+      "192:0.1",
+      "192:0.2",
+      "192:0.4"
+    ],
+    "note": "The northern province where Jesus did most of his public work."
+  },
+  {
+    "name": "Gennesaret",
+    "kind": "place",
+    "refs": [
+      "152:5.5",
+      "152:6.1",
+      "152:6.2"
+    ],
+    "note": "The plain on the Sea of Galilee where Jesus ministered."
+  },
+  {
+    "name": "Gethsemane",
+    "kind": "place",
+    "refs": [
+      "182:0.1",
+      "182:2.10",
+      "182:3.1"
+    ],
+    "note": "The garden where Jesus prayed before his arrest."
+  },
+  {
+    "name": "Golgotha",
+    "kind": "place",
+    "refs": [
+      "187:0.4",
+      "187:1.1",
+      "187:1.4"
+    ],
+    "note": "The place of the crucifixion, outside Jerusalem."
+  },
+  {
+    "name": "Havona",
+    "kind": "place",
+    "refs": [
+      "14:0.1",
+      "14:1.12",
+      "14:2.9"
+    ],
+    "note": "The central universe of one billion perfect worlds surrounding Paradise."
+  },
+  {
+    "name": "India",
+    "kind": "place",
+    "refs": [
+      "79:1.1",
+      "79:2.1",
+      "79:3.3"
+    ],
+    "note": "The land of Gautama, later visited by Nathaniel."
+  },
+  {
+    "name": "Jerusalem",
+    "kind": "place",
+    "refs": [
+      "172:0.2",
+      "172:0.3",
+      "172:3.4"
+    ],
+    "note": "The holy city of the Jews, scene of Jesus' death and resurrection."
+  },
+  {
+    "name": "Jerusem",
+    "kind": "place",
+    "refs": [
+      "46:0.1",
+      "46:1.2",
+      "46:2.6"
+    ],
+    "note": "The capital of the system Satania."
+  },
+  {
+    "name": "Jordan River",
+    "kind": "place",
+    "refs": [
+      "141:0.1",
+      "141:1.1",
+      "141:1.2"
+    ],
+    "note": "The river where John baptized and Jesus began his public ministry."
+  },
+  {
+    "name": "Judea",
+    "kind": "place",
+    "refs": [
+      "185:0.1",
+      "185:1.1",
+      "185:1.2"
+    ],
+    "note": "The southern Jewish province containing Jerusalem."
+  },
+  {
+    "name": "Land of Nod",
+    "kind": "place",
+    "refs": [
+      "67:4.2"
+    ],
+    "note": "The region east of Eden settled by the Nodites."
+  },
+  {
+    "name": "Magdala",
+    "kind": "place",
+    "refs": [
+      "150:0.4",
+      "150:2.1",
+      "150:2.2"
+    ],
+    "note": "The lakeside town associated with Mary Magdalene."
+  },
+  {
+    "name": "Mansion worlds",
+    "kind": "place",
+    "refs": [
+      "47:0.1",
+      "47:0.4",
+      "47:4.4"
+    ],
+    "note": "The seven worlds where ascending mortals are repersonalized."
+  },
+  {
+    "name": "Mesopotamia",
+    "kind": "place",
+    "refs": [
+      "78:0.1",
+      "78:5.2",
+      "78:8.4"
+    ],
+    "note": "The land between the rivers, cradle of Dalamatia and Eden."
+  },
+  {
+    "name": "Mount Hermon",
+    "kind": "place",
+    "refs": [
+      "134:7.6",
+      "134:7.7",
+      "134:8.6"
+    ],
+    "note": "The high mountain of the transfiguration."
+  },
+  {
+    "name": "Mount Olivet",
+    "kind": "place",
+    "refs": [
+      "172:3.7",
+      "172:3.9",
+      "172:3.10"
+    ],
+    "note": "The hill east of Jerusalem associated with Jesus' last days."
+  },
+  {
+    "name": "Nazareth",
+    "kind": "place",
+    "refs": [
+      "123:0.1",
+      "123:0.6",
+      "123:1.7"
+    ],
+    "note": "The Galilean town where Jesus grew up."
+  },
+  {
+    "name": "Nebadon",
+    "kind": "place",
+    "refs": [
+      "33:1.1",
+      "33:1.2",
+      "33:2.5"
+    ],
+    "note": "The local universe of Michael's creation, containing Urantia."
+  },
+  {
+    "name": "Norlatiadek",
+    "kind": "place",
+    "refs": [
+      "43:0.1",
+      "43:0.2",
+      "43:0.4"
+    ],
+    "note": "The constellation containing the system Satania."
+  },
+  {
+    "name": "Orvonton",
+    "kind": "place",
+    "refs": [
+      "15:1.5",
+      "15:3.1",
+      "15:14.4"
+    ],
+    "note": "The seventh superuniverse, containing the local universe Nebadon."
+  },
+  {
+    "name": "Paradise",
+    "kind": "place",
+    "refs": [
+      "30:0.1",
+      "30:1.1",
+      "30:4.31"
+    ],
+    "note": "The eternal Isle at the center of all things, dwelling place of Deity."
+  },
+  {
+    "name": "Perea",
+    "kind": "place",
+    "refs": [
+      "163:1.6",
+      "163:5.1",
+      "163:5.2"
+    ],
+    "note": "The province east of the Jordan, scene of Jesus' later ministry."
+  },
+  {
+    "name": "Persia",
+    "kind": "place",
+    "refs": [
+      "85:4.4",
+      "85:5.2"
+    ],
+    "note": "The eastern empire in the book's historical narratives."
+  },
+  {
+    "name": "Rome",
+    "kind": "place",
+    "refs": [
+      "132:0.1",
+      "132:0.4",
+      "132:0.10"
+    ],
+    "note": "The imperial capital visited by Jesus on his Mediterranean tour."
+  },
+  {
+    "name": "Salvington",
+    "kind": "place",
+    "refs": [
+      "33:1.1",
+      "33:2.5",
+      "33:6.1"
+    ],
+    "note": "The capital of the local universe Nebadon."
+  },
+  {
+    "name": "Samaria",
+    "kind": "place",
+    "refs": [
+      "143:0.1",
+      "143:0.2",
+      "143:3.8"
+    ],
+    "note": "The district between Judea and Galilee, home of the Samaritans."
+  },
+  {
+    "name": "Satania",
+    "kind": "place",
+    "refs": [
+      "45:0.1",
+      "45:1.10",
+      "45:2.3"
+    ],
+    "note": "The administrative system containing Urantia, rebelled under Lucifer."
+  },
+  {
+    "name": "Sea of Galilee",
+    "kind": "place",
+    "refs": [
+      "139:8.2",
+      "139:8.13",
+      "139:12.2"
+    ],
+    "note": "The lake at the center of Jesus' Galilean ministry."
+  },
+  {
+    "name": "Second Garden",
+    "kind": "place",
+    "refs": [
+      "78:1.3",
+      "78:1.12",
+      "78:2.2"
+    ],
+    "note": "The Adamic headquarters established after Eden."
+  },
+  {
+    "name": "Sidon",
+    "kind": "place",
+    "refs": [
+      "156:0.1",
+      "156:0.2",
+      "156:2.2"
+    ],
+    "note": "The Phoenician city of Jesus' tour with the apostles."
+  },
+  {
+    "name": "Sychar",
+    "kind": "place",
+    "refs": [
+      "143:3.8",
+      "143:5.2",
+      "143:6.2"
+    ],
+    "note": "The Samaritan town of Jacob's well."
+  },
+  {
+    "name": "Tiberias",
+    "kind": "place",
+    "refs": [
+      "150:0.4",
+      "150:1.1",
+      "150:3.1"
+    ],
+    "note": "The Herodian capital on the Sea of Galilee."
+  },
+  {
+    "name": "Tyre",
+    "kind": "place",
+    "refs": [
+      "156:3.2",
+      "156:4.1",
+      "156:4.2"
+    ],
+    "note": "The Phoenician city visited during Jesus' later ministry."
+  },
+  {
+    "name": "Urantia",
+    "kind": "place",
+    "refs": [
+      "114:0.2",
+      "114:1.1",
+      "114:1.3"
+    ],
+    "note": "The name of the planet Earth in universe records."
+  },
+  {
+    "name": "Urmia",
+    "kind": "place",
+    "refs": [
+      "134:2.1",
+      "134:3.1",
+      "134:3.8"
+    ],
+    "note": "The Persian city where Jesus lectured on the kingdom."
+  },
+  {
+    "name": "Uversa",
+    "kind": "place",
+    "refs": [
+      "30:0.1",
+      "30:3.2",
+      "30:3.3"
+    ],
+    "note": "The capital of the superuniverse Orvonton."
+  }
+]

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UB Parallel — The Gospels and The Urantia Book, side by side</title>
+<style>
+  :root { --ink:#1e2430; --muted:#5b6472; --line:#e2e6ec; --bg:#f7f8fa; --card:#ffffff;
+          --restates:#2e7d4f; --expands:#1f6fb2; --corrects:#b3541e; --fulfills:#7a3fa0; }
+  * { box-sizing:border-box; }
+  body { font-family: Georgia, 'Times New Roman', serif; color:var(--ink); background:var(--bg);
+         margin:0; padding:0 16px 80px; max-width:1080px; margin-left:auto; margin-right:auto; }
+  header { padding:28px 0 8px; border-bottom:2px solid var(--ink); }
+  h1 { font-size:1.7rem; margin:0 0 6px; }
+  header p { color:var(--muted); margin:4px 0; font-size:0.95rem; }
+  .legend { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; }
+  .badge { font-family:system-ui,sans-serif; font-size:0.72rem; font-weight:700; letter-spacing:0.04em;
+           text-transform:uppercase; padding:3px 10px; border-radius:999px; color:#fff; }
+  .badge.restates{ background:var(--restates);} .badge.expands{ background:var(--expands);}
+  .badge.corrects{ background:var(--corrects);} .badge.fulfills{ background:var(--fulfills);}
+  .def { font-size:0.85rem; color:var(--muted); font-family:system-ui,sans-serif; }
+  .def b { color:var(--ink); }
+  #searchbar { display:flex; gap:8px; margin:18px 0 6px; }
+  #q { flex:1; font-size:1.05rem; padding:10px 14px; border:1px solid var(--line); border-radius:8px;
+       font-family:Georgia,serif; }
+  button.go { font-size:1rem; padding:10px 22px; border:0; border-radius:8px; background:var(--ink);
+              color:#fff; cursor:pointer; }
+  button.go:hover { opacity:0.85; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 4px; font-family:system-ui,sans-serif; }
+  .chip { font-size:0.82rem; padding:6px 12px; border:1px solid var(--line); border-radius:999px;
+          background:#fff; cursor:pointer; }
+  .chip.active { background:var(--ink); color:#fff; border-color:var(--ink); }
+  #status { font-family:system-ui,sans-serif; font-size:0.78rem; color:var(--muted); margin:8px 0; }
+  #results { margin-top:14px; }
+  .link-card { background:var(--card); border:1px solid var(--line); border-radius:12px;
+               padding:16px 18px; margin:0 0 16px; }
+  .link-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+  .refs { font-weight:bold; font-size:1.02rem; }
+  .note { font-family:system-ui,sans-serif; font-size:0.85rem; color:var(--muted); margin-top:10px;
+          border-top:1px dashed var(--line); padding-top:8px; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:720px){ .cols{ grid-template-columns:1fr; } }
+  .col { border:1px solid var(--line); border-radius:8px; padding:12px 14px; background:#fbfcfd; }
+  .col h3 { font-family:system-ui,sans-serif; font-size:0.75rem; text-transform:uppercase;
+            letter-spacing:0.06em; color:var(--muted); margin:0 0 8px; }
+  .col p { margin:0; line-height:1.55; font-size:0.98rem; }
+  .ref-tag { font-family:system-ui,sans-serif; font-size:0.78rem; color:var(--muted); }
+  .empty { color:var(--muted); font-style:italic; padding:20px 0; }
+  footer { margin-top:30px; border-top:1px solid var(--line); padding-top:12px;
+           font-family:system-ui,sans-serif; font-size:0.8rem; color:var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>UB Parallel</h1>
+  <p>The Gospels and <em>The Urantia Book</em>, verse by verse and paragraph by paragraph — side by side,
+     with the relationship between each pair stated plainly.</p>
+  <p>KJV text (public domain) · UB text from the standard English edition. Every pair below was
+     individually verified against the actual text of both sources.</p>
+  <div class="legend">
+    <span class="badge restates">restates</span><span class="def"><b>restates</b> — same event or saying, in both accounts</span>
+    <span class="badge expands">expands</span><span class="def"><b>expands</b> — the UB gives more detail</span>
+    <span class="badge corrects">corrects</span><span class="def"><b>corrects</b> — the accounts differ; both texts shown, you judge</span>
+    <span class="badge fulfills">fulfills</span><span class="def"><b>fulfills</b> — the UB presents itself as the fuller revelation of the theme</span>
+  </div>
+</header>
+
+<div id="searchbar">
+  <input id="q" type="text" placeholder="Try &quot;John 15:5&quot; or &quot;180:2.1&quot; — or a chapter like &quot;Luke 2&quot;">
+  <button class="go" id="go">Look up</button>
+</div>
+<div class="chips" id="chips">
+  <button class="chip active" data-rel="all">All</button>
+  <button class="chip" data-rel="restates">restates</button>
+  <button class="chip" data-rel="expands">expands</button>
+  <button class="chip" data-rel="corrects">corrects</button>
+  <button class="chip" data-rel="fulfills">fulfills</button>
+</div>
+<div id="status">Loading texts…</div>
+<div id="results"></div>
+
+<footer>
+  <p>UB Parallel v1 · seed dataset: <span id="count"></span> curated links. Texts load from the local
+  checkout when hosted, otherwise from public mirrors and are cached in your browser — nothing you
+  check leaves your computer.</p>
+</footer>
+
+<script>
+'use strict';
+/* ---------------- configuration ---------------- */
+const LINKS_URLS = ['../data/links.json', './links.json'];
+const KJV_LOCAL = '../data/kjv.json';
+const KJV_REMOTE = 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_kjv.json';
+const UB_LOCAL = n => '../../source-texts/papers/Doc' + String(n).padStart(3,'0') + '.json';
+const UB_REMOTE = n => 'https://raw.githubusercontent.com/JanHerca/urantiapedia/master/input/json/book-en/Doc' + String(n).padStart(3,'0') + '.json';
+const BOOKS66 = ["Genesis","Exodus","Leviticus","Numbers","Deuteronomy","Joshua","Judges","Ruth","1 Samuel","2 Samuel","1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra","Nehemiah","Esther","Job","Psalms","Proverbs","Ecclesiastes","Song of Solomon","Isaiah","Jeremiah","Lamentations","Ezekiel","Daniel","Hosea","Joel","Amos","Obadiah","Jonah","Micah","Nahum","Habakkuk","Zephaniah","Haggai","Zechariah","Malachi","Matthew","Mark","Luke","John","Acts","Romans","1 Corinthians","2 Corinthians","Galatians","Ephesians","Philippians","Colossians","1 Thessalonians","2 Thessalonians","1 Timothy","2 Timothy","Titus","Philemon","Hebrews","James","1 Peter","2 Peter","1 John","2 John","3 John","Jude","Revelation"];
+const ABBR = {gen:'Genesis',ex:'Exodus',lev:'Leviticus',num:'Numbers',deut:'Deuteronomy',josh:'Joshua',judg:'Judges',ps:'Psalms',psa:'Psalms',prov:'Proverbs',isa:'Isaiah',jer:'Jeremiah',ezek:'Ezekiel',dan:'Daniel',matt:'Matthew',mt:'Matthew',mk:'Mark',lk:'Luke',jn:'John',rom:'Romans',gal:'Galatians',eph:'Ephesians',phil:'Philippians',col:'Colossians',heb:'Hebrews',jas:'James',rev:'Revelation'};
+
+/* ---------------- IndexedDB cache ---------------- */
+const DB = 'ub-parallel', STORE = 'texts';
+function idb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open(DB, 1);
+    r.onupgradeneeded = () => r.result.createObjectStore(STORE);
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+let _db = null;
+async function cacheGet(k) {
+  try { _db = _db || await idb();
+    return await new Promise((res, rej) => {
+      const t = _db.transaction(STORE).objectStore(STORE).get(k);
+      t.onsuccess = () => res(t.result || null); t.onerror = () => rej(t.error);
+    });
+  } catch(e) { return null; }
+}
+async function cacheSet(k, v) {
+  try { _db = _db || await idb();
+    await new Promise((res, rej) => {
+      const t = _db.transaction(STORE, 'readwrite').objectStore(STORE).put(v, k);
+      t.onsuccess = () => res(); t.onerror = () => rej(t.error);
+    });
+  } catch(e) { /* cache is best-effort */ }
+}
+
+/* ---------------- text loading ---------------- */
+async function fetchJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error('HTTP ' + r.status + ' for ' + url);
+  return r.json();
+}
+function stripMarkup(s) {
+  return String(s).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')
+    .replace(/&mdash;/g, '—').replace(/&ndash;/g, '–').replace(/[*_]{1,3}/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+function normalizeKJV(raw) {
+  // thiagobodruk format: [{abbrev, name(Portuguese), chapters:[[verse,...]]}]
+  return { books: raw.map((b, i) => ({ name: BOOKS66[i] || b.name, chapters: b.chapters })) };
+}
+
+let KJV = null, LINKS = [], kjvSource = 'unknown';
+const ubPaperCache = new Map();
+
+async function loadKJV() {
+  const cached = await cacheGet('kjv');
+  if (cached) { KJV = cached; kjvSource = 'browser cache'; return; }
+  for (const u of [KJV_LOCAL]) {
+    try { KJV = await fetchJSON(u); kjvSource = 'local checkout'; await cacheSet('kjv', KJV); return; }
+    catch(e) { /* try next */ }
+  }
+  KJV = normalizeKJV(await fetchJSON(KJV_REMOTE));
+  kjvSource = 'remote mirror'; await cacheSet('kjv', KJV);
+}
+async function loadLinks() {
+  for (const u of LINKS_URLS) {
+    try { const d = await fetchJSON(u); LINKS = d.links || []; return; }
+    catch(e) { /* try next */ }
+  }
+  throw new Error('Could not load links.json — is the app hosted next to parallel/data/?');
+}
+async function loadUBPaper(paperNum) {
+  if (ubPaperCache.has(paperNum)) return ubPaperCache.get(paperNum);
+  const key = 'ub' + paperNum;
+  const cached = await cacheGet(key);
+  if (cached) { const map = new Map(cached); ubPaperCache.set(paperNum, map); return map; }
+  let doc = null;
+  try { doc = await fetchJSON(UB_LOCAL(paperNum)); }
+  catch(e) { doc = await fetchJSON(UB_REMOTE(paperNum)); }
+  const map = new Map();
+  for (const s of doc.sections || [])
+    for (const p of s.pars || [])
+      map.set(p.par_ref, stripMarkup(p.par_content || '').replace(/\*/g, ''));
+  ubPaperCache.set(paperNum, map);
+  await cacheSet(key, [...map.entries()]);
+  return map;
+}
+async function getUB(ref) {
+  const m = String(ref).trim().match(/^(\d{1,3}):(\d{1,2})\.(\d{1,3})$/);
+  if (!m) return null;
+  const map = await loadUBPaper(parseInt(m[1], 10));
+  return map.get(ref) || null;
+}
+function bookIdx(name) {
+  const norm = name.toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ').trim();
+  if (ABBR[norm]) return KJV.books.findIndex(b => b.name === ABBR[norm]);
+  return KJV.books.findIndex(b => b.name.toLowerCase() === norm);
+}
+function getBible(ref) {
+  const m = String(ref).trim().match(/^(.+?)\s+(\d{1,3}):(\d{1,3})(?:\s*[-–—]\s*(\d{1,3}))?$/);
+  if (!m) return [];
+  const [, bookName, ch, v1, v2] = m;
+  const bi = bookIdx(bookName);
+  if (bi < 0) return [];
+  const book = KJV.books[bi];
+  const chapter = book.chapters[parseInt(ch, 10) - 1];
+  if (!chapter) return [];
+  const lo = parseInt(v1, 10), hi = v2 ? parseInt(v2, 10) : lo, out = [];
+  for (let v = lo; v <= hi && v <= chapter.length; v++)
+    out.push({ ref: book.name + ' ' + ch + ':' + v, text: chapter[v - 1] });
+  return out;
+}
+
+/* ---------------- query ---------------- */
+let activeRel = 'all', lastQuery = '';
+function parseQuery(q) {
+  q = q.trim();
+  if (!q) return null;
+  let m = q.match(/^(\d{1,3}):(\d{1,2})(?:\.(\d{1,3}))?$/);           // 180:2.1 or 180:2
+  if (m) return { type: 'ub', paper: +m[1], section: +m[2], par: m[3] ? +m[3] : null };
+  m = q.match(/^(.+?)\s+(\d{1,3})(?::(\d{1,3})(?:\s*[-–—]\s*(\d{1,3}))?)?$/); // John 15:5, Luke 2
+  if (m) {
+    const bi = bookIdx(m[1]);
+    if (bi < 0) return { type: 'none' };
+    return { type: 'bible', book: KJV.books[bi].name, chapter: +m[2],
+             verse: m[3] ? +m[3] : null, verse2: m[4] ? +m[4] : null };
+  }
+  return { type: 'none' };
+}
+function matchLinks(parsed) {
+  if (!parsed || parsed.type === 'none') return [];
+  return LINKS.filter(l => {
+    if (activeRel !== 'all' && l.relationship !== activeRel) return false;
+    if (parsed.type === 'ub') {
+      const m = l.ub_ref.match(/^(\d{1,3}):(\d{1,2})\.(\d{1,3})$/);
+      return m && +m[1] === parsed.paper && +m[2] === parsed.section &&
+             (parsed.par === null || +m[3] === parsed.par);
+    }
+    // bible: match book+chapter, and verse if given (range overlap)
+    const m = l.bible_ref.match(/^(.+?)\s+(\d{1,3}):(\d{1,3})(?:\s*[-–—]\s*(\d{1,3}))?$/);
+    if (!m) return false;
+    if (m[1] !== parsed.book || +m[2] !== parsed.chapter) return false;
+    if (parsed.verse === null) return true;
+    const lo = +m[3], hi = m[4] ? +m[4] : lo;
+    const qlo = parsed.verse, qhi = parsed.verse2 || parsed.verse;
+    return lo <= qhi && hi >= qlo;
+  });
+}
+
+/* ---------------- rendering ---------------- */
+const $ = id => document.getElementById(id);
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function renderCard(l) {
+  const [bible, ub] = await Promise.all([getBible(l.bible_ref), getUB(l.ub_ref)]);
+  const bibleHTML = bible.length
+    ? bible.map(v => `<p><span class="ref-tag">${esc(v.ref)}</span><br>${esc(v.text)}</p>`).join('')
+    : '<p class="empty">Verse text unavailable.</p>';
+  const ubHTML = ub
+    ? `<p><span class="ref-tag">${esc(l.ub_ref)}</span><br>${esc(ub)}</p>`
+    : '<p class="empty">UB paragraph unavailable.</p>';
+  return `<div class="link-card">
+    <div class="link-head"><span class="refs">${esc(l.bible_ref)} ↔ ${esc(l.ub_ref)}</span>
+      <span class="badge ${esc(l.relationship)}">${esc(l.relationship)}</span></div>
+    <div class="cols">
+      <div class="col"><h3>Bible (KJV)</h3>${bibleHTML}</div>
+      <div class="col"><h3>The Urantia Book</h3>${ubHTML}</div>
+    </div>
+    ${l.note ? `<div class="note">${esc(l.note)}</div>` : ''}
+  </div>`;
+}
+
+async function render() {
+  const box = $('results');
+  const parsed = parseQuery(lastQuery);
+  let links;
+  if (!lastQuery) {
+    links = LINKS.filter(l => activeRel === 'all' || l.relationship === activeRel);
+  } else if (!parsed || parsed.type === 'none') {
+    box.innerHTML = '<p class="empty">Couldn’t understand that reference. Try “John 15:5”, “Luke 2”, or “180:2.1”.</p>';
+    return;
+  } else {
+    links = matchLinks(parsed);
+  }
+  if (!links.length) {
+    box.innerHTML = '<p class="empty">No curated links for this reference yet. The seed dataset is not exhaustive — propose more with <code>node parallel/propose.js</code>.</p>';
+    return;
+  }
+  box.innerHTML = '<p class="empty">Loading ' + links.length + ' link(s)…</p>';
+  const cards = [];
+  for (const l of links.slice(0, 60)) cards.push(await renderCard(l));
+  box.innerHTML = cards.join('') +
+    (links.length > 60 ? '<p class="empty">Showing 60 of ' + links.length + ' — narrow your query.</p>' : '');
+}
+
+async function boot() {
+  try {
+    await loadLinks();
+    await loadKJV();
+    $('count').textContent = LINKS.length;
+    $('status').textContent = 'Texts: KJV from ' + kjvSource + ' · ' + LINKS.length +
+      ' curated links loaded. UB paragraphs load on demand and are cached in your browser.';
+    // Deep link: ?ref=180:2.1 (or "John 15:5") runs the search on load.
+    try {
+      const r = new URLSearchParams(location.search).get('ref');
+      if (r) { $('q').value = r; lastQuery = r; }
+    } catch (e) { /* non-browser / no URL API */ }
+    await render();
+  } catch(e) {
+    $('status').textContent = 'Error: ' + e.message;
+  }
+}
+
+$('go').addEventListener('click', () => { lastQuery = $('q').value; render(); });
+$('q').addEventListener('keydown', e => { if (e.key === 'Enter') { lastQuery = $('q').value; render(); } });
+document.querySelectorAll('#chips .chip').forEach(c =>
+  c.addEventListener('click', () => {
+    document.querySelectorAll('#chips .chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active'); activeRel = c.dataset.rel; render();
+  }));
+boot();
+</script>
+</body>
+</html>

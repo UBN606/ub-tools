@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+/* Shared display prefs with UB Tools Studio (localStorage). Runs pre-paint to avoid a flash. */
+try{
+var g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
+var t=g('ub-tools-theme');try{t=JSON.parse(t)}catch(e){}
+if(t!=='dark'&&t!=='light'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
+document.documentElement.setAttribute('data-theme',t);
+var s=g('ub-tools-text-size');try{s=JSON.parse(s)}catch(e){}
+var n=(typeof s==='number'&&isFinite(s))?Math.max(0,Math.min(3,Math.floor(s))):1;
+document.documentElement.style.fontSize=[90,100,112,125][n]+'%';
+}catch(e){}
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Master Universe — an interactive schematic (Urantia Book Papers 11–15)</title>
+<style>
+:root{--bg:#0a0c10;--panel:#11141b;--ink:#e9e2d0;--muted:#9a917e;--gold:#d9a94f;
+      --gold-dim:#8a6f35;--line:#262b36;--hav:#3d2f14;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+     font-family:Georgia,'Times New Roman',serif;}
+header{padding:22px 28px 6px;border-bottom:1px solid var(--line);max-width:1400px;margin:0 auto}
+header h1{font-size:1.5rem;margin:0 0 4px;letter-spacing:.02em}
+header h1 .g{color:var(--gold)}
+header p{color:var(--muted);font-size:.92rem;margin:4px 0;font-family:system-ui,sans-serif}
+main{display:flex;gap:0;max-width:1400px;margin:0 auto;align-items:stretch}
+#mapwrap{flex:1 1 auto;min-width:0;padding:10px}
+svg#map{width:100%;height:auto;display:block;max-height:92vh}
+#side{flex:0 0 360px;background:var(--panel);border-left:1px solid var(--line);
+      padding:24px 22px;font-family:system-ui,sans-serif;overflow-y:auto;max-height:92vh}
+#side h2{font-family:Georgia,serif;font-size:1.25rem;color:var(--gold);margin:0 0 6px}
+#side .blurb{color:var(--muted);font-size:.9rem;margin:0 0 14px;line-height:1.5}
+#side blockquote{border-left:3px solid var(--gold);margin:0 0 12px;padding:2px 0 2px 14px;
+      font-family:Georgia,serif;font-size:1.02rem;line-height:1.55;color:var(--ink)}
+#side .cite{font-size:.82rem;color:var(--muted);letter-spacing:.03em}
+#side .cite b{color:var(--gold)}
+#regionlist{max-width:1400px;margin:0 auto;padding:18px 28px 60px}
+#regionlist h3{font-family:system-ui,sans-serif;font-size:.8rem;letter-spacing:.14em;
+      text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+#rgrid{display:flex;flex-wrap:wrap;gap:8px}
+#rgrid button{background:#141821;border:1px solid var(--line);color:var(--ink);
+      font-family:system-ui,sans-serif;font-size:.82rem;padding:7px 12px;border-radius:999px;cursor:pointer}
+#rgrid button:hover,#rgrid button.on{border-color:var(--gold);color:var(--gold)}
+footer{max-width:1400px;margin:0 auto;padding:0 28px 40px;color:var(--muted);
+      font-size:.82rem;font-family:system-ui,sans-serif;line-height:1.6}
+/* ---- SVG region styling ---- */
+.region{cursor:pointer;outline:none;transition:opacity .15s}
+.region:hover{opacity:.92}
+.region:focus-visible{stroke:var(--gold);stroke-width:2}
+.region.sel{stroke:var(--gold)!important;stroke-width:2.5}
+.isle{fill:url(#islegrad);stroke:#6b5326;stroke-width:1.5}
+.upper{fill:#e8c876;stroke:#6b5326;stroke-width:1}
+.nether{fill:#1a2233;stroke:#5b6b8c;stroke-width:1.5;stroke-dasharray:7 5}
+.periph{fill:rgba(217,169,79,.18);stroke:none}
+.sat{fill:#cdb87a;stroke:#6b5326;stroke-width:.8}
+.circuit{fill:none;stroke:#7d6a3c;stroke-width:1.4;opacity:.85}
+.pcirc{stroke:#8d7c48}
+.havona-band{fill:rgba(217,169,79,.10);stroke:#4d3f22;stroke-width:1}
+.belt{fill:none;stroke:#3f4a63;stroke-width:10;stroke-dasharray:2 14;stroke-linecap:round;opacity:.9}
+.su{fill:#151a24;stroke:#2c3444;stroke-width:1}
+.su:hover{fill:#1d2330}
+.su.ours{fill:#2b2110;stroke:var(--gold-dim)}
+.lbl{fill:var(--ink);font-family:system-ui,sans-serif;letter-spacing:.06em;pointer-events:none}
+.lbl.dim{fill:var(--muted)} .lbl.gold{fill:var(--gold)} .lbl.tiny{fill:#3a3223}
+.su-lbl{fill:#cfc6ae;font-weight:600}
+.title{fill:var(--ink);font-family:Georgia,serif;letter-spacing:.28em;pointer-events:none}
+.proc-arrow{fill:none;stroke:var(--muted);stroke-width:1.4;opacity:.7}
+.thinring{fill:none;stroke:#39415a;stroke-width:1.2;opacity:.8}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin-cw{transform-origin:600px 600px;animation:spin 140s linear infinite}
+.spin-ccw{transform-origin:600px 600px;animation:spin 180s linear infinite reverse}
+@media (max-width:900px){main{flex-direction:column}#side{flex:none;border-left:none;border-top:1px solid var(--line);max-height:none}}
+
+/* display-settings pill (theme + text size; prefs shared with Studio via localStorage) */
+.ub-a11y{position:fixed;top:10px;right:10px;z-index:60;display:flex;gap:6px;align-items:center;padding:6px;border-radius:999px;border:1px solid var(--line);background:var(--panel);box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.ub-a11y button{min-width:44px;min-height:44px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink,var(--text,#ece9e1));font:600 14px/1 system-ui,sans-serif;cursor:pointer;padding:0 10px}
+.ub-a11y button:hover{border-color:var(--gold)}
+.ub-a11y button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.ub-a11y button:disabled{opacity:.4;cursor:default}
+.ub-a11y button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+:root{color-scheme:dark}
+[data-theme="light"]{color-scheme:light}
+/* light mode (default on this page is dark) */
+[data-theme="light"]{--bg:#f5f1e8;--panel:#fbf8f1;--ink:#2b2620;--muted:#6b6257;--gold:#8a5a1f;--gold-dim:rgba(138,90,31,.25);--line:#ddd3c0}
+[data-theme="light"] #rgrid button{background:#fdfbf5}
+[data-theme="light"] #rgrid button:hover,[data-theme="light"] #rgrid button.on{border-color:var(--gold);color:var(--gold)}
+[data-theme="light"] #rgrid button{min-height:44px}
+[data-theme="light"] .sat{fill:#8a7134;stroke:#5a4a1f}
+[data-theme="light"] .su{fill:#efe9d9;stroke:#d8cfbc}
+[data-theme="light"] .su:hover{fill:#e7ddc6}
+[data-theme="light"] .su.ours{fill:#f0e3c2;stroke:var(--gold-dim)}
+[data-theme="light"] .isle{fill:#e8ddc0;stroke:#8a7134}
+[data-theme="light"] .upper{fill:#c9a44a;stroke:#8a7134}
+[data-theme="light"] .nether{fill:#dfe6f0;stroke:#8a9bb8}
+[data-theme="light"] .belt{stroke:#a08a5a}
+[data-theme="light"] .circuit{stroke:#a08a5a}
+[data-theme="light"] .havona-band{fill:rgba(138,90,31,.10);stroke:#c9b98a}
+[data-theme="light"] .lbl.tiny{fill:#8a7f68}
+</style>
+</head>
+<body>
+<div class="ub-a11y" role="group" aria-label="Display settings">
+<button type="button" id="ub-theme" aria-pressed="false">☀ Light</button>
+<button type="button" id="ub-sdec" aria-label="Smaller text">A−</button>
+<button type="button" id="ub-sreset" aria-label="Default text size" aria-pressed="true">A</button>
+<button type="button" id="ub-sinc" aria-label="Larger text">A+</button>
+</div>
+<header>
+<h1><span class="g">The Master Universe</span> — an interactive schematic</h1>
+<p>Based on Papers 11–15 of <i>The Urantia Book</i>. Click any region for its exact book quote and citation. Hand-drawn schematic — not to scale.</p>
+</header>
+<main>
+<div id="mapwrap">
+<svg id="map" viewBox="0 0 1200 1200" role="img" aria-label="Schematic map of the master universe">
+<defs>
+<radialGradient id="islegrad" cx="50%" cy="42%" r="65%">
+<stop offset="0%" stop-color="#f4dd9a"/><stop offset="55%" stop-color="#d9a94f"/><stop offset="100%" stop-color="#8a6a2c"/>
+</radialGradient>
+<marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+<path d="M0,0 L6,3 L0,6 Z" fill="#9a917e"/>
+</marker>
+</defs>
+<g id="outer-levels">
+<circle cx="600" cy="600" r="545" class="region thinring" data-region="outer-space-levels" tabindex="0" role="button" aria-label="outer-space-levels"/>
+<circle cx="600" cy="600" r="562" class="region thinring" data-region="outer-space-levels" tabindex="0" role="button" aria-label="outer-space-levels"/>
+<circle cx="600" cy="600" r="579" class="region thinring" data-region="outer-space-levels" tabindex="0" role="button" aria-label="outer-space-levels"/>
+<circle cx="600" cy="600" r="596" class="region thinring" data-region="outer-space-levels" tabindex="0" role="button" aria-label="outer-space-levels"/>
+<text x="600.0" y="-10.0" class="lbl dim" text-anchor="middle" font-size="13">OUTER SPACE LEVELS 1–4</text>
+</g>
+<g id="superuniverses">
+<path d="M383.4,127.3 A520,520 0 0 1 816.6,127.3 L762.4,245.4 A390,390 0 0 0 437.6,245.4 Z" class="region su" data-region="superuniverse-1" tabindex="0" role="button" aria-label="superuniverse-1" />
+<text x="600.0" y="149.0" class="lbl su-lbl" text-anchor="middle" font-size="13">No. 1</text>
+<path d="M95.4,474.6 A520,520 0 0 1 365.4,135.9 L424.1,251.9 A390,390 0 0 0 221.5,505.9 Z" class="region su" data-region="superuniverse-2" tabindex="0" role="button" aria-label="superuniverse-2" />
+<text x="244.3" y="320.3" class="lbl su-lbl" text-anchor="middle" font-size="13">No. 2</text>
+<path d="M187.3,916.4 A520,520 0 0 1 90.9,494.0 L218.2,520.5 A390,390 0 0 0 290.5,837.3 Z" class="region su" data-region="superuniverse-3" tabindex="0" role="button" aria-label="superuniverse-3" />
+<text x="156.4" y="705.2" class="lbl su-lbl" text-anchor="middle" font-size="13">No. 3</text>
+<path d="M590.0,1119.9 A520,520 0 0 1 199.7,932.0 L299.8,849.0 A390,390 0 0 0 592.5,989.9 Z" class="region su" data-region="superuniverse-4" tabindex="0" role="button" aria-label="superuniverse-4" />
+<text x="402.6" y="1013.9" class="lbl su-lbl" text-anchor="middle" font-size="13">No. 4</text>
+<path d="M1000.3,932.0 A520,520 0 0 1 610.0,1119.9 L607.5,989.9 A390,390 0 0 0 900.2,849.0 Z" class="region su" data-region="superuniverse-5" tabindex="0" role="button" aria-label="superuniverse-5" />
+<text x="797.4" y="1013.9" class="lbl su-lbl" text-anchor="middle" font-size="13">No. 5</text>
+<path d="M1109.1,494.0 A520,520 0 0 1 1012.7,916.4 L909.5,837.3 A390,390 0 0 0 981.8,520.5 Z" class="region su" data-region="superuniverse-6" tabindex="0" role="button" aria-label="superuniverse-6" />
+<text x="1043.6" y="705.2" class="lbl su-lbl" text-anchor="middle" font-size="13">No. 6</text>
+<path d="M834.6,135.9 A520,520 0 0 1 1104.6,474.6 L978.5,505.9 A390,390 0 0 0 775.9,251.9 Z" class="region su ours" data-region="superuniverse-7" tabindex="0" role="button" aria-label="superuniverse-7" />
+<text x="955.7" y="320.3" class="lbl su-lbl" text-anchor="middle" font-size="15">ORVONTON · 7</text>
+<text x="799.5" y="191.0" class="lbl gold" text-anchor="middle" font-size="12">★ ours</text>
+<path d="M1080.6,322.5 A555,555 0 0 0 696.4,53.4" class="proc-arrow" marker-end="url(#arrowhead)"/>
+<text x="941.7" y="162.7" class="lbl dim" text-anchor="middle" font-size="11">counterclockwise processional</text>
+</g>
+<g id="dark-belts">
+<ellipse cx="600" cy="600" rx="350" ry="338" class="region belt spin-ccw" data-region="dark-gravity-bodies" tabindex="0" role="button" aria-label="dark-gravity-bodies"/>
+<ellipse cx="600" cy="600" rx="290" ry="280" class="region belt spin-cw" data-region="dark-gravity-bodies" tabindex="0" role="button" aria-label="dark-gravity-bodies"/>
+<text x="875.8" y="831.5" class="lbl dim" text-anchor="middle" font-size="12">DARK GRAVITY BODIES — two belts</text>
+</g>
+<g id="havona">
+<path d="M355,600 A245,245 0 1 0 845,600 A245,245 0 1 0 355,600 Z M450,600 A150,150 0 1 1 750,600 A150,150 0 1 1 450,600 Z" fill-rule="evenodd" class="region havona-band" data-region="havona" tabindex="0" role="button" aria-label="havona"/>
+<circle cx="600" cy="600" r="158" class="region circuit" data-region="circuits" tabindex="0" role="button" aria-label="circuits"/>
+<circle cx="600" cy="600" r="172" class="region circuit" data-region="circuits" tabindex="0" role="button" aria-label="circuits"/>
+<circle cx="600" cy="600" r="186" class="region circuit" data-region="circuits" tabindex="0" role="button" aria-label="circuits"/>
+<circle cx="600" cy="600" r="200" class="region circuit" data-region="circuits" tabindex="0" role="button" aria-label="circuits"/>
+<circle cx="600" cy="600" r="214" class="region circuit" data-region="circuits" tabindex="0" role="button" aria-label="circuits"/>
+<circle cx="600" cy="600" r="228" class="region circuit" data-region="circuits" tabindex="0" role="button" aria-label="circuits"/>
+<circle cx="600" cy="600" r="242" class="region circuit" data-region="circuits" tabindex="0" role="button" aria-label="circuits"/>
+<text x="421.8" y="726.5" class="lbl" text-anchor="middle" font-size="13">HAVONA — 1 billion worlds</text>
+<circle cx="600" cy="600" r="118" class="region circuit pcirc" data-region="circuits" tabindex="0" role="button" aria-label="circuits"/>
+<circle cx="600" cy="600" r="130" class="region circuit pcirc" data-region="circuits" tabindex="0" role="button" aria-label="circuits"/>
+<circle cx="600" cy="600" r="142" class="region circuit pcirc" data-region="circuits" tabindex="0" role="button" aria-label="circuits"/>
+</g>
+<g id="satellites">
+<circle cx="600.0" cy="505.0" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="628.0" cy="509.2" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="653.5" cy="521.5" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="674.3" cy="540.8" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="688.4" cy="565.3" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="694.7" cy="592.9" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="692.6" cy="621.1" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="682.3" cy="647.5" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="664.6" cy="669.6" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="641.2" cy="685.6" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="614.2" cy="693.9" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="585.8" cy="693.9" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="558.8" cy="685.6" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="535.4" cy="669.6" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="517.7" cy="647.5" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="507.4" cy="621.1" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="505.3" cy="592.9" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="511.6" cy="565.3" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="525.7" cy="540.8" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="546.5" cy="521.5" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<circle cx="572.0" cy="509.2" r="5" class="region sat" data-region="paradise-satellites" tabindex="0" role="button" aria-label="paradise-satellites"><title>Paradise satellite</title></circle>
+<text x="650.6" y="701.9" class="lbl dim" text-anchor="middle" font-size="11">21 Paradise satellites</text>
+</g>
+<g id="paradise">
+<circle cx="600" cy="600" r="70" class="region nether" data-region="nether-paradise" tabindex="0" role="button" aria-label="nether-paradise" />
+<circle cx="600" cy="600" r="58" class="region isle" data-region="paradise" tabindex="0" role="button" aria-label="paradise" />
+<path d="M542,600 A58,58 0 1 0 658,600 A58,58 0 1 0 542,600 Z M558,600 A42,42 0 1 1 642,600 A42,42 0 1 1 558,600 Z" fill-rule="evenodd" class="region periph" data-region="peripheral-paradise" tabindex="0" role="button" aria-label="peripheral-paradise"/>
+<circle cx="600" cy="600" r="19" class="region upper" data-region="upper-paradise" tabindex="0" role="button" aria-label="upper-paradise" />
+<text x="548.9" y="677.2" class="lbl dim" text-anchor="middle" font-size="11">Nether Paradise</text>
+<text x="600.0" y="534.0" class="lbl gold" text-anchor="middle" font-size="13">THE ISLE OF PARADISE</text>
+<text x="600.0" y="602.0" class="lbl tiny" text-anchor="middle" font-size="10">Upper</text>
+<text x="533.4" y="591.5" class="lbl dim" text-anchor="middle" font-size="10">Peripheral</text>
+</g>
+<text x="600.0" y="46.0" class="title" text-anchor="middle" font-size="26">THE MASTER UNIVERSE</text>
+<text x="600.0" y="70.0" class="lbl dim" text-anchor="middle" font-size="13">as described in Papers 11–15 of The Urantia Book · schematic — not to scale</text>
+</svg>
+</div>
+<aside id="side" aria-live="polite"><div id="panel"></div></aside>
+</main>
+<section id="regionlist"><h3>All regions</h3><div id="rgrid"></div></section>
+<footer>
+<p>Quotes are short verbatim excerpts from <i>The Urantia Book</i>, each shown with its paragraph citation (paper:section.paragraph). Dataset embedded in this page — no network requests.</p>
+<p>Schematic liberties: Paradise’s upper / peripheral / nether zones are shown as concentric layers for clickability (the book describes them directionally); superuniverse wedge positions follow the directional account in 15:1.4; only Orvonton is named in the text — superuniverses 1–6 are numbered, not named.</p>
+</footer>
+<script id="cosmos-data" type="application/json">
+[
+ {
+  "id": "paradise",
+  "name": "The Isle of Paradise",
+  "blurb": "The eternal center of the map; everything else revolves around it.",
+  "quote": "PARADISE is the eternal center of the universe of universes and the abiding place of the Universal Father, the Eternal Son, the Infinite Spirit, and their divine co-ordinates and associates.",
+  "citation": "11:0.1",
+  "paper": "Paper 11 — The Eternal Isle of Paradise"
+ },
+ {
+  "id": "upper-paradise",
+  "name": "Upper Paradise",
+  "blurb": "The spiritual heart of the Isle: the Deity presence, the Most Holy Sphere, and the Holy Area.",
+  "quote": "On upper Paradise there are three grand spheres of activity, the Deity presence, the Most Holy Sphere, and the Holy Area. The vast region immediately surrounding the presence of the Deities is set aside as the Most Holy Sphere and is reserved for the functions of worship, trinitization, and high spiritual attainment.",
+  "citation": "11:3.1",
+  "paper": "Paper 11 — The Eternal Isle of Paradise"
+ },
+ {
+  "id": "peripheral-paradise",
+  "name": "Peripheral Paradise",
+  "blurb": "The rim of the Isle, with landing and dispatching fields for spirit personalities.",
+  "quote": "The central Isle ends abruptly at the periphery, but its size is so enormous that this terminal angle is relatively indiscernible within any circumscribed area. The peripheral surface of Paradise is occupied, in part, by the landing and dispatching fields for various groups of spirit personalities.",
+  "citation": "11:4.1",
+  "paper": "Paper 11 — The Eternal Isle of Paradise"
+ },
+ {
+  "id": "nether-paradise",
+  "name": "Nether Paradise",
+  "blurb": "The underside of the Isle; personalities do not sojourn there.",
+  "quote": "Concerning nether Paradise, we know only that which is revealed; personalities do not sojourn there. It has nothing whatever to do with the affairs of spirit intelligences, nor does the Deity Absolute there function.",
+  "citation": "11:5.1",
+  "paper": "Paper 11 — The Eternal Isle of Paradise"
+ },
+ {
+  "id": "paradise-satellites",
+  "name": "The 21 Paradise Satellites",
+  "blurb": "Twenty-one spheres encircling the Isle, shown here as a single ring of worlds.",
+  "quote": "These twenty-one spheres embrace the potentials of the function of the master universe.",
+  "citation": "13:0.7",
+  "paper": "Paper 13 — The Sacred Spheres of Paradise"
+ },
+ {
+  "id": "circuits",
+  "name": "The Ten Concentric Circuits",
+  "blurb": "Three circuits of Paradise spheres plus seven circuits of Havona worlds, whirling in one vast plane around the Isle.",
+  "quote": "The central universe whirls around the stationary Isle of Paradise in one vast plane, consisting of ten concentric stabilized units—the three circuits of Paradise spheres and the seven circuits of Havona worlds.",
+  "citation": "14:1.10",
+  "paper": "Paper 14 — The Central and Divine Universe"
+ },
+ {
+  "id": "havona",
+  "name": "Havona — the Central Universe",
+  "blurb": "The eternal, never-beginning central creation: one billion perfect spheres surrounding Paradise.",
+  "quote": "Havona, the central universe, is not a time creation; it is an eternal existence. This never-beginning, never-ending universe consists of one billion spheres of sublime perfection and is surrounded by the enormous dark gravity bodies.",
+  "citation": "12:1.10",
+  "paper": "Paper 12 — The Universe of Universes"
+ },
+ {
+  "id": "dark-gravity-bodies",
+  "name": "The Dark Gravity Bodies",
+  "blurb": "Two elliptical circuits of enormous dark masses that encircle and enshroud Havona; the inner belt revolves counterclockwise, the outer clockwise.",
+  "quote": "These dark gravity bodies neither reflect nor absorb light; they are nonreactive to physical-energy light, and they so completely encircle and enshroud Havona as to hide it from the view of even near-by inhabited universes of time and space.",
+  "citation": "14:1.14",
+  "paper": "Paper 14 — The Central and Divine Universe"
+ },
+ {
+  "id": "superuniverse-1",
+  "name": "Superuniverse Number One",
+  "blurb": "The book numbers this superuniverse but gives it no name; only Orvonton is named. It swings almost due north.",
+  "quote": "In this age and as direction is regarded on Urantia, superuniverse number one swings almost due north, approximately opposite, in an easterly direction, to the Paradise residence of the Great Sources and Centers and the central universe of Havona.",
+  "citation": "15:1.4",
+  "paper": "Paper 15 — The Seven Superuniverses"
+ },
+ {
+  "id": "superuniverse-2",
+  "name": "Superuniverse Number Two",
+  "blurb": "Numbered but not named in the text; each superuniverse has a special function and a unique nature.",
+  "quote": "There are seven major purposes which are being unfolded in the evolution of the seven superuniverses. Each major purpose in superuniverse evolution will find fullest expression in only one of the seven superuniverses, and therefore does each superuniverse have a special function and a unique nature.",
+  "citation": "15:14.1",
+  "paper": "Paper 15 — The Seven Superuniverses"
+ },
+ {
+  "id": "superuniverse-3",
+  "name": "Superuniverse Number Three",
+  "blurb": "Numbered but not named in the text; each superuniverse has a special function and a unique nature.",
+  "quote": "There are seven major purposes which are being unfolded in the evolution of the seven superuniverses. Each major purpose in superuniverse evolution will find fullest expression in only one of the seven superuniverses, and therefore does each superuniverse have a special function and a unique nature.",
+  "citation": "15:14.1",
+  "paper": "Paper 15 — The Seven Superuniverses"
+ },
+ {
+  "id": "superuniverse-4",
+  "name": "Superuniverse Number Four",
+  "blurb": "Numbered but not named in the text; each superuniverse has a special function and a unique nature.",
+  "quote": "There are seven major purposes which are being unfolded in the evolution of the seven superuniverses. Each major purpose in superuniverse evolution will find fullest expression in only one of the seven superuniverses, and therefore does each superuniverse have a special function and a unique nature.",
+  "citation": "15:14.1",
+  "paper": "Paper 15 — The Seven Superuniverses"
+ },
+ {
+  "id": "superuniverse-5",
+  "name": "Superuniverse Number Five",
+  "blurb": "Numbered but not named in the text; each superuniverse has a special function and a unique nature.",
+  "quote": "There are seven major purposes which are being unfolded in the evolution of the seven superuniverses. Each major purpose in superuniverse evolution will find fullest expression in only one of the seven superuniverses, and therefore does each superuniverse have a special function and a unique nature.",
+  "citation": "15:14.1",
+  "paper": "Paper 15 — The Seven Superuniverses"
+ },
+ {
+  "id": "superuniverse-6",
+  "name": "Superuniverse Number Six",
+  "blurb": "Numbered but not named in the text; each superuniverse has a special function and a unique nature.",
+  "quote": "There are seven major purposes which are being unfolded in the evolution of the seven superuniverses. Each major purpose in superuniverse evolution will find fullest expression in only one of the seven superuniverses, and therefore does each superuniverse have a special function and a unique nature.",
+  "citation": "15:14.1",
+  "paper": "Paper 15 — The Seven Superuniverses"
+ },
+ {
+  "id": "superuniverse-7",
+  "name": "Orvonton — the Seventh Superuniverse",
+  "blurb": "Our superuniverse. The local universe of Nebadon belongs to Orvonton.",
+  "quote": "Your local universe of Nebadon belongs to Orvonton, the seventh superuniverse, which swings on between superuniverses one and six, having not long since (as we reckon time) turned the southeastern bend of the superuniverse space level.",
+  "citation": "15:1.5",
+  "paper": "Paper 15 — The Seven Superuniverses"
+ },
+ {
+  "id": "outer-space-levels",
+  "name": "The Outer Space Levels",
+  "blurb": "Four vast space levels beyond the grand universe, shown as four thin rings.",
+  "quote": "Proceeding outward from Paradise through the horizontal extension of pervaded space, the master universe is existent in six concentric ellipses, the space levels encircling the central Isle:",
+  "citation": "12:1.3",
+  "paper": "Paper 12 — The Universe of Universes"
+ }
+]
+</script>
+<script>
+var DATA=JSON.parse(document.getElementById('cosmos-data').textContent);
+var BY={}; DATA.forEach(function(r){BY[r.id]=r;});
+var panel=document.getElementById('panel'), grid=document.getElementById('rgrid');
+function select(id){
+  var r=BY[id]; if(!r) return;
+  document.querySelectorAll('.region.sel').forEach(function(e){e.classList.remove('sel');});
+  document.querySelectorAll('[data-region="'+id+'"]').forEach(function(e){e.classList.add('sel');});
+  grid.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.id===id);});
+  panel.innerHTML='<h2>'+esc(r.name)+'</h2><p class="blurb">'+esc(r.blurb)+'</p>'
+    +'<blockquote>'+esc(r.quote)+'</blockquote>'
+    +'<div class="cite"><b>\u00b6 '+esc(r.citation)+'</b> &nbsp;·&nbsp; '+esc(r.paper)+'</div>';
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+/* a11y-touch-halo: invisible 44px tap targets around the small satellite dots */
+document.querySelectorAll('.sat').forEach(function(e){
+  var c=document.createElementNS('http:'+'//www.w3.org/2000/svg','circle') /* split: portability test rejects absolute-URL-looking literals; this is only the SVG namespace identifier, never fetched */;
+  c.setAttribute('cx',e.getAttribute('cx'));c.setAttribute('cy',e.getAttribute('cy'));
+  c.setAttribute('r','22');c.setAttribute('fill','transparent');c.setAttribute('class','region');
+  c.setAttribute('data-region',e.getAttribute('data-region'));
+  e.parentNode.insertBefore(c,e);
+});
+document.querySelectorAll('[data-region]').forEach(function(e){
+  var id=e.getAttribute('data-region');
+  e.addEventListener('click',function(){select(id);});
+  e.addEventListener('keydown',function(ev){if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();select(id);}});
+});
+DATA.forEach(function(r){
+  var b=document.createElement('button'); b.textContent=r.name; b.dataset.id=r.id;
+  b.addEventListener('click',function(){select(r.id);});
+  grid.appendChild(b);
+});
+select('paradise');
+</script>
+<script>
+/* Display-settings pill: theme + text size, synced with UB Tools Studio via localStorage. */
+(function(){
+var root=document.documentElement,PCTS=[90,100,112,125];
+function getN(){var s=null;try{s=JSON.parse(localStorage.getItem('ub-tools-text-size'))}catch(e){}return (typeof s==='number'&&isFinite(s))?Math.max(0,Math.min(3,Math.floor(s))):1}
+function paint(){
+var light=root.getAttribute('data-theme')==='light',tb=document.getElementById('ub-theme');
+tb.setAttribute('aria-pressed',String(light));
+tb.textContent=light?'\u263E Dark':'\u2600 Light';
+var n=getN();
+document.getElementById('ub-sreset').setAttribute('aria-pressed',String(n===1));
+document.getElementById('ub-sdec').disabled=n<=0;
+document.getElementById('ub-sinc').disabled=n>=3;
+}
+function setN(n){try{localStorage.setItem('ub-tools-text-size',JSON.stringify(n))}catch(e){}root.style.fontSize=PCTS[n]+'%';paint()}
+document.getElementById('ub-theme').addEventListener('click',function(){
+var next=root.getAttribute('data-theme')==='light'?'dark':'light';
+try{localStorage.setItem('ub-tools-theme',JSON.stringify(next))}catch(e){}
+root.setAttribute('data-theme',next);paint();
+});
+document.getElementById('ub-sdec').addEventListener('click',function(){setN(Math.max(0,getN()-1))});
+document.getElementById('ub-sreset').addEventListener('click',function(){setN(1)});
+document.getElementById('ub-sinc').addEventListener('click',function(){setN(Math.min(3,getN()+1))});
+paint();
+})();
+</script>
+</body>
+</html>

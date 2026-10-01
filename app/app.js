@@ -1,7 +1,10 @@
 // UB Tools Studio: the interface. The engine (engine.js) runs the repository's own tools.
 import { loadEngine } from './engine.js'
 import { citeLine, copyText, shareQuote, quotePicture, shareRowHTML, shareTo } from './share.js'
+import { parseRefParam, expandRange, isValidRef, refLink } from './deep-link.js'
+import { renderReadAlong } from './readalong.js'
 import { loadTopics, findTopics } from './topics.js'
+import { THEME_KEY, SIZE_KEY, SIZE_DEFAULT, resolveTheme, oppositeTheme, parseStoredTheme, parseStoredSize, stepSize, applyTheme, applySize, migrateLegacyBig, themeToggleState } from './a11y.js'
 import { answer, speech, listener, englishVoices, whenVoices, chooseVoice } from './ask.js'
 
 const $ = (id) => document.getElementById(id)
@@ -55,15 +58,91 @@ loadEngine((done, total, source) => {
   status.textContent = `${E.paragraphs.toLocaleString()} paragraphs ready`
   status.classList.add('ready')
   loadTopics().catch(() => {})
+  renderReadAlong($('listen-slab'), E, { esc, store, startReading, setView })
   $('groove').classList.add('done')
   for (const el of [$('q'), $('draft'), $('go')]) el.disabled = false
   $('q').focus()
   const u = new URL(location.href)
   if (u.searchParams.get('q')) { $('q').value = u.searchParams.get('q'); setMode(u.searchParams.get('mode') || 'ask'); submit() }
+  else handleRefLink()
 }).catch((err) => {
   status.textContent = 'The book could not be loaded'
   $('hint').innerHTML = `The book text did not load (${esc(err.message)}). Check your connection and reload. If you run the tools from a copy of the repository, run <code>node fetch-data.js</code> there first.`
 })
+
+// ---------- shareable citation links (?ref=) ----------
+function handleRefLink() {
+  const box = $('results')
+  const fail = (msg) => {
+    box.innerHTML = `<div class="summary"><h2>Shared passage</h2><p>${esc(msg)}</p></div><p class="empty">The link you opened names a paragraph the Studio cannot show. Check the link, or look the passage up by its number, like 180:2.1.</p>`
+  }
+  const { refs, ranges, error } = parseRefParam(location.search)
+  if (error) { fail(error); return }
+  if (!refs.length && !ranges.length) return // no ?ref=: nothing to do
+  const bad = [], ok = []
+  for (const r of refs) (isValidRef(r, E.byRef) ? ok : bad).push(r)
+  const grown = []
+  for (const { start, end } of ranges) {
+    const ex = isValidRef(start, E.byRef) && isValidRef(end, E.byRef) ? expandRange(start, end, E.order) : []
+    if (ex.length) grown.push(...ex)
+    else bad.push(`${start}-${end}`)
+  }
+  if (bad.length) { fail(`"${esc(bad[0])}" is not in this edition of the book.`); return }
+  const all = [...new Set([...ok, ...grown])]
+  if (!all.length) { fail('This link names no paragraph.'); return }
+  renderList(all.map((ref) => ({ ref })), {
+    title: all.length === 1 ? `Paragraph ${all[0]}` : `${all.length} paragraphs`,
+    sub: 'Opened from a shared link.',
+  })
+  openRef(all[0])
+}
+
+// ---------- top-level views: Read, Listen, Plans, Quiz, Explore, Tools ----------
+import { renderExploreView } from './explore.js'
+import { renderPlansView } from './plans.js'
+import { renderQuizView } from './quiz.js'
+import { renderToolsView } from './tools.js'
+const VIEWS = ['read', 'listen', 'plans', 'quiz', 'explore', 'tools']
+const viewInited = {}
+function placeTopThumb() {
+  const on = document.querySelector('.topnav [aria-current="true"]')
+  const thumb = document.querySelector('.topnav-thumb')
+  if (!on || !thumb) return
+  thumb.style.width = `${on.offsetWidth}px`
+  thumb.style.transform = `translateX(${on.offsetLeft - 5}px)`
+}
+function initView(v) {
+  if (v === 'explore') renderExploreView($('explore-slab'), { esc, openRef, copyText, setView })
+  if (v === 'tools') renderToolsView($('tools-slab'), { esc, setView })
+  if (v === 'plans') renderPlansView($('plans-slab'), E, { esc, store, openRef: (ref) => { setView('read'); openRef(ref) } })
+  if (v === 'quiz') {
+    renderQuizView($('quiz-slab'), E, { esc, store })
+    // Reveal links use the ?ref= format: open them in the Read view without losing quiz state.
+    $('quiz-slab').addEventListener('click', (e) => {
+      const a = e.target.closest('a[href^="?ref="]')
+      if (!a) return
+      e.preventDefault()
+      const ref = decodeURIComponent(a.getAttribute('href').slice(5))
+      setView('read'); openRef(ref)
+    })
+  }
+}
+function setView(v) {
+  if (!VIEWS.includes(v)) v = 'read'
+  stopReading()
+  for (const x of VIEWS) {
+    $(`view-${x}`).hidden = x !== v
+    const b = document.querySelector(`.topnav [data-view="${x}"]`)
+    if (b) b.setAttribute('aria-current', String(x === v))
+  }
+  placeTopThumb()
+  if (v === 'read') { placeThumb(); closeTablet() }
+  if (E && !viewInited[v]) { viewInited[v] = true; initView(v) }
+}
+document.querySelectorAll('.topnav [data-view]').forEach((b) =>
+  b.addEventListener('click', () => setView(b.dataset.view)))
+addEventListener('resize', placeTopThumb)
+document.fonts?.ready.then(placeTopThumb)
 
 // ---------- modes ----------
 const tabs = [...document.querySelectorAll('.modes button')]
@@ -120,15 +199,39 @@ whenVoices(() => {
   $('voice-wrap').hidden = false
 })
 $('voice').addEventListener('change', (e) => { chooseVoice(e.target.value); speech.say('This is how I will read to you.') })
-const bigger = $('bigger')
-const setBig = (on) => { document.documentElement.classList.toggle('big', on); bigger.setAttribute('aria-pressed', String(on)); store.set('big', on); placeThumb() }
-bigger.addEventListener('click', () => setBig(!document.documentElement.classList.contains('big')))
-setBig(store.get('big', true))
+// --- display accessibility: theme + text size (see a11y.js) ---
+const mqDark = matchMedia('(prefers-color-scheme: dark)')
+let theme = resolveTheme(store.get(THEME_KEY, null), mqDark.matches)
+let size = parseStoredSize(store.get(SIZE_KEY, null))
+if (size == null) size = migrateLegacyBig(store.get('big', true)) // old single toggle
+const themeBtn = $('theme-toggle')
+const sizeDec = $('size-dec'), sizeReset = $('size-reset'), sizeInc = $('size-inc')
+const applyDisplay = () => {
+  applyTheme(document, theme); applySize(document, size)
+  const st = themeToggleState(theme)
+  themeBtn.setAttribute('aria-pressed', String(st.pressed))
+  themeBtn.setAttribute('aria-label', st.label)
+  themeBtn.textContent = st.shortLabel
+  sizeDec.disabled = size <= 0
+  sizeInc.disabled = size >= 3
+  sizeReset.setAttribute('aria-pressed', String(size === SIZE_DEFAULT))
+  placeThumb()
+}
+themeBtn.addEventListener('click', () => { theme = oppositeTheme(theme); store.set(THEME_KEY, theme); applyDisplay() })
+sizeDec.addEventListener('click', () => { size = stepSize(size, -1); store.set(SIZE_KEY, size); applyDisplay() })
+sizeInc.addEventListener('click', () => { size = stepSize(size, 1); store.set(SIZE_KEY, size); applyDisplay() })
+sizeReset.addEventListener('click', () => { size = SIZE_DEFAULT; store.set(SIZE_KEY, size); applyDisplay() })
+// follow the device until the user picks a theme explicitly
+mqDark.addEventListener?.('change', (e) => {
+  if (parseStoredTheme(store.get(THEME_KEY, null)) == null) { theme = e.matches ? 'dark' : 'light'; applyDisplay() }
+})
+applyDisplay()
 setMode('ask')
 tabs.forEach((t) => { t.tabIndex = t.getAttribute('aria-selected') === 'true' ? 0 : -1 })
 addEventListener('resize', placeThumb)
 document.fonts?.ready.then(placeThumb)
 placeThumb()
+placeTopThumb()
 
 function renderChips() {
   const box = $('chips')
@@ -218,7 +321,7 @@ function runAsk(q, max = 5) {
   const index = topicsFound.length ? `<div class="index-hint">${topicsFound.map((t, k) => `<button type="button" class="soft" data-topic="${k}">The book's index: ${esc(t.label)} (${t.refs.length} passages)</button>`).join('')}</div>` : ''
   box.innerHTML = `<div class="answer-head"><h2>What the book says</h2><div class="head-actions">${speech.ok ? '<button type="button" class="soft strong" id="read-all">Listen to the answer</button>' : ''}<button type="button" class="soft" id="print">Print the answer</button><button type="button" class="soft" id="copy-all">Copy the answer</button></div></div>
 <p class="print-question">Question: ${esc(q)}</p>${silence}${index}
-<ol class="answer">${pars.map((p, i) => `<li><p class="a-ref">${esc(p.ref)}</p><p class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</p><p class="a-text">${esc(plain(p.text))}</p><p class="a-why">Found because it speaks of: ${[...(r.why.get(p.ref) || [])].map(esc).join(', ')}</p><div class="a-actions">${speech.ok ? `<button type="button" class="soft" data-say="${i}">Listen</button>` : ''}<button type="button" class="soft" data-open="${esc(p.ref)}">See it in the book</button><button type="button" class="soft" data-study="${i}">Add to study list</button></div>${shareRowHTML()}<p class="a-note" aria-live="polite"></p></li>`).join('')}</ol>
+<ol class="answer">${pars.map((p, i) => `<li><p class="a-ref">${esc(p.ref)}</p><p class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</p><p class="a-text">${esc(plain(p.text))}</p><p class="a-why">Found because it speaks of: ${[...(r.why.get(p.ref) || [])].map(esc).join(', ')}</p><div class="a-actions">${speech.ok ? `<button type="button" class="soft" data-say="${i}">Listen</button>` : ''}<button type="button" class="soft" data-open="${esc(p.ref)}">See it in the book</button><button type="button" class="soft" data-study="${i}">Add to study list</button><button type="button" class="soft" data-link="${esc(refLink(p.ref))}">Copy link</button></div>${shareRowHTML()}<p class="a-note" aria-live="polite"></p></li>`).join('')}</ol>
 ${r.more.length ? `<button type="button" class="soft more" id="more">Show more passages</button>` : ''}
 ${goDeeper(pars.map((p) => p.ref))}
 ${missed}
@@ -236,6 +339,11 @@ ${missed}
   cards.forEach((card, i) => card.querySelectorAll('.share-btn').forEach((btn) => btn.addEventListener('click', () =>
     shareTo(btn.dataset.to, quotes[i], q, (msg) => note(i, msg), () => printOnly(card)))))
   box.querySelectorAll('[data-study]').forEach((b) => b.addEventListener('click', () => { const i = Number(b.dataset.study); study.add(quotes[i]); note(i, 'Added to your study list.') }))
+  box.querySelectorAll('[data-link]').forEach((b) => b.addEventListener('click', async (e) => {
+    const btn = e.currentTarget
+    btn.textContent = (await copyText(btn.dataset.link)) ? 'Link copied' : 'Copy blocked'
+    setTimeout(() => { btn.textContent = 'Copy link' }, 2500)
+  }))
   $('print').addEventListener('click', () => { stopReading(); print() })
   $('copy-all').addEventListener('click', async (e) => { const btn = e.currentTarget; const ok = await copyText([q, ...quotes.map(citeLine)].join('\n\n')); btn.textContent = ok ? 'Copied' : 'Copy blocked'; setTimeout(() => { $('copy-all') && ($('copy-all').textContent = 'Copy the answer') }, 2500) })
 }
@@ -406,9 +514,14 @@ function renderList(items, { title, sub, empty, progressKey, read }) {
     const text = i.text ?? p?.text ?? ''
     const where = p ? `${esc(p.paperTitle)}${p.sectionTitle ? `, ${esc(p.sectionTitle)}` : ''}` : ''
     const tick = read ? `<input type="checkbox" class="read-toggle tick" data-ref="${esc(i.ref)}" aria-label="Mark ${esc(i.ref)} as read" ${read.has(i.ref) ? 'checked' : ''}>` : ''
-    return `<li class="row"><button type="button" data-open="${esc(i.ref)}"><span class="ref">${esc(i.ref)}</span><span><span class="where">${where}</span><span class="txt">${highlight(text, i.res)}</span></span></button>${tick}</li>`
+    return `<li class="row"><button type="button" data-open="${esc(i.ref)}"><span class="ref">${esc(i.ref)}</span><span><span class="where">${where}</span><span class="txt">${highlight(text, i.res)}</span></span></button><button type="button" class="soft copy-link" data-link="${esc(refLink(i.ref))}" aria-label="Copy link to ${esc(i.ref)}">Copy link</button>${tick}</li>`
   }).join('')}</ul>`
   box.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openRef(b.dataset.open)))
+  box.querySelectorAll('.copy-link').forEach((b) => b.addEventListener('click', async (e) => {
+    const btn = e.currentTarget
+    btn.textContent = (await copyText(btn.dataset.link)) ? 'Link copied' : 'Copy blocked'
+    setTimeout(() => { btn.textContent = 'Copy link' }, 2500)
+  }))
   if (read) {
     const update = () => {
       const n = items.filter((i) => read.has(i.ref)).length
@@ -428,6 +541,7 @@ function renderList(items, { title, sub, empty, progressKey, read }) {
 function openRef(ref) {
   const exact = E.search.getParagraphs([ref])[0]
   current = ref
+  store.set('last-read-ref', ref)
   $('panel').classList.add('work', 'reading')
   $('tablet').hidden = false
   const inner = document.querySelector('.tablet-inner')
@@ -461,7 +575,14 @@ $('t-prev').addEventListener('click', () => { const i = E.order.indexOf(current)
 $('t-next').addEventListener('click', () => { const i = E.order.indexOf(current); if (i >= 0 && i < E.order.length - 1) openRef(E.order[i + 1]) })
 const currentQuote = () => { const x = E.search.getParagraphs([current])[0]; return x.error ? null : { ref: x.ref, text: x.text.replace(/<[^>]+>/g, '') } }
 const tNote = (msg) => { $('t-note').textContent = msg }
-$('t-share').innerHTML = shareRowHTML() + '<button type="button" class="soft study-add" id="t-study">Add to study list</button>'
+$('t-share').innerHTML = shareRowHTML() + '<button type="button" class="soft study-add" id="t-copylink">Copy link to this paragraph</button><button type="button" class="soft study-add" id="t-study">Add to study list</button><button type="button" class="soft study-add" id="t-parallel">Compare with the Bible</button>'
+$('t-parallel').addEventListener('click', () => {
+  if (!current) return
+  window.open(`../parallel/app/index.html?ref=${encodeURIComponent(current)}`, '_blank', 'noopener')
+})
+$('t-copylink').addEventListener('click', async () => {
+  tNote(current && (await copyText(refLink(current))) ? 'Link copied. Paste it anywhere to share this paragraph.' : 'Copy was blocked.')
+})
 $('t-study').addEventListener('click', () => { const p = currentQuote(); if (p) { study.add(p); tNote('Added to your study list.') } })
 $('t-share').querySelectorAll('.share-btn').forEach((btn) => btn.addEventListener('click', () => {
   const p = currentQuote(); if (!p) return

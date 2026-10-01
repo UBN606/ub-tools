@@ -1,3 +1,6 @@
 # Downloaded by fetch-data.js from Urantiapedia (CC BY-SA 4.0); never committed here
 source-texts/
 node_modules/
+__pycache__/
+*.pyc
+.DS_Store

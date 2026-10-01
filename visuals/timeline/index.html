@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+/* Shared display prefs with UB Tools Studio (localStorage). Runs pre-paint to avoid a flash. */
+try{
+var g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
+var t=g('ub-tools-theme');try{t=JSON.parse(t)}catch(e){}
+if(t!=='dark'&&t!=='light'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
+document.documentElement.setAttribute('data-theme',t);
+var s=g('ub-tools-text-size');try{s=JSON.parse(s)}catch(e){}
+var n=(typeof s==='number'&&isFinite(s))?Math.max(0,Math.min(3,Math.floor(s))):1;
+document.documentElement.style.fontSize=[90,100,112,125][n]+'%';
+}catch(e){}
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Life of Jesus — An Interactive Timeline · UB Tools</title>
+<meta name="description" content="An interactive, scrubbable timeline of Jesus' life across Papers 120–196 of The Urantia Book. Every date, citation, and quote verified against the book's text.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d0e12'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23d9a441' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23d9a441'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0d0e12; --panel:#14161c; --panel2:#191c24; --line:#262b37;
+  --gold:#d9a441; --gold-hi:#f2c66d; --gold-dim:rgba(217,164,65,.16);
+  --text:#ece9e1; --muted:#a39e93; --faint:#6d6a63;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.6 var(--sans);
+  background-image:radial-gradient(1200px 500px at 50% -10%,rgba(217,164,65,.07),transparent 60%);}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+header.site{padding:44px 0 10px;text-align:center}
+.eyebrow{color:var(--gold);letter-spacing:.32em;text-transform:uppercase;font-size:12px;margin:0 0 14px}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,5vw,52px);margin:0 0 10px;letter-spacing:.01em}
+.sub{color:var(--muted);max-width:640px;margin:0 auto;font-size:15px}
+/* ---------- timeline ---------- */
+.tl-shell{margin:34px 0 8px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px 22px 14px}
+.tl-nav{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.tl-nav button{background:var(--panel2);border:1px solid var(--line);color:var(--text);
+  border-radius:12px;padding:9px 16px;font-size:14px;cursor:pointer;white-space:nowrap}
+.tl-nav button:hover{border-color:var(--gold);color:var(--gold-hi)}
+.tl-nav button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.tl-hint{flex:1;text-align:center;color:var(--faint);font-size:12.5px;letter-spacing:.04em}
+#tl{position:relative;height:196px;margin:6px 0 0;touch-action:none;cursor:grab}
+#tl.dragging{cursor:grabbing}
+.era-band{position:absolute;top:0;bottom:34px;border-left:1px solid var(--line);pointer-events:none}
+.era-band span{position:absolute;top:2px;left:8px;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);white-space:nowrap}
+.track{position:absolute;left:0;right:0;top:118px;height:2px;background:linear-gradient(90deg,var(--line),#3a3f4e,var(--line))}
+.node{position:absolute;top:118px;width:15px;height:15px;margin:-7.5px 0 0 -7.5px;border-radius:50%;
+  background:var(--panel);border:2px solid var(--muted);padding:0;cursor:pointer;z-index:2}
+.node:hover{border-color:var(--gold-hi)}
+.node.sel{background:var(--gold);border-color:var(--gold-hi);box-shadow:0 0 14px rgba(217,164,65,.75);z-index:3}
+.node:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+.nlabel{position:absolute;transform:translateX(-50%);font-size:11px;color:var(--muted);white-space:nowrap;
+  pointer-events:none;max-width:130px;overflow:hidden;text-overflow:ellipsis}
+.nlabel.above{top:56px}.nlabel.below{top:142px}
+.node.sel + .nlabel,.nlabel.on{color:var(--gold-hi)}
+.handle{position:absolute;top:8px;bottom:26px;width:3px;margin-left:-1.5px;background:var(--gold);
+  border-radius:2px;z-index:4;pointer-events:none;box-shadow:0 0 10px rgba(217,164,65,.6)}
+.handle::before{content:"";position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+  width:17px;height:17px;border-radius:50%;background:var(--gold);border:3px solid #0d0e12;
+  box-shadow:0 0 0 2px var(--gold),0 2px 8px rgba(0,0,0,.6)}
+.tl-scale{display:flex;justify-content:space-between;color:var(--faint);font-size:11.5px;letter-spacing:.06em;padding:2px 2px 0}
+/* ---------- detail card ---------- */
+.card{margin:22px 0;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--gold);
+  border-radius:14px;padding:26px 30px;min-height:230px}
+.card .date{color:var(--gold);letter-spacing:.14em;text-transform:uppercase;font-size:12.5px;margin:0 0 8px}
+.card .datenote{color:var(--faint);font-size:12.5px;margin:-4px 0 10px}
+.card h2{font-family:var(--serif);font-weight:400;font-size:clamp(22px,3.4vw,32px);margin:0 0 12px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.chip{background:var(--gold-dim);border:1px solid rgba(217,164,65,.45);color:var(--gold-hi);
+  font-size:12.5px;padding:3px 12px;border-radius:999px;letter-spacing:.05em}
+.cite{color:var(--muted);font-size:13.5px}
+.cite b{color:var(--text);font-weight:600}
+blockquote{font-family:var(--serif);font-style:italic;font-size:clamp(17px,2.4vw,21px);line-height:1.65;
+  margin:0;padding:0 0 0 18px;border-left:2px solid var(--line);color:#f4f1e9}
+.counter{margin-top:16px;color:var(--faint);font-size:12.5px;letter-spacing:.1em}
+/* ---------- event index ---------- */
+.index{margin:10px 0 30px}
+.index h3{font-family:var(--serif);font-weight:400;font-size:20px;color:var(--gold);margin:26px 0 10px;
+  letter-spacing:.06em}
+.egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+.egrid button{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:10px 14px;color:var(--text);cursor:pointer;font-size:13.5px}
+.egrid button .d{display:block;color:var(--gold);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.egrid button:hover{border-color:var(--gold)}
+.egrid button.sel{border-color:var(--gold);background:var(--gold-dim)}
+.egrid button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+footer.site{border-top:1px solid var(--line);padding:22px 0 60px;color:var(--faint);font-size:13px}
+footer.site p{max-width:760px}
+footer.site b{color:var(--muted)}
+@media (max-width:640px){
+  .tl-shell{padding:18px 12px 10px}
+  #tl{height:170px}
+  .nlabel{display:none}
+  .card{padding:20px}
+}
+
+/* display-settings pill (theme + text size; prefs shared with Studio via localStorage) */
+.ub-a11y{position:fixed;top:10px;right:10px;z-index:60;display:flex;gap:6px;align-items:center;padding:6px;border-radius:999px;border:1px solid var(--line);background:var(--panel);box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.ub-a11y button{min-width:44px;min-height:44px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink,var(--text,#ece9e1));font:600 14px/1 system-ui,sans-serif;cursor:pointer;padding:0 10px}
+.ub-a11y button:hover{border-color:var(--gold)}
+.ub-a11y button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.ub-a11y button:disabled{opacity:.4;cursor:default}
+.ub-a11y button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+:root{color-scheme:dark}
+[data-theme="light"]{color-scheme:light}
+/* light mode (default on this page is dark); timeline nodes get a 44px tap halo */
+.node::after{content:"";position:absolute;inset:-15px}
+.tl-nav button{min-height:44px}
+.egrid button{min-height:44px}
+[data-theme="light"]{--bg:#f5f1e8;--panel:#fbf8f1;--panel2:#f3edde;--line:#ddd3c0;--gold:#8a5a1f;--gold-hi:#a5741f;--gold-dim:rgba(138,90,31,.12);--text:#2b2620;--muted:#6b6257;--faint:#9a9084}
+[data-theme="light"] body{background-image:radial-gradient(1200px 500px at 50% -10%,rgba(138,90,31,.08),transparent 60%)}
+[data-theme="light"] .tl-nav button:hover{border-color:var(--gold);color:var(--gold)}
+[data-theme="light"] .node.sel{background:var(--gold);border-color:#8a5a1f;box-shadow:0 0 14px rgba(138,90,31,.5)}
+[data-theme="light"] .chip{border-color:rgba(138,90,31,.45);color:#8a5a1f}
+[data-theme="light"] .track{background:linear-gradient(90deg,var(--line),#c9bfa9,var(--line))}
+[data-theme="light"] .egrid button .d{color:#8a5a1f}
+</style>
+</head>
+<body>
+<div class="ub-a11y" role="group" aria-label="Display settings">
+<button type="button" id="ub-theme" aria-pressed="false">☀ Light</button>
+<button type="button" id="ub-sdec" aria-label="Smaller text">A−</button>
+<button type="button" id="ub-sreset" aria-label="Default text size" aria-pressed="true">A</button>
+<button type="button" id="ub-sinc" aria-label="Larger text">A+</button>
+</div>
+<header class="site wrap">
+  <p class="eyebrow">The Urantia Book · Papers 120–196</p>
+  <h1>The Life of Jesus</h1>
+  <p class="sub">An interactive timeline of the bestowal life — from the bestowal commission to the faith of Jesus.
+  Drag the scrubber, use the arrows, or pick an event. Every date, citation, and quote was verified against the book's text.</p>
+</header>
+<main class="wrap">
+  <section class="tl-shell" aria-label="Interactive timeline">
+    <div class="tl-nav">
+      <button id="prev" type="button" aria-label="Previous event">← Prev</button>
+      <p class="tl-hint">drag the gold scrubber · ← → keys work too</p>
+      <button id="next" type="button" aria-label="Next event">Next →</button>
+    </div>
+    <div id="tl" role="slider" aria-label="Timeline scrubber" aria-valuemin="1" aria-valuemax="40" aria-valuenow="1" tabindex="0"></div>
+    <div class="tl-scale"><span>7 B.C.</span><span>A.D. 15</span><span>A.D. 26</span><span>A.D. 30</span></div>
+  </section>
+  <section class="card" id="card" aria-live="polite" aria-label="Event details"></section>
+  <section class="index" id="index" aria-label="All events"></section>
+</main>
+<footer class="site"><div class="wrap">
+  <p><b>About this timeline.</b> Dates are given exactly as stated in the text; where the text gives only a weekday or a relative time,
+  the label says so and the note explains the anchor. One short exact quote per event, each with its paragraph citation
+  (Paper:Section.Paragraph). Built for UB Tools · open source · works offline from a single folder.</p>
+</div></footer>
+<script id="timeline-data" type="application/json">
+[
+{"id":"bestowal","title":"The Seventh Bestowal Commission","dateLabel":"Date not given in the text","dateNote":"The commission precedes the birth; the text assigns it no date.","paperRange":"120–121","era":"bestowal","citation":"120:2.1","sortKey":-8.0,"quote":"You will grow up on Urantia as a child of the realm, complete your human education—all the while subject to the will of your Paradise Father—live your life on Urantia as you have determined"},
+{"id":"gabriel-mary","title":"Gabriel’s Announcement to Mary","dateLabel":"Date not given in the text","dateNote":"Made “the day following the conception of Jesus” (122:3.4); the conception itself is not dated.","paperRange":"122","era":"birth","citation":"122:3.1","sortKey":-7.9,"quote":"To you, Mary, I bring glad tidings when I announce that the conception within you is ordained by heaven, and that in due time you will become the mother of a son"},
+{"id":"birth","title":"The Birth of Jesus","dateLabel":"August 21, 7 B.C., at noon","dateNote":"","paperRange":"122","era":"birth","citation":"122:8.1","sortKey":-7.36,"quote":"Jesus of Nazareth was born into the world, was wrapped in the clothes which Mary had brought along for such a possible contingency, and laid in a near-by manger."},
+{"id":"presentation","title":"The Presentation in the Temple","dateLabel":"Date not given in the text","dateNote":"Simeon and Anna greet the infant at the temple; no date is stated.","paperRange":"122","era":"birth","citation":"122:9.6","sortKey":-7.3,"quote":"For he has visited us and wrought redemption for his people;"},
+{"id":"return-nazareth","title":"Return to Nazareth","dateLabel":"Early October, 4 B.C.","dateNote":"","paperRange":"123","era":"birth","citation":"123:0.6","sortKey":-4.17,"quote":"By the first of October Joseph had convinced Mary and all their friends that it was best for them to return to Nazareth."},
+{"id":"school","title":"School Days in Nazareth","dateLabel":"August, A.D. 1","dateNote":"“In August of this year” of his seventh year (123:5.1); the year is counted from the stated birth date.","paperRange":"123","era":"birth","citation":"123:5.1","sortKey":1.6,"quote":"Already this lad was a fluent reader, writer, and speaker of two languages, Aramaic and Greek."},
+{"id":"jerusalem-12","title":"First Passover at Jerusalem","dateLabel":"Saturday, April 9, A.D. 7","dateNote":"The Passover “fell on Saturday, April 9, A.D. 7” (124:6.1); Jesus was twelve.","paperRange":"124–125","era":"birth","citation":"125:6.7","sortKey":7.36,"quote":"Would you not expect to find me in my Father’s house since the time has come when I should be about my Father’s business?"},
+{"id":"joseph-death","title":"The Death of Joseph","dateLabel":"Tuesday, September 25, A.D. 8","dateNote":"In his fourteenth year (126:1.1); “that fateful day of Tuesday, September 25” (126:2.1).","paperRange":"126","era":"birth","citation":"126:2.1","sortKey":8.82,"quote":"the tragic news that Joseph had been severely injured by the falling of a derrick while at work on the governor’s residence"},
+{"id":"head-of-family","title":"Head of the Nazareth Family","dateLabel":"A.D. 13","dateNote":"His nineteenth year (127:4.1).","paperRange":"127","era":"youth","citation":"127:4.1","sortKey":13.2,"quote":"he had become to her more a father to her children"},
+{"id":"roman-tour","title":"The Tour of the Roman World","dateLabel":"April 26, A.D. 22 – December 10, A.D. 23","dateNote":"","paperRange":"130–133","era":"youth","citation":"130:0.1","sortKey":22.32,"quote":"THE tour of the Roman world consumed most of the twenty-eighth and the entire twenty-ninth year of Jesus’ life on earth."},
+{"id":"john-preaches","title":"John the Baptist Begins to Preach","dateLabel":"Early March, A.D. 25","dateNote":"","paperRange":"135","era":"ministry","citation":"135:6.2","sortKey":25.17,"quote":"the kingdom of heaven is at hand"},
+{"id":"baptism","title":"The Baptism of Jesus","dateLabel":"A.D. 26","dateNote":"“Almost thirty-one and one-half years old”; the fifteenth year of Tiberius reckoned as A.D. 26 (136:2.8). No month or day is stated.","paperRange":"136","era":"ministry","citation":"136:2.6","sortKey":26.05,"quote":"His was the baptism of consecration to the performance of the will of the heavenly Father."},
+{"id":"forty-days","title":"The Forty Days in the Hills","dateLabel":"A.D. 26","dateNote":"The forty days of retirement following the baptism (136:3–4).","paperRange":"136","era":"ministry","citation":"136:4.9","sortKey":26.12,"quote":"Even to the bitter end he invariably subordinated his sovereign will to that of his heavenly Father."},
+{"id":"cana","title":"The Wedding at Cana","dateLabel":"Wednesday, February 27, A.D. 26","dateNote":"The journey to Cana was “Tuesday” and the wedding “the following day” (137:3.6); the Tuesday after Sunday, February 24 (137:2.1).","paperRange":"137","era":"ministry","citation":"137:4.12","sortKey":26.16,"quote":"Of all persons present at the marriage feast of Cana, Jesus was the most surprised."},
+{"id":"ordination","title":"Ordination of the Twelve","dateLabel":"Sunday, January 12, A.D. 27, just before noon","dateNote":"","paperRange":"140","era":"ministry","citation":"140:0.1","sortKey":27.03,"quote":"Jesus called the apostles together for their ordination as public preachers of the gospel of the kingdom."},
+{"id":"nicodemus","title":"Nicodemus: Born of the Spirit","dateLabel":"April, A.D. 27","dateNote":"“The month of April” at the Jerusalem Passover (142:0.1); the party leaves Jerusalem at the end of June, A.D. 27 (143:0.1).","paperRange":"142","era":"ministry","citation":"142:6.5","sortKey":27.3,"quote":"except a man be born of the spirit, he cannot enter into the kingdom of God"},
+{"id":"first-tour","title":"First Preaching Tour of Galilee","dateLabel":"Sunday, January 18, A.D. 28","dateNote":"","paperRange":"146","era":"ministry","citation":"146:0.1","sortKey":28.05,"quote":"first public preaching tour of Galilee began on Sunday, January 18, A.D. 28, and continued for about two months"},
+{"id":"feeding","title":"Feeding of the Five Thousand","dateLabel":"Sunday, March 27, A.D. 29","dateNote":"The multitude gathers “on Sunday morning, March 27” (152:2.1); the feeding follows that day.","paperRange":"152","era":"ministry","citation":"152:2.9","sortKey":29.32,"quote":"And this multitude did eat and were filled."},
+{"id":"crisis","title":"The Crisis at Capernaum","dateLabel":"Sabbath, April 2, A.D. 29","dateNote":"“Friday evening” they reach Bethsaida and the sermon follows on “Sabbath” (153:0.1), five days after the March 27 feeding.","paperRange":"153","era":"ministry","citation":"153:2.12","sortKey":29.34,"quote":"I am this bread of life. Your fathers ate manna in the wilderness and are dead. But this bread which comes down from God, if a man eats thereof, he shall never die in spirit."},
+{"id":"confession","title":"Peter’s Confession","dateLabel":"Tuesday, August 9, A.D. 29","dateNote":"“Six days after the memorable noontide confession” the party ascends Hermon on Monday, August 15 (158:1.1); they had left for Caesarea-Philippi “early Tuesday morning” (157:3.1).","paperRange":"157","era":"ministry","citation":"157:3.5","sortKey":29.69,"quote":"You are the Deliverer, the Son of the living God."},
+{"id":"transfiguration","title":"The Transfiguration","dateLabel":"Monday, August 15, A.D. 29","dateNote":"“Early on the morning of Monday, August 15” the ascent begins (158:1.1); the vision is that day.","paperRange":"158","era":"ministry","citation":"158:1.4","sortKey":29.7,"quote":"leaving him alone to finish out his earth life as the Son of Man and the Son of God."},
+{"id":"tabernacles","title":"At the Feast of Tabernacles","dateLabel":"October, A.D. 29","dateNote":"The party assembles at Magadan “Sunday, September 25, A.D. 29” and goes up for the feast (161:0.1).","paperRange":"162","era":"ministry","citation":"162:7.6","sortKey":29.78,"quote":"Verily, verily, I say to you, before Abraham was, I am."},
+{"id":"seventy","title":"Ordination of the Seventy","dateLabel":"Sabbath afternoon, November 19, A.D. 29","dateNote":"“Sabbath afternoon, November 19, at the Magadan Camp” (163:1.1); the year follows the September–October, A.D. 29 sequence.","paperRange":"163","era":"ministry","citation":"163:1.1","sortKey":29.97,"quote":"The seventy were ordained by Jesus on Sabbath afternoon, November 19, at the Magadan Camp"},
+{"id":"perea","title":"The Perean Mission Begins","dateLabel":"Tuesday, January 3, A.D. 30","dateNote":"","paperRange":"165","era":"ministry","citation":"165:0.1","sortKey":30.01,"quote":"This Perean mission continued for almost three months and was the last ministry of the Master."},
+{"id":"lazarus","title":"The Resurrection of Lazarus","dateLabel":"Thursday, March 2, A.D. 30","dateNote":"The message reaches Jesus “very late on Sunday night, February 26” (167:4.1); “on Wednesday” they are on the way (167:5.1); the raising follows on “this day, Thursday” (168:0.1).","paperRange":"168","era":"lastweek","citation":"168:2.2","sortKey":30.26,"quote":"Lazarus, come forth!"},
+{"id":"entry","title":"Entry into Jerusalem","dateLabel":"Sunday, April 2, A.D. 30","dateNote":"The party reaches Bethany “Friday afternoon, March 31, A.D. 30” (172:0.1); the entry is “this Sunday” (172:2–3).","paperRange":"172","era":"lastweek","citation":"172:3.9","sortKey":30.3,"quote":"Hosanna to the son of David; blessed is he who comes in the name of the Lord. Hosanna in the highest."},
+{"id":"supper","title":"The Last Supper","dateLabel":"Thursday, April 6, A.D. 30","dateNote":"“This Thursday, his last free day” (178:0.1), the day before the Friday trial dated April 7, A.D. 30 (185:0.1).","paperRange":"179","era":"lastweek","citation":"179:5.9","sortKey":30.33,"quote":"This is the new Passover which I leave with you, even the memory of my bestowal life, the word of eternal truth"},
+{"id":"gethsemane","title":"In Gethsemane","dateLabel":"Thursday night, April 6, A.D. 30","dateNote":"The night following the Last Supper, before the Friday trial.","paperRange":"182","era":"lastweek","citation":"182:3.4","sortKey":30.34,"quote":"Not my will, but yours, be done."},
+{"id":"trial","title":"The Trial Before Pilate","dateLabel":"Friday morning, April 7, A.D. 30","dateNote":"","paperRange":"185","era":"lastweek","citation":"185:0.1","sortKey":30.35,"quote":"SHORTLY after six o’clock on this Friday morning, April 7, A.D. 30, Jesus was brought before Pilate"},
+{"id":"crucifixion","title":"The Crucifixion","dateLabel":"Friday, April 7, A.D. 30","dateNote":"“At about half past nine o’clock this Friday morning, Jesus was hung upon the cross” (187:3.1).","paperRange":"187","era":"lastweek","citation":"187:2.4","sortKey":30.36,"quote":"Father, forgive them, for they know not what they do."},
+{"id":"tomb","title":"The Time of the Tomb","dateLabel":"Friday afternoon, April 7 – Sunday morning, April 9, A.D. 30","dateNote":"“Three o’clock Friday afternoon to three o’clock Sunday morning” (188:0.1).","paperRange":"188","era":"lastweek","citation":"188:5.1","sortKey":30.37,"quote":"The cross of Jesus portrays the full measure of the supreme devotion of the true shepherd for even the unworthy members of his flock."},
+{"id":"resurrection","title":"The Resurrection","dateLabel":"Sunday, April 9, A.D. 30, at 3:02 AM","dateNote":"","paperRange":"189","era":"risen","citation":"189:1.1","sortKey":30.375,"quote":"at two minutes past three o’clock, this Sunday morning, April 9, A.D. 30, the resurrected morontia form and personality of Jesus of Nazareth came forth from the tomb."},
+{"id":"mary","title":"First Appearance: Mary Magdalene","dateLabel":"Sunday morning, April 9, A.D. 30","dateNote":"","paperRange":"189","era":"risen","citation":"189:5.4","sortKey":30.38,"quote":"Go back to my apostles and again tell them that I have risen, that I will appear to them"},
+{"id":"emmaus","title":"The Walk to Emmaus","dateLabel":"Sunday afternoon, April 9, A.D. 30","dateNote":"That same resurrection Sunday, on the road to Emmaus (190:5.1).","paperRange":"190","era":"risen","citation":"190:5.6","sortKey":30.385,"quote":"No wonder our hearts burned within us as he spoke to us while we walked along the road!"},
+{"id":"apostles1","title":"Appearance to the Ten Apostles","dateLabel":"Sunday evening, April 9, A.D. 30","dateNote":"“Shortly after nine o’clock that evening” (191:2.1), after the Emmaus walk.","paperRange":"191","era":"risen","citation":"191:2.1","sortKey":30.39,"quote":"Peace be upon you."},
+{"id":"thomas","title":"Appearance to Thomas","dateLabel":"Sunday evening, April 16, A.D. 30","dateNote":"Thomas is brought back “about nine o’clock on Saturday, April 15” and the Master appears “the next day” at the evening meal (191:5.1–2).","paperRange":"191","era":"risen","citation":"191:5.5","sortKey":30.4,"quote":"I believe! My Lord and my Master!"},
+{"id":"galilee","title":"Appearance in Galilee: Peter Restored","dateLabel":"Friday morning, April 21, A.D. 30","dateNote":"“About six o’clock Friday morning, April 21, the morontia Master made his thirteenth appearance, the first in Galilee” (192:1.1); the talk with Peter follows that morning.","paperRange":"192","era":"risen","citation":"192:2.2","sortKey":30.41,"quote":"If you love me, Peter, feed my lambs."},
+{"id":"ascension","title":"The Ascension","dateLabel":"Thursday, May 18, A.D. 30","dateNote":"","paperRange":"193","era":"risen","citation":"193:5.2","sortKey":30.46,"quote":"My love overshadows you, my spirit will dwell with you, and my peace shall abide upon you. Farewell."},
+{"id":"pentecost","title":"Bestowal of the Spirit of Truth","dateLabel":"Date not given in the text","dateNote":"“This day happened to be the Jewish festival of Pentecost” (194:1.1); no calendar date is stated.","paperRange":"194","era":"risen","citation":"194:3.5","sortKey":30.48,"quote":"Where the spirit of the Lord is, there is liberty."},
+{"id":"faith","title":"The Faith of Jesus","dateLabel":"Closing reflection — no date","dateNote":"Paper 196 gathers the meaning of the whole life; it is not an event in time.","paperRange":"196","era":"risen","citation":"196:0.4","sortKey":31.0,"quote":"religion based on personal spiritual relations with the Universal Father and wholly validated by the supreme authority of genuine personal experience"}
+]
+</script>
+<script>
+(function(){
+"use strict";
+var DATA = JSON.parse(document.getElementById('timeline-data').textContent);
+var ERAS = [
+  {key:'bestowal', label:'The Bestowal'},
+  {key:'birth',    label:'Birth & Childhood'},
+  {key:'youth',    label:'Youth & Young Manhood'},
+  {key:'ministry', label:'Public Ministry'},
+  {key:'lastweek', label:'The Last Week'},
+  {key:'risen',    label:'Resurrection & Ascension'}
+];
+// era-segmented mapping: [sortStart, sortEnd, xStart, xEnd]
+var SEGS = [
+  [-8.5, 13.5, 0.015, 0.300],
+  [13.5, 26.0, 0.300, 0.460],
+  [26.0, 30.0, 0.460, 0.800],
+  [30.0, 31.5, 0.800, 0.985]
+];
+function xOf(s){
+  for(var i=0;i<SEGS.length;i++){
+    var g=SEGS[i];
+    if(s<=g[1] || i===SEGS.length-1){
+      var t=(s-g[0])/(g[1]-g[0]);
+      t=Math.max(0,Math.min(1,t));
+      return g[2]+t*(g[3]-g[2]);
+    }
+  }
+  return 0;
+}
+var tl=document.getElementById('tl'),
+    card=document.getElementById('card'),
+    indexBox=document.getElementById('index'),
+    slider=tl, sel=-1, nodes=[], labels=[], handle=null;
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ---- build timeline ----
+ERAS.forEach(function(e){
+  var evs=DATA.filter(function(d){return d.era===e.key;});
+  if(!evs.length)return;
+  var lo=Math.min.apply(null,evs.map(function(d){return d.sortKey;})),
+      hi=Math.max.apply(null,evs.map(function(d){return d.sortKey;}));
+  var b=document.createElement('div');
+  b.className='era-band';
+  b.style.left=(xOf(lo)*100)+'%';
+  b.style.width=Math.max(0.5,(xOf(hi)-xOf(lo))*100)+'%';
+  var s=document.createElement('span');s.textContent=e.label;b.appendChild(s);
+  tl.appendChild(b);
+});
+var track=document.createElement('div');track.className='track';tl.appendChild(track);
+DATA.forEach(function(d,i){
+  var n=document.createElement('button');
+  n.className='node';n.type='button';
+  n.style.left=(xOf(d.sortKey)*100)+'%';
+  n.setAttribute('aria-label',d.title+' — '+d.dateLabel);
+  n.addEventListener('click',function(){select(i);});
+  tl.appendChild(n);nodes.push(n);
+  var l=document.createElement('div');
+  l.className='nlabel '+(i%2?'below':'above');
+  l.style.left=(xOf(d.sortKey)*100)+'%';
+  l.textContent=d.title;
+  tl.appendChild(l);labels.push(l);
+});
+handle=document.createElement('div');handle.className='handle';tl.appendChild(handle);
+
+function paperChip(d){
+  return 'Paper '+d.paperRange.replace('–','-').split('-')[0];
+}
+function select(i){
+  if(i<0)i=0;if(i>=DATA.length)i=DATA.length-1;
+  sel=i;var d=DATA[i];
+  nodes.forEach(function(n,k){n.classList.toggle('sel',k===i);});
+  labels.forEach(function(l,k){l.classList.toggle('on',k===i);});
+  handle.style.left=(xOf(d.sortKey)*100)+'%';
+  slider.setAttribute('aria-valuenow',String(i+1));
+  slider.setAttribute('aria-valuetext',d.title+' — '+d.dateLabel);
+  card.innerHTML=
+    '<p class="date">'+esc(d.dateLabel)+'</p>'+
+    (d.dateNote?'<p class="datenote">'+esc(d.dateNote)+'</p>':'')+
+    '<h2>'+esc(d.title)+'</h2>'+
+    '<div class="meta"><span class="chip">'+esc(paperChip(d))+'</span>'+
+    '<span class="cite">Citation <b>'+esc(d.citation)+'</b> · Papers '+esc(d.paperRange)+'</span></div>'+
+    '<blockquote>“'+esc(d.quote)+'”</blockquote>'+
+    '<p class="counter">'+(i+1)+' / '+DATA.length+'</p>';
+  var btns=indexBox.querySelectorAll('button');
+  btns.forEach(function(b,k){b.classList.toggle('sel',k===i);});
+  var on=indexBox.querySelector('button.sel');
+  if(on&&document.activeElement&&document.activeElement.tagName==='BUTTON'){/* keep focus where it is */}
+}
+
+// ---- event index ----
+ERAS.forEach(function(e){
+  var evs=DATA.map(function(d,i){return {d:d,i:i};}).filter(function(o){return o.d.era===e.key;});
+  if(!evs.length)return;
+  var h=document.createElement('h3');h.textContent=e.label;indexBox.appendChild(h);
+  var g=document.createElement('div');g.className='egrid';
+  evs.forEach(function(o){
+    var b=document.createElement('button');b.type='button';
+    b.innerHTML='<span class="d">'+esc(o.d.dateLabel)+'</span>'+esc(o.d.title);
+    b.addEventListener('click',function(){select(o.i);card.scrollIntoView({behavior:'smooth',block:'nearest'});});
+    g.appendChild(b);
+  });
+  indexBox.appendChild(g);
+});
+
+// ---- controls ----
+document.getElementById('prev').addEventListener('click',function(){select(sel-1);});
+document.getElementById('next').addEventListener('click',function(){select(sel+1);});
+slider.addEventListener('keydown',function(ev){
+  if(ev.key==='ArrowRight'||ev.key==='ArrowDown'){ev.preventDefault();select(sel+1);}
+  else if(ev.key==='ArrowLeft'||ev.key==='ArrowUp'){ev.preventDefault();select(sel-1);}
+  else if(ev.key==='Home'){ev.preventDefault();select(0);}
+  else if(ev.key==='End'){ev.preventDefault();select(DATA.length-1);}
+});
+function nearestFromEvent(ev){
+  var r=tl.getBoundingClientRect();
+  var px=(ev.clientX-r.left)/r.width, best=0, bd=1e9;
+  DATA.forEach(function(d,i){
+    var dd=Math.abs(xOf(d.sortKey)-px);
+    if(dd<bd){bd=dd;best=i;}
+  });
+  return best;
+}
+var dragging=false;
+tl.addEventListener('pointerdown',function(ev){
+  if(ev.target.closest('button'))return;
+  dragging=true;tl.classList.add('dragging');
+  tl.setPointerCapture(ev.pointerId);
+  select(nearestFromEvent(ev));
+});
+tl.addEventListener('pointermove',function(ev){
+  if(!dragging)return;
+  select(nearestFromEvent(ev));
+});
+['pointerup','pointercancel'].forEach(function(t){
+  tl.addEventListener(t,function(){dragging=false;tl.classList.remove('dragging');});
+});
+
+select(0);
+})();
+</script>
+<script>
+/* Display-settings pill: theme + text size, synced with UB Tools Studio via localStorage. */
+(function(){
+var root=document.documentElement,PCTS=[90,100,112,125];
+function getN(){var s=null;try{s=JSON.parse(localStorage.getItem('ub-tools-text-size'))}catch(e){}return (typeof s==='number'&&isFinite(s))?Math.max(0,Math.min(3,Math.floor(s))):1}
+function paint(){
+var light=root.getAttribute('data-theme')==='light',tb=document.getElementById('ub-theme');
+tb.setAttribute('aria-pressed',String(light));
+tb.textContent=light?'\u263E Dark':'\u2600 Light';
+var n=getN();
+document.getElementById('ub-sreset').setAttribute('aria-pressed',String(n===1));
+document.getElementById('ub-sdec').disabled=n<=0;
+document.getElementById('ub-sinc').disabled=n>=3;
+}
+function setN(n){try{localStorage.setItem('ub-tools-text-size',JSON.stringify(n))}catch(e){}root.style.fontSize=PCTS[n]+'%';paint()}
+document.getElementById('ub-theme').addEventListener('click',function(){
+var next=root.getAttribute('data-theme')==='light'?'dark':'light';
+try{localStorage.setItem('ub-tools-theme',JSON.stringify(next))}catch(e){}
+root.setAttribute('data-theme',next);paint();
+});
+document.getElementById('ub-sdec').addEventListener('click',function(){setN(Math.max(0,getN()-1))});
+document.getElementById('ub-sreset').addEventListener('click',function(){setN(1)});
+document.getElementById('ub-sinc').addEventListener('click',function(){setN(Math.min(3,getN()+1))});
+paint();
+})();
+</script>
+</body>
+</html>

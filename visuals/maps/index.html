@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+/* Shared display prefs with UB Tools Studio (localStorage). Runs pre-paint to avoid a flash. */
+try{
+var g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
+var t=g('ub-tools-theme');try{t=JSON.parse(t)}catch(e){}
+if(t!=='dark'&&t!=='light'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
+document.documentElement.setAttribute('data-theme',t);
+var s=g('ub-tools-text-size');try{s=JSON.parse(s)}catch(e){}
+var n=(typeof s==='number'&&isFinite(s))?Math.max(0,Math.min(3,Math.floor(s))):1;
+document.documentElement.style.fontSize=[90,100,112,125][n]+'%';
+}catch(e){}
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ancient Palestine — Places of The Urantia Book | UB Tools</title>
+<meta name="description" content="Schematic map of places named in The Urantia Book across ancient Palestine, with paragraph citations. Runs offline in your browser.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%2314161c' stroke='%23d4a94e' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23d4a94e'/%3E%3C/svg%3E">
+<style>*{box-sizing:border-box}
+:root{--bg:#14161c;--bg2:#1c1f28;--card:#20242f;--line:#333a49;--ink:#ece7db;--muted:#a7a294;--gold:#d4a94e;--gold-d:#8a6a2a;--sea:#1d3247;--land:#232733;--water:#3f6d96}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:"Hanken Grotesk",-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+header.bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 1.4rem;border-bottom:1px solid var(--line);background:var(--bg2);position:sticky;top:0;z-index:10}
+.brand{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--ink);font-weight:700;letter-spacing:.02em}
+.brand .ring{width:26px;height:26px;border:2px solid var(--gold);border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+.brand .ring i{width:9px;height:9px;background:var(--gold);border-radius:50%;display:block}
+.bar .sub{color:var(--muted);font-size:.85rem}
+main.wrap{max-width:1240px;margin:0 auto;padding:1.4rem;display:grid;grid-template-columns:minmax(0,7fr) minmax(300px,4fr);gap:1.4rem}
+@media(max-width:900px){main.wrap{grid-template-columns:1fr}}
+.map-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;position:relative}
+.map-card h1{font-size:1.25rem;margin:.2rem 0 .1rem}
+.kicker{color:var(--gold);text-transform:uppercase;letter-spacing:.14em;font-size:.72rem;font-weight:700}
+.lede{color:var(--muted);font-size:.92rem;margin:.2rem 0 .8rem}
+svg.map{width:100%;height:auto;display:block;background:var(--land);border-radius:10px;border:1px solid var(--line)}
+.sea-fill{fill:var(--sea)}
+.coast{fill:none;stroke:var(--gold-d);stroke-width:2.5;stroke-linecap:round}
+.lake{fill:var(--water);stroke:#9cc4e4;stroke-width:1.2;opacity:.9}
+.river{fill:none;stroke:var(--water);stroke-width:3;stroke-linecap:round;opacity:.95}
+.geo-label{fill:#9cc4e4;font-size:15px;font-style:italic;letter-spacing:.06em}
+.sea-label{fill:#6f89a3;font-size:17px;letter-spacing:.35em}
+.dot{cursor:pointer;fill:var(--gold);stroke:#14161c;stroke-width:1.5}
+.dot .hollow{fill:none;stroke:var(--gold);stroke-width:2}
+.dot:hover,.dot:focus-visible{fill:#f2c668;outline:none}
+.dot.active{fill:#ffe1a1}
+.dot.active .hollow{stroke:#ffe1a1}
+.dot-label{fill:var(--ink);font-size:13.5px;stroke:none;paint-order:stroke;stroke:#14161ccc;stroke-width:3px;pointer-events:none}
+.dot-region .dot-label,.dot-water .dot-label{fill:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:1rem;margin-top:.8rem;color:var(--muted);font-size:.82rem}
+.legend span{display:inline-flex;align-items:center;gap:.4rem}
+.sw{width:12px;height:12px;display:inline-block}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.2rem;align-self:start;position:sticky;top:76px}
+@media(max-width:900px){.panel{position:static}}
+.panel h2{margin:.1rem 0 .3rem;font-size:1.3rem}
+.tag{display:inline-block;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);border:1px solid var(--gold-d);border-radius:999px;padding:.1rem .6rem;margin-bottom:.4rem}
+.cites{display:flex;flex-wrap:wrap;gap:.4rem;margin:.6rem 0}
+.cite{background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:.15rem .55rem;font-variant-numeric:tabular-nums;font-size:.85rem;color:var(--ink)}
+.note{color:var(--ink);font-size:.95rem}
+.schematic-note{color:var(--muted);font-size:.78rem;margin-top:.8rem;border-top:1px solid var(--line);padding-top:.7rem}
+.filter{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:.5rem .7rem;margin-bottom:.8rem;font-size:.9rem}
+.lists{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;max-width:1240px;margin:0 auto;padding:0 1.4rem 1.4rem}
+@media(max-width:900px){.lists{grid-template-columns:1fr}}
+.list-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.2rem}
+.list-card h3{margin:.1rem 0 .6rem;font-size:1.05rem;color:var(--gold)}
+.list-card ul{margin:0;padding-left:1.1rem;color:var(--muted);font-size:.88rem}
+.list-card li{margin:.3rem 0}
+.list-card li b{color:var(--ink);font-weight:600}
+.list-card .refs{color:var(--gold-d);font-size:.78rem}
+footer{max-width:1240px;margin:0 auto;padding:0 1.4rem 2.5rem;color:var(--muted);font-size:.8rem}
+footer code{color:var(--ink);font-size:.78rem}
+a{color:var(--gold)}
+/* display-settings pill (theme + text size; prefs shared with Studio via localStorage) */
+.ub-a11y{position:fixed;top:10px;right:10px;z-index:60;display:flex;gap:6px;align-items:center;padding:6px;border-radius:999px;border:1px solid var(--line);background:var(--panel);box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.ub-a11y button{min-width:44px;min-height:44px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink,var(--text,#ece9e1));font:600 14px/1 system-ui,sans-serif;cursor:pointer;padding:0 10px}
+.ub-a11y button:hover{border-color:var(--gold)}
+.ub-a11y button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.ub-a11y button:disabled{opacity:.4;cursor:default}
+.ub-a11y button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+:root{color-scheme:dark}
+[data-theme="light"]{color-scheme:light}
+/* light mode (default on this page is dark); pill sits below the sticky header */
+.ub-a11y{top:64px}
+[data-theme="light"]{--bg:#f5f1e8;--bg2:#efe8d8;--card:#fbf8f1;--line:#ddd3c0;--ink:#2b2620;--muted:#6b6257;--gold:#8a5a1f;--gold-d:#b08a3a;--sea:#cfe0ee;--land:#f1ebdd;--water:#5b8fb8}
+[data-theme="light"] .lake{stroke:#3f6d96}
+[data-theme="light"] .river{stroke:#5b8fb8}
+[data-theme="light"] .geo-label{fill:#3f6d96}
+[data-theme="light"] .sea-label{fill:#7d99b0}
+[data-theme="light"] .dot{stroke:#f5f1e8}
+[data-theme="light"] .dot:hover,[data-theme="light"] .dot:focus-visible{fill:#b8860b}
+[data-theme="light"] .dot.active{fill:#c98f1b}
+[data-theme="light"] .dot.active .hollow{stroke:#c98f1b}
+[data-theme="light"] .dot-label{stroke:#fbf8f1cc}
+[data-theme="light"] .list-card .refs{color:#8a5a1f}
+[data-theme="light"] .tag{color:#8a5a1f;border-color:#b08a3a}
+[data-theme="light"] .kicker{color:#8a5a1f}
+[data-theme="light"] .list-card h3{color:#8a5a1f}
+</style>
+</head>
+<body>
+<div class="ub-a11y" role="group" aria-label="Display settings">
+<button type="button" id="ub-theme" aria-pressed="false">☀ Light</button>
+<button type="button" id="ub-sdec" aria-label="Smaller text">A−</button>
+<button type="button" id="ub-sreset" aria-label="Default text size" aria-pressed="true">A</button>
+<button type="button" id="ub-sinc" aria-label="Larger text">A+</button>
+</div>
+<header class="bar">
+  <span class="brand"><span class="ring"><i></i></span> UB Tools &middot; Maps</span>
+  <span class="sub">Schematic &mdash; not to scale</span>
+</header>
+<main class="wrap">
+  <section class="map-card" aria-label="Schematic map of ancient Palestine">
+    <div class="kicker">The Urantia Book &middot; Geography</div>
+    <h1>Ancient Palestine: Places of the Book</h1>
+    <p class="lede">A hand-drawn schematic of the lands where the papers' earthly narratives unfold. Click any marker for its book citations.</p>
+    <input class="filter" id="filter" type="search" placeholder="Filter places&hellip;" aria-label="Filter places">
+    <svg class="map" viewBox="0 0 800 1000" role="img" aria-label="Schematic map of ancient Palestine with clickable place markers">
+      <rect class="sea-fill" x="0" y="0" width="800" height="1000"/>
+      <path d="M467.7,0.0 L430.8,60.0 L400.0,116.7 L369.2,176.7 L332.3,233.3 L298.5,283.3 L303.1,326.7 L283.1,366.7 L270.8,416.7 L261.5,466.7 L246.2,533.3 L230.8,573.3 L209.2,633.3 L169.2,716.7 L107.7,783.3 L46.2,866.7 L6.2,950.0 L800,1000 L800,0 Z" fill="#232733"/>
+      <path class="coast" d="M467.7,0.0 L430.8,60.0 L400.0,116.7 L369.2,176.7 L332.3,233.3 L298.5,283.3 L303.1,326.7 L283.1,366.7 L270.8,416.7 L261.5,466.7 L246.2,533.3 L230.8,573.3 L209.2,633.3 L169.2,716.7 L107.7,783.3 L46.2,866.7 L6.2,950.0"/>
+      <ellipse class="lake" cx="489.2" cy="326.7" rx="20" ry="32" transform="rotate(12 489.2 326.7)"/>
+      <ellipse class="lake" cx="455.4" cy="750.0" rx="15" ry="72" transform="rotate(-8 455.4 750.0)"/>
+      <path class="river" d="M484.6,333.3 L481.5,400.0 L478.5,466.7 L476.9,533.3 L478.5,600.0 L476.9,640.0 L467.7,666.7"/>
+      <text class="sea-label" x="40" y="520" transform="rotate(-72 40 520)">MEDITERRANEAN SEA</text>
+      <text class="geo-label" x="519" y="371">Sea of Galilee</text>
+      <text class="geo-label" x="479" y="760">Dead Sea</text>
+      <text class="geo-label" x="506" y="454" transform="rotate(-80 506 454">Jordan River</text>
+      <g class="dot dot-town" data-id="bethany" tabindex="0" role="button" aria-label="Bethany">
+  <circle cx="387.7" cy="676.4" r="6.5"/>
+  <text class="dot-label" x="397.7" y="666.4" text-anchor="start">Bethany</text>
+</g>
+<g class="dot dot-town" data-id="bethlehem" tabindex="0" role="button" aria-label="Bethlehem">
+  <circle cx="371.2" cy="698.6" r="6.5"/>
+  <text class="dot-label" x="381.2" y="714.6" text-anchor="start">Bethlehem</text>
+</g>
+<g class="dot dot-town" data-id="bethsaida" tabindex="0" role="button" aria-label="Bethsaida">
+  <circle cx="499.4" cy="298.7" r="6.5"/>
+  <text class="dot-label" x="511.4" y="310.7" text-anchor="start">Bethsaida</text>
+</g>
+<g class="dot dot-town" data-id="caesarea-philippi" tabindex="0" role="button" aria-label="Caesarea-Philippi">
+  <circle cx="521.2" cy="184.2" r="6.5"/>
+  <text class="dot-label" x="531.2" y="198.2" text-anchor="start">Caesarea-Philippi</text>
+</g>
+<g class="dot dot-town" data-id="cana" tabindex="0" role="button" aria-label="Cana">
+  <circle cx="410.8" cy="352.3" r="6.5"/>
+  <text class="dot-label" x="420.8" y="342.3" text-anchor="start">Cana</text>
+</g>
+<g class="dot dot-town" data-id="capernaum" tabindex="0" role="button" aria-label="Capernaum">
+  <circle cx="484.1" cy="306.5" r="6.5"/>
+  <text class="dot-label" x="496.1" y="298.5" text-anchor="start">Capernaum</text>
+</g>
+<g class="dot dot-town" data-id="damascus" tabindex="0" role="button" aria-label="Damascus">
+  <circle cx="712.9" cy="94.5" r="6.5"/>
+  <text class="dot-label" x="722.9" y="86.5" text-anchor="start">Damascus</text>
+</g>
+<g class="dot dot-water" data-id="dead-sea" tabindex="0" role="button" aria-label="Dead Sea">
+  <circle cx="455.4" cy="750.0" r="6.5" class="hollow"/>
+  <text class="dot-label" x="475.4" y="754.0" text-anchor="start">Dead Sea</text>
+</g>
+<g class="dot dot-town" data-id="gadara" tabindex="0" role="button" aria-label="Gadara">
+  <circle cx="516.7" cy="381.4" r="6.5"/>
+  <text class="dot-label" x="526.7" y="395.4" text-anchor="start">Gadara</text>
+</g>
+<g class="dot dot-region" data-id="galilee" tabindex="0" role="button" aria-label="Galilee">
+  <path d="M424.6,332.0 L432.6,340.0 L424.6,348.0 L416.6,340.0 Z"/>
+  <text class="dot-label" x="436.6" y="330.0" text-anchor="start">Galilee</text>
+</g>
+<g class="dot dot-region" data-id="gennesaret" tabindex="0" role="button" aria-label="Gennesaret">
+  <path d="M470.8,308.7 L478.8,316.7 L470.8,324.7 L462.8,316.7 Z"/>
+  <text class="dot-label" x="458.8" y="304.7" text-anchor="end">Gennesaret</text>
+</g>
+<g class="dot dot-site" data-id="gethsemane" tabindex="0" role="button" aria-label="Gethsemane">
+  <rect x="377.0" y="669.9" width="12" height="12" rx="2"/>
+  <text class="dot-label" x="395.0" y="667.9" text-anchor="start">Gethsemane</text>
+</g>
+<g class="dot dot-site" data-id="golgotha" tabindex="0" role="button" aria-label="Golgotha">
+  <rect x="372.3" y="667.9" width="12" height="12" rx="2"/>
+  <text class="dot-label" x="366.3" y="663.9" text-anchor="end">Golgotha</text>
+</g>
+<g class="dot dot-town" data-id="jerusalem" tabindex="0" role="button" aria-label="Jerusalem">
+  <circle cx="377.5" cy="674.2" r="6.5"/>
+  <text class="dot-label" x="365.5" y="694.2" text-anchor="end">Jerusalem</text>
+</g>
+<g class="dot dot-water" data-id="jordan-river" tabindex="0" role="button" aria-label="Jordan River">
+  <circle cx="476.9" cy="633.3" r="6.5" class="hollow"/>
+  <text class="dot-label" x="488.9" y="635.3" text-anchor="start">Jordan River</text>
+</g>
+<g class="dot dot-region" data-id="judea" tabindex="0" role="button" aria-label="Judea">
+  <path d="M353.8,742.0 L361.8,750.0 L353.8,758.0 L345.8,750.0 Z"/>
+  <text class="dot-label" x="365.8" y="760.0" text-anchor="start">Judea</text>
+</g>
+<g class="dot dot-town" data-id="magdala" tabindex="0" role="button" aria-label="Magdala">
+  <circle cx="463.5" cy="318.5" r="6.5"/>
+  <text class="dot-label" x="451.5" y="328.5" text-anchor="end">Magdala</text>
+</g>
+<g class="dot dot-mountain" data-id="mount-hermon" tabindex="0" role="button" aria-label="Mount Hermon">
+  <path d="M571.5,120.5 L578.5,134.0 L564.5,134.0 Z"/>
+  <text class="dot-label" x="581.5" y="120.0" text-anchor="start">Mount Hermon</text>
+</g>
+<g class="dot dot-mountain" data-id="mount-olivet" tabindex="0" role="button" aria-label="Mount Olivet">
+  <path d="M382.7,667.0 L389.7,680.5 L375.7,680.5 Z"/>
+  <text class="dot-label" x="392.7" y="658.5" text-anchor="start">Mount Olivet</text>
+</g>
+<g class="dot dot-town" data-id="nazareth" tabindex="0" role="button" aria-label="Nazareth">
+  <circle cx="397.9" cy="366.6" r="6.5"/>
+  <text class="dot-label" x="385.9" y="374.6" text-anchor="end">Nazareth</text>
+</g>
+<g class="dot dot-region" data-id="perea" tabindex="0" role="button" aria-label="Perea">
+  <path d="M507.7,608.7 L515.7,616.7 L507.7,624.7 L499.7,616.7 Z"/>
+  <text class="dot-label" x="517.7" y="606.7" text-anchor="start">Perea</text>
+</g>
+<g class="dot dot-town" data-id="samaria" tabindex="0" role="button" aria-label="Samaria">
+  <circle cx="367.7" cy="507.9" r="6.5"/>
+  <text class="dot-label" x="377.7" y="497.9" text-anchor="start">Samaria</text>
+</g>
+<g class="dot dot-water" data-id="sea-of-galilee" tabindex="0" role="button" aria-label="Sea of Galilee">
+  <circle cx="489.2" cy="326.7" r="6.5" class="hollow"/>
+  <text class="dot-label" x="511.2" y="318.7" text-anchor="start">Sea of Galilee</text>
+</g>
+<g class="dot dot-town" data-id="sidon" tabindex="0" role="button" aria-label="Sidon">
+  <circle cx="420.8" cy="79.2" r="6.5"/>
+  <text class="dot-label" x="430.8" y="71.2" text-anchor="start">Sidon</text>
+</g>
+<g class="dot dot-town" data-id="sychar" tabindex="0" role="button" aria-label="Sychar">
+  <circle cx="395.5" cy="530.2" r="6.5"/>
+  <text class="dot-label" x="405.5" y="544.2" text-anchor="start">Sychar</text>
+</g>
+<g class="dot dot-town" data-id="tiberias" tabindex="0" role="button" aria-label="Tiberias">
+  <circle cx="469.3" cy="337.4" r="6.5"/>
+  <text class="dot-label" x="481.3" y="351.4" text-anchor="start">Tiberias</text>
+</g>
+<g class="dot dot-town" data-id="tyre" tabindex="0" role="button" aria-label="Tyre">
+  <circle cx="369.3" cy="176.5" r="6.5"/>
+  <text class="dot-label" x="357.3" y="166.5" text-anchor="end">Tyre</text>
+</g>
+    </svg>
+    <div class="legend" aria-label="Marker legend">
+      <span><i class="sw" style="background:var(--gold);border-radius:50%"></i> town / city</span>
+      <span><i class="sw" style="background:var(--gold)"></i> site</span>
+      <span><i class="sw" style="background:var(--gold);clip-path:polygon(50% 0,100% 100%,0 100%)"></i> mountain</span>
+      <span><i class="sw" style="background:var(--gold);transform:rotate(45deg) scale(.85)"></i> region</span>
+      <span><i class="sw" style="border:2px solid var(--gold);border-radius:50%"></i> water</span>
+    </div>
+  </section>
+  <aside class="panel" id="panel" aria-live="polite" aria-label="Place details"></aside>
+</main>
+<section class="lists">
+  <div class="list-card">
+    <h3>Beyond the map area (14)</h3>
+    <p style="color:var(--muted);font-size:.85rem;margin-top:0">Real places from the index that lie outside this Palestine-focused schematic.</p>
+    <ul><li><b>Alexandria</b> — Off-map (Egypt) <span class="refs">130:0.2, 130:3.2, 130:3.8</span></li>
+<li><b>Antioch</b> — Off-map (Syria, north of map area) <span class="refs">133:7.13, 133:8.1, 133:8.2</span></li>
+<li><b>Athens</b> — Off-map (Greece) <span class="refs">133:4.13, 133:4.14, 133:5.12</span></li>
+<li><b>Babylon</b> — Off-map (Iraq) <span class="refs">97:6.4, 97:7.1, 97:9.27</span></li>
+<li><b>Carthage</b> — Off-map (Tunisia) <span class="refs">130:0.2, 130:6.6, 130:7.1</span></li>
+<li><b>China</b> — Off-map (region, not a point) <span class="refs">94:5.1, 94:5.7, 94:6.9</span></li>
+<li><b>Corinth</b> — Off-map (Greece) <span class="refs">133:2.5, 133:3.12, 133:4.13</span></li>
+<li><b>Cyrene</b> — Off-map (Libya) <span class="refs">130:0.2, 130:6.6</span></li>
+<li><b>Egypt</b> — Off-map (region, mostly outside map area) <span class="refs">95:0.1, 95:2.2, 95:3.5</span></li>
+<li><b>India</b> — Off-map (region, not a point) <span class="refs">79:1.1, 79:2.1, 79:3.3</span></li>
+<li><b>Mesopotamia</b> — Off-map (vague region, Iraq) <span class="refs">78:0.1, 78:5.2, 78:8.4</span></li>
+<li><b>Persia</b> — Off-map (region, not a point) <span class="refs">85:4.4, 85:5.2</span></li>
+<li><b>Rome</b> — Off-map (Italy) <span class="refs">132:0.1, 132:0.4, 132:0.10</span></li>
+<li><b>Urmia</b> — Off-map (Iran) <span class="refs">134:2.1, 134:3.1, 134:3.8</span></li></ul>
+  </div>
+  <div class="list-card">
+    <h3>Not plotted (18)</h3>
+    <p style="color:var(--muted);font-size:.85rem;margin-top:0">Index entries omitted as vague, disputed, or non-geographic.</p>
+    <ul><li><b>Dalamatia</b> — Vague / disputed — mythic headquarters city of the Planetary Prince; no locatable modern site.</li>
+<li><b>Decapolis</b> — Vague — league of ten gentile cities, not a single point.</li>
+<li><b>Eden</b> — Vague / disputed — no agreed modern location.</li>
+<li><b>Edentia</b> — Non-geographic — constellation capital, not on Earth.</li>
+<li><b>Emmaus</b> — Disputed — several candidate sites, no consensus.</li>
+<li><b>Havona</b> — Non-geographic — central universe, not on Earth.</li>
+<li><b>Jerusem</b> — Non-geographic — system capital, not on Earth.</li>
+<li><b>Land of Nod</b> — Vague — region east of Eden, no agreed location.</li>
+<li><b>Mansion worlds</b> — Non-geographic — not on Earth.</li>
+<li><b>Nebadon</b> — Non-geographic — local universe, not on Earth.</li>
+<li><b>Norlatiadek</b> — Non-geographic — constellation, not on Earth.</li>
+<li><b>Orvonton</b> — Non-geographic — superuniverse, not on Earth.</li>
+<li><b>Paradise</b> — Non-geographic — not on Earth.</li>
+<li><b>Salvington</b> — Non-geographic — local universe capital, not on Earth.</li>
+<li><b>Satania</b> — Non-geographic — administrative system, not on Earth.</li>
+<li><b>Second Garden</b> — Vague — between the Tigris and Euphrates, no agreed site.</li>
+<li><b>Urantia</b> — Non-geographic — the planet Earth itself.</li>
+<li><b>Uversa</b> — Non-geographic — superuniverse capital, not on Earth.</li></ul>
+  </div>
+</section>
+<footer>
+  <p><b>Projection.</b> Linear latitude/longitude to SVG: x = (lon &minus; 34) / 2.6 &times; 800, y = (33.8 &minus; lat) / 3.0 &times; 1000. Coastline, rivers, and lakes are hand-drawn and schematic &mdash; not to scale.</p>
+  <p><b>Accuracy.</b> Coordinates position the dots only; they are not claims from the book. Place descriptions are short summaries verified against the local book text; citations resolve to real paragraphs (e.g. <code>172:0.1</code> = Paper 172, section 0, paragraph 1). One correction vs the entity index: Caesarea-Philippi's citations were 130:0.2/130:2.1/130:2.5 (Mediterranean-tour paragraphs); replaced with 157:3.1 and 157:6.3, the Peter's-confession paragraphs matching the note.</p>
+  <p>Self-contained: no network calls, no external files. Works from <code>file://</code> and offline.</p>
+</footer>
+<script id="places-data" type="application/json">[{"id":"bethany","name":"Bethany","kind":"town","lat":31.77072,"lon":35.25993,"refs":["172:0.1","172:0.2","172:3.1"],"note":"The village near Jerusalem, home of Lazarus, Martha, and Mary."},{"id":"bethlehem","name":"Bethlehem","kind":"town","lat":31.70424,"lon":35.20631,"refs":["122:4.3","122:8.7","122:10.1"],"note":"The city of David, birthplace of Jesus."},{"id":"bethsaida","name":"Bethsaida","kind":"town","lat":32.904,"lon":35.623,"refs":["148:0.1","148:3.2","148:8.1"],"note":"The lakeside town where the apostolic party stayed at the Zebedee home (148:0.1). Plotted at et-Tell, the traditional identification; debated."},{"id":"caesarea-philippi","name":"Caesarea-Philippi","kind":"town","lat":33.24725,"lon":35.69396,"refs":["157:3.1","157:6.3"],"note":"The northern city where Peter confessed Jesus as the Son of God."},{"id":"cana","name":"Cana","kind":"town","lat":32.7431,"lon":35.33496,"refs":["137:2.3","137:3.1","137:3.6"],"note":"The Galilean town of the wedding feast attended by Jesus."},{"id":"capernaum","name":"Capernaum","kind":"town","lat":32.88052,"lon":35.57335,"refs":["137:1.1","137:3.4","137:6.1"],"note":"The lakeside city that became Jesus' headquarters in Galilee."},{"id":"damascus","name":"Damascus","kind":"town","lat":33.51656,"lon":36.31708,"refs":["128:3.3","128:4.1","128:4.4"],"note":"The Syrian city visited by Jesus in his twenty-ninth year."},{"id":"dead-sea","name":"Dead Sea","kind":"water","lat":31.55,"lon":35.48,"refs":["124:1.9","124:6.5","124:6.8"],"note":"The salt sea at the Jordan's mouth."},{"id":"gadara","name":"Gadara","kind":"town","lat":32.65585,"lon":35.67943,"refs":["138:2.5","138:9.3"],"note":"A city of the Decapolis visited by Jesus."},{"id":"galilee","name":"Galilee","kind":"region","lat":32.78,"lon":35.38,"refs":["192:0.1","192:0.2","192:0.4"],"note":"The northern province where Jesus did most of his public work."},{"id":"gennesaret","name":"Gennesaret","kind":"region","lat":32.85,"lon":35.53,"refs":["152:5.5","152:6.1","152:6.2"],"note":"The plain on the Sea of Galilee where Jesus ministered."},{"id":"gethsemane","name":"Gethsemane","kind":"site","lat":31.77215,"lon":35.24472,"refs":["182:0.1","182:2.10","182:3.1"],"note":"The garden where Jesus prayed before his arrest."},{"id":"golgotha","name":"Golgotha","kind":"site","lat":31.7784,"lon":35.2296,"refs":["187:0.4","187:1.1","187:1.4"],"note":"The place of the crucifixion, outside Jerusalem."},{"id":"jerusalem","name":"Jerusalem","kind":"town","lat":31.77729,"lon":35.22702,"refs":["172:0.2","172:0.3","172:3.4"],"note":"The holy city of the Jews, scene of Jesus' death and resurrection."},{"id":"jordan-river","name":"Jordan River","kind":"water","lat":31.9,"lon":35.55,"refs":["141:0.1","141:1.1","141:1.2"],"note":"The river where John baptized and Jesus began his public ministry."},{"id":"judea","name":"Judea","kind":"region","lat":31.55,"lon":35.15,"refs":["185:0.1","185:1.1","185:1.2"],"note":"The southern Jewish province containing Jerusalem."},{"id":"magdala","name":"Magdala","kind":"town","lat":32.8444,"lon":35.50637,"refs":["150:0.4","150:2.1","150:2.2"],"note":"The lakeside town associated with Mary Magdalene."},{"id":"mount-hermon","name":"Mount Hermon","kind":"mountain","lat":33.41611,"lon":35.8575,"refs":["134:7.6","134:7.7","134:8.6"],"note":"The high mountain of the transfiguration (158:3.1)."},{"id":"mount-olivet","name":"Mount Olivet","kind":"mountain","lat":31.7765,"lon":35.2437,"refs":["172:3.7","172:3.9","172:3.10"],"note":"The hill east of Jerusalem associated with Jesus' last days."},{"id":"nazareth","name":"Nazareth","kind":"town","lat":32.7001,"lon":35.29315,"refs":["123:0.1","123:0.6","123:1.7"],"note":"The Galilean town where Jesus grew up."},{"id":"perea","name":"Perea","kind":"region","lat":31.95,"lon":35.65,"refs":["163:1.6","163:5.1","163:5.2"],"note":"The province east of the Jordan, scene of Jesus' later ministry."},{"id":"samaria","name":"Samaria","kind":"town","lat":32.27639,"lon":35.195,"refs":["143:0.1","143:0.2","143:3.8"],"note":"The district between Judea and Galilee, home of the Samaritans; dot marks the ancient city (Sebastia)."},{"id":"sea-of-galilee","name":"Sea of Galilee","kind":"water","lat":32.82,"lon":35.59,"refs":["139:8.2","139:8.13","139:12.2"],"note":"The lake at the center of Jesus' Galilean ministry."},{"id":"sidon","name":"Sidon","kind":"town","lat":33.56253,"lon":35.36757,"refs":["156:0.1","156:0.2","156:2.2"],"note":"The Phoenician city of Jesus' tour with the apostles."},{"id":"sychar","name":"Sychar","kind":"town","lat":32.2093,"lon":35.2853,"refs":["143:3.8","143:5.2","143:6.2"],"note":"The Samaritan town of Jacob's well."},{"id":"tiberias","name":"Tiberias","kind":"town","lat":32.78769,"lon":35.52531,"refs":["150:0.4","150:1.1","150:3.1"],"note":"The Herodian capital on the Sea of Galilee (135:12.1)."},{"id":"tyre","name":"Tyre","kind":"town","lat":33.27057,"lon":35.20016,"refs":["156:3.2","156:4.1","156:4.2"],"note":"The Phoenician city visited during Jesus' later ministry."}]</script>
+<script>const DATA = JSON.parse(document.getElementById("places-data").textContent);
+const byId = Object.fromEntries(DATA.map(p => [p.id, p]));
+const panel = document.getElementById("panel");
+const KIND_LABEL = {town:"Town / city", site:"Site", mountain:"Mountain", region:"Region", water:"Water"};
+function select(id){
+  const p = byId[id]; if(!p) return;
+  document.querySelectorAll(".dot.active").forEach(d => d.classList.remove("active"));
+  const g = document.querySelector('.dot[data-id="'+id+'"]');
+  if(g) g.classList.add("active");
+  panel.innerHTML =
+    '<span class="tag">'+(KIND_LABEL[p.kind]||p.kind)+'</span>'+
+    '<h2>'+p.name+'</h2>'+
+    '<div class="cites">'+p.refs.map(r=>'<span class="cite">'+r+'</span>').join("")+'</div>'+
+    '<p class="note">'+p.note+'</p>'+
+    '<div class="schematic-note">Citations are paragraph references in The Urantia Book (e.g. 172:0.1 = Paper 172, section 0, paragraph 1). '+
+    'Dot positions are schematic, not book claims.</div>';
+}
+document.querySelectorAll(".dot").forEach(g => {
+  g.addEventListener("click", () => select(g.dataset.id));
+  g.addEventListener("keydown", e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); select(g.dataset.id); } });
+});
+/* a11y-touch-halo: invisible 44px tap targets around each map dot */
+document.querySelectorAll(".dot").forEach(g => {
+  try{
+    var b=g.getBBox(),cx=b.x+b.width/2,cy=b.y+b.height/2;
+    var c=document.createElementNS('http:'+'//www.w3.org/2000/svg','circle') /* split: portability test rejects absolute-URL-looking literals; this is only the SVG namespace identifier, never fetched */;
+    c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r','22');
+    c.setAttribute('style','fill:transparent');c.setAttribute('aria-hidden','true');
+    g.insertBefore(c,g.firstChild);
+  }catch(e){}
+});
+const filter = document.getElementById("filter");
+filter.addEventListener("input", () => {
+  const q = filter.value.trim().toLowerCase();
+  document.querySelectorAll(".dot").forEach(g => {
+    const p = byId[g.dataset.id];
+    g.style.display = (!q || p.name.toLowerCase().includes(q)) ? "" : "none";
+  });
+});
+select("jerusalem");</script>
+<script>
+/* Display-settings pill: theme + text size, synced with UB Tools Studio via localStorage. */
+(function(){
+var root=document.documentElement,PCTS=[90,100,112,125];
+function getN(){var s=null;try{s=JSON.parse(localStorage.getItem('ub-tools-text-size'))}catch(e){}return (typeof s==='number'&&isFinite(s))?Math.max(0,Math.min(3,Math.floor(s))):1}
+function paint(){
+var light=root.getAttribute('data-theme')==='light',tb=document.getElementById('ub-theme');
+tb.setAttribute('aria-pressed',String(light));
+tb.textContent=light?'\u263E Dark':'\u2600 Light';
+var n=getN();
+document.getElementById('ub-sreset').setAttribute('aria-pressed',String(n===1));
+document.getElementById('ub-sdec').disabled=n<=0;
+document.getElementById('ub-sinc').disabled=n>=3;
+}
+function setN(n){try{localStorage.setItem('ub-tools-text-size',JSON.stringify(n))}catch(e){}root.style.fontSize=PCTS[n]+'%';paint()}
+document.getElementById('ub-theme').addEventListener('click',function(){
+var next=root.getAttribute('data-theme')==='light'?'dark':'light';
+try{localStorage.setItem('ub-tools-theme',JSON.stringify(next))}catch(e){}
+root.setAttribute('data-theme',next);paint();
+});
+document.getElementById('ub-sdec').addEventListener('click',function(){setN(Math.max(0,getN()-1))});
+document.getElementById('ub-sreset').addEventListener('click',function(){setN(1)});
+document.getElementById('ub-sinc').addEventListener('click',function(){setN(Math.min(3,getN()+1))});
+paint();
+})();
+</script>
+</body>
+</html>

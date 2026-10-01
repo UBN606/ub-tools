@@ -1,0 +1,428 @@
+[
+  {
+    "name": "Adamites",
+    "kind": "group",
+    "refs": [
+      "78:1.3",
+      "78:1.4",
+      "78:4.2"
+    ],
+    "note": "The descendants of Adam, the violet race."
+  },
+  {
+    "name": "Ancients of Days",
+    "kind": "group",
+    "refs": [
+      "18:0.4",
+      "18:3.2",
+      "18:3.4"
+    ],
+    "note": "The three rulers of each superuniverse, of Trinity origin."
+  },
+  {
+    "name": "Andites",
+    "kind": "group",
+    "refs": [
+      "78:0.1",
+      "78:5.2",
+      "78:5.5"
+    ],
+    "note": "The blended race of Adamites and Nodites that civilized Mesopotamia."
+  },
+  {
+    "name": "Andonites",
+    "kind": "group",
+    "refs": [
+      "63:3.3",
+      "63:4.1",
+      "63:5.6"
+    ],
+    "note": "The descendants of Andon and Fonta, the first human race."
+  },
+  {
+    "name": "Archangels",
+    "kind": "group",
+    "refs": [
+      "37:1.4",
+      "37:3.2",
+      "37:3.5"
+    ],
+    "note": "The high angels devoted to creature uplift and resurrection roll calls."
+  },
+  {
+    "name": "Celestial Artisans",
+    "kind": "group",
+    "refs": [
+      "44:0.1",
+      "44:0.3",
+      "44:0.4"
+    ],
+    "note": "The artisans of spirit beauty in the morontia and spirit worlds."
+  },
+  {
+    "name": "Cherubim",
+    "kind": "group",
+    "refs": [
+      "38:0.2",
+      "38:7.7",
+      "38:8.3"
+    ],
+    "note": "Angelic workers associated with the seraphim in local universe service."
+  },
+  {
+    "name": "Constellation Fathers",
+    "kind": "group",
+    "refs": [
+      "35:5.1",
+      "35:6.1",
+      "35:6.2"
+    ],
+    "note": "The Vorondadek rulers of the constellations."
+  },
+  {
+    "name": "Essenes",
+    "kind": "group",
+    "refs": [
+      "137:7.8"
+    ],
+    "note": "The separatist Jewish sect of Jesus' time."
+  },
+  {
+    "name": "Evening Stars",
+    "kind": "group",
+    "refs": [
+      "37:1.3",
+      "37:2.10",
+      "37:2.11"
+    ],
+    "note": "A high order of created beings serving in the local universes."
+  },
+  {
+    "name": "Finaliters",
+    "kind": "group",
+    "refs": [
+      "31:0.1",
+      "31:1.5",
+      "31:2.1"
+    ],
+    "note": "The corps of perfected ascendant mortals destined for outer-space service."
+  },
+  {
+    "name": "Lanonandek Sons",
+    "kind": "group",
+    "refs": [
+      "35:0.5",
+      "35:0.7",
+      "35:8.15"
+    ],
+    "note": "The order of Sons who serve as System Sovereigns; Lucifer was one."
+  },
+  {
+    "name": "Life Carriers",
+    "kind": "group",
+    "refs": [
+      "36:0.1",
+      "36:1.1",
+      "36:1.3"
+    ],
+    "note": "The Sons who plant and foster life on the evolutionary worlds."
+  },
+  {
+    "name": "Magisterial Sons",
+    "kind": "group",
+    "refs": [
+      "20:1.3",
+      "20:4.1",
+      "20:5.6"
+    ],
+    "note": "The order of Sons who bestow themselves on worlds in magisterial missions."
+  },
+  {
+    "name": "Master Physical Controllers",
+    "kind": "group",
+    "refs": [
+      "29:0.8",
+      "29:2.9",
+      "29:2.19"
+    ],
+    "note": "The mobilizers and directors of physical energies."
+  },
+  {
+    "name": "Material Sons",
+    "kind": "group",
+    "refs": [
+      "45:3.16",
+      "45:5.3",
+      "45:5.7"
+    ],
+    "note": "The Adamic order sent to uplift the mortal races; Adam and Eve were of this order."
+  },
+  {
+    "name": "Melchizedek Sons",
+    "kind": "group",
+    "refs": [
+      "35:0.3",
+      "35:1.3",
+      "35:2.2"
+    ],
+    "note": "The order of Sons who serve as teachers and emergency ministers; Machiventa was one."
+  },
+  {
+    "name": "Midwayers",
+    "kind": "group",
+    "refs": [
+      "77:0.2",
+      "77:2.1",
+      "77:7.4"
+    ],
+    "note": "Beings midway between men and angels, permanent citizens of Urantia."
+  },
+  {
+    "name": "Mighty Messengers",
+    "kind": "group",
+    "refs": [
+      "22:1.2",
+      "22:2.4",
+      "22:2.5"
+    ],
+    "note": "Ascendant mortals who survived rebellion and serve as messengers."
+  },
+  {
+    "name": "Morontia Companions",
+    "kind": "group",
+    "refs": [
+      "48:3.1",
+      "48:3.4",
+      "48:3.13"
+    ],
+    "note": "The friendly hosts of ascending mortals on the morontia worlds."
+  },
+  {
+    "name": "Nodites",
+    "kind": "group",
+    "refs": [
+      "77:2.3",
+      "77:4.1",
+      "77:4.3"
+    ],
+    "note": "The descendants of the Prince's staff, centered in the land of Nod."
+  },
+  {
+    "name": "Paradise Creator Sons",
+    "kind": "group",
+    "refs": [
+      "21:0.1",
+      "21:1.3",
+      "21:1.4"
+    ],
+    "note": "The order of Michael Sons who create and rule the local universes."
+  },
+  {
+    "name": "Pharisees",
+    "kind": "group",
+    "refs": [
+      "166:1.1",
+      "166:1.2",
+      "166:1.4"
+    ],
+    "note": "A Jewish religious party prominent in the gospel narratives."
+  },
+  {
+    "name": "Sadducees",
+    "kind": "group",
+    "refs": [
+      "174:2.1",
+      "174:3.3",
+      "174:4.1"
+    ],
+    "note": "The priestly Jewish party at the time of Jesus."
+  },
+  {
+    "name": "Samaritans",
+    "kind": "group",
+    "refs": [
+      "143:0.1",
+      "143:0.2",
+      "143:4.2"
+    ],
+    "note": "The mixed people of Samaria, ministered to by Jesus."
+  },
+  {
+    "name": "Sangik peoples",
+    "kind": "group",
+    "refs": [
+      "64:5.2",
+      "64:5.3",
+      "64:7.10"
+    ],
+    "note": "The six colored races that appeared in the Sangik family."
+  },
+  {
+    "name": "Sanhedrin",
+    "kind": "group",
+    "refs": [
+      "164:0.1",
+      "164:4.1",
+      "164:5.1"
+    ],
+    "note": "The Jewish high court that tried Jesus."
+  },
+  {
+    "name": "Sanobim",
+    "kind": "group",
+    "refs": [
+      "38:0.2",
+      "38:7.2",
+      "38:8.6"
+    ],
+    "note": "The lowest order of angels, assistants to the cherubim."
+  },
+  {
+    "name": "Seconaphim",
+    "kind": "group",
+    "refs": [
+      "28:0.1",
+      "28:3.1",
+      "28:3.2"
+    ],
+    "note": "The children of the Reflective Spirits, serving in the superuniverses."
+  },
+  {
+    "name": "Seraphim",
+    "kind": "group",
+    "refs": [
+      "39:0.1",
+      "39:0.9",
+      "39:9.2"
+    ],
+    "note": "The angelic ministers of the local universes, guardians of mortals."
+  },
+  {
+    "name": "Seven Master Spirits",
+    "kind": "group",
+    "refs": [
+      "16:0.1",
+      "16:1.1",
+      "16:1.2"
+    ],
+    "note": "The sevenfold expression of the Infinite Spirit, each ruling a superuniverse."
+  },
+  {
+    "name": "Solitary Messengers",
+    "kind": "group",
+    "refs": [
+      "23:0.1",
+      "23:1.1",
+      "23:4.4"
+    ],
+    "note": "The personal messengers of the Infinite Spirit, serving all universes."
+  },
+  {
+    "name": "Supernaphim",
+    "kind": "group",
+    "refs": [
+      "26:0.1",
+      "26:1.12",
+      "26:2.7"
+    ],
+    "note": "The highest angels, ministers of the central universe."
+  },
+  {
+    "name": "The Prince's staff",
+    "kind": "group",
+    "refs": [
+      "66:2.4",
+      "66:4.8"
+    ],
+    "note": "The one hundred Jerusem volunteers rematerialized to serve at Dalamatia."
+  },
+  {
+    "name": "The seventy",
+    "kind": "group",
+    "refs": [
+      "163:0.1",
+      "163:2.6",
+      "163:2.7"
+    ],
+    "note": "The seventy evangelists ordained to assist the apostles."
+  },
+  {
+    "name": "Thought Adjusters",
+    "kind": "group",
+    "refs": [
+      "107:0.7",
+      "107:6.7",
+      "107:7.1"
+    ],
+    "note": "Fragments of the Universal Father that indwell mortal minds."
+  },
+  {
+    "name": "Trinity Teacher Sons",
+    "kind": "group",
+    "refs": [
+      "19:0.1",
+      "19:0.2",
+      "19:0.9"
+    ],
+    "note": "The order of Sons devoted to teaching truth on the worlds."
+  },
+  {
+    "name": "Twelve apostles",
+    "kind": "group",
+    "refs": [
+      "138:1.2",
+      "138:2.9",
+      "138:5.3"
+    ],
+    "note": "The twelve men Jesus chose and ordained to preach the kingdom."
+  },
+  {
+    "name": "Twenty-four counselors",
+    "kind": "group",
+    "refs": [
+      "45:4.1",
+      "45:4.2",
+      "45:4.16"
+    ],
+    "note": "The council of twenty-four advisers on Jerusem."
+  },
+  {
+    "name": "Universe Power Directors",
+    "kind": "group",
+    "refs": [
+      "16:4.2",
+      "16:4.3",
+      "16:4.12"
+    ],
+    "note": "The controllers of physical energy in the universes."
+  },
+  {
+    "name": "Violet race",
+    "kind": "group",
+    "refs": [
+      "76:3.3",
+      "76:4.1",
+      "76:6.1"
+    ],
+    "note": "The Adamic race, the violet people of Adam and Eve's line."
+  },
+  {
+    "name": "Vorondadek Sons",
+    "kind": "group",
+    "refs": [
+      "35:0.4",
+      "35:5.7",
+      "35:6.1"
+    ],
+    "note": "The order of Sons who rule the constellations as Constellation Fathers."
+  },
+  {
+    "name": "Women's corps",
+    "kind": "group",
+    "refs": [
+      "139:2.14",
+      "139:5.11"
+    ],
+    "note": "The corps of women evangelists organized to minister to women."
+  }
+]

@@ -1,0 +1,3420 @@
+{
+  "plans": [
+    {
+      "id": "year",
+      "title": "The Whole Book in a Year",
+      "blurb": "The Foreword and all 196 papers, in 365 daily portions.",
+      "days": [
+        {
+          "n": 1,
+          "title": "Foreword",
+          "startRef": "0:0.1",
+          "endRef": "0:2.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 2,
+          "title": "Foreword",
+          "startRef": "0:2.9",
+          "endRef": "0:4.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 3,
+          "title": "Foreword",
+          "startRef": "0:4.6",
+          "endRef": "0:7.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 4,
+          "title": "Foreword",
+          "startRef": "0:7.8",
+          "endRef": "0:12.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 5,
+          "title": "Foreword–Paper 1",
+          "startRef": "0:12.3",
+          "endRef": "1:3.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 6,
+          "title": "Paper 1: The Universal Father",
+          "startRef": "1:3.7",
+          "endRef": "1:7.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 7,
+          "title": "Papers 1–2",
+          "startRef": "1:7.8",
+          "endRef": "2:5.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 8,
+          "title": "Papers 2–3",
+          "startRef": "2:5.7",
+          "endRef": "3:1.9",
+          "paragraphs": 40
+        },
+        {
+          "n": 9,
+          "title": "Paper 3: The Attributes of God",
+          "startRef": "3:1.10",
+          "endRef": "3:5.10",
+          "paragraphs": 40
+        },
+        {
+          "n": 10,
+          "title": "Papers 3–4",
+          "startRef": "3:5.11",
+          "endRef": "4:3.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 11,
+          "title": "Papers 4–5",
+          "startRef": "4:3.2",
+          "endRef": "5:2.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 12,
+          "title": "Paper 5: God’s Relation to the Individual",
+          "startRef": "5:2.4",
+          "endRef": "5:5.14",
+          "paragraphs": 40
+        },
+        {
+          "n": 13,
+          "title": "Papers 5–6",
+          "startRef": "5:6.1",
+          "endRef": "6:4.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 14,
+          "title": "Papers 6–7",
+          "startRef": "6:4.4",
+          "endRef": "7:1.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 15,
+          "title": "Paper 7: Relation of the Eternal Son to the Universe",
+          "startRef": "7:1.6",
+          "endRef": "7:6.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 16,
+          "title": "Papers 7–8",
+          "startRef": "7:6.6",
+          "endRef": "8:3.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 17,
+          "title": "Papers 8–9",
+          "startRef": "8:3.8",
+          "endRef": "9:2.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 18,
+          "title": "Paper 9: Relation of the Infinite Spirit to the Universe",
+          "startRef": "9:2.4",
+          "endRef": "9:8.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 19,
+          "title": "Papers 9–10",
+          "startRef": "9:8.4",
+          "endRef": "10:2.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 20,
+          "title": "Paper 10: The Paradise Trinity",
+          "startRef": "10:3.1",
+          "endRef": "10:6.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 21,
+          "title": "Papers 10–11",
+          "startRef": "10:6.7",
+          "endRef": "11:2.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 22,
+          "title": "Paper 11: The Eternal Isle of Paradise",
+          "startRef": "11:2.7",
+          "endRef": "11:8.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 23,
+          "title": "Papers 11–12",
+          "startRef": "11:8.4",
+          "endRef": "12:2.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 24,
+          "title": "Paper 12: The Universe of Universes",
+          "startRef": "12:3.1",
+          "endRef": "12:6.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 25,
+          "title": "Paper 12: The Universe of Universes",
+          "startRef": "12:6.2",
+          "endRef": "12:8.14",
+          "paragraphs": 40
+        },
+        {
+          "n": 26,
+          "title": "Papers 12–13",
+          "startRef": "12:8.15",
+          "endRef": "13:2.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 27,
+          "title": "Papers 13–14",
+          "startRef": "13:2.2",
+          "endRef": "14:1.18",
+          "paragraphs": 40
+        },
+        {
+          "n": 28,
+          "title": "Paper 14: The Central and Divine Universe",
+          "startRef": "14:2.1",
+          "endRef": "14:5.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 29,
+          "title": "Paper 14: The Central and Divine Universe",
+          "startRef": "14:5.2",
+          "endRef": "14:6.30",
+          "paragraphs": 40
+        },
+        {
+          "n": 30,
+          "title": "Papers 14–15",
+          "startRef": "14:6.31",
+          "endRef": "15:2.19",
+          "paragraphs": 40
+        },
+        {
+          "n": 31,
+          "title": "Paper 15: The Seven Superuniverses",
+          "startRef": "15:2.20",
+          "endRef": "15:5.9",
+          "paragraphs": 40
+        },
+        {
+          "n": 32,
+          "title": "Paper 15: The Seven Superuniverses",
+          "startRef": "15:5.10",
+          "endRef": "15:8.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 33,
+          "title": "Paper 15: The Seven Superuniverses",
+          "startRef": "15:8.8",
+          "endRef": "15:10.19",
+          "paragraphs": 40
+        },
+        {
+          "n": 34,
+          "title": "Papers 15–16",
+          "startRef": "15:10.20",
+          "endRef": "16:1.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 35,
+          "title": "Paper 16: The Seven Master Spirits",
+          "startRef": "16:1.2",
+          "endRef": "16:4.12",
+          "paragraphs": 40
+        },
+        {
+          "n": 36,
+          "title": "Paper 16: The Seven Master Spirits",
+          "startRef": "16:4.13",
+          "endRef": "16:8.10",
+          "paragraphs": 40
+        },
+        {
+          "n": 37,
+          "title": "Papers 16–17",
+          "startRef": "16:8.11",
+          "endRef": "17:1.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 38,
+          "title": "Paper 17: The Seven Supreme Spirit Groups",
+          "startRef": "17:1.4",
+          "endRef": "17:6.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 39,
+          "title": "Papers 17–18",
+          "startRef": "17:6.9",
+          "endRef": "18:3.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 40,
+          "title": "Papers 18–19",
+          "startRef": "18:3.7",
+          "endRef": "19:1.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 41,
+          "title": "Paper 19: The Co-ordinate Trinity-Origin Beings",
+          "startRef": "19:1.2",
+          "endRef": "19:5.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 42,
+          "title": "Papers 19–20",
+          "startRef": "19:5.8",
+          "endRef": "20:2.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 43,
+          "title": "Paper 20: The Paradise Sons of God",
+          "startRef": "20:2.2",
+          "endRef": "20:8.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 44,
+          "title": "Papers 20–21",
+          "startRef": "20:8.3",
+          "endRef": "21:3.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 45,
+          "title": "Papers 21–22",
+          "startRef": "21:3.8",
+          "endRef": "22:0.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 46,
+          "title": "Paper 22: The Trinitized Sons of God",
+          "startRef": "22:0.3",
+          "endRef": "22:5.1",
+          "paragraphs": 39
+        },
+        {
+          "n": 47,
+          "title": "Paper 22: The Trinitized Sons of God",
+          "startRef": "22:5.2",
+          "endRef": "22:10.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 48,
+          "title": "Papers 22–23",
+          "startRef": "22:10.5",
+          "endRef": "23:2.22",
+          "paragraphs": 40
+        },
+        {
+          "n": 49,
+          "title": "Papers 23–24",
+          "startRef": "23:2.23",
+          "endRef": "24:1.11",
+          "paragraphs": 40
+        },
+        {
+          "n": 50,
+          "title": "Paper 24: Higher Personalities of the Infinite Spirit",
+          "startRef": "24:1.12",
+          "endRef": "24:7.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 51,
+          "title": "Papers 24–25",
+          "startRef": "24:7.6",
+          "endRef": "25:3.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 52,
+          "title": "Paper 25: The Messenger Hosts of Space",
+          "startRef": "25:3.8",
+          "endRef": "25:6.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 53,
+          "title": "Papers 25–26",
+          "startRef": "25:7.1",
+          "endRef": "26:2.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 54,
+          "title": "Paper 26: Ministering Spirits of the Central Universe",
+          "startRef": "26:2.7",
+          "endRef": "26:7.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 55,
+          "title": "Papers 26–27",
+          "startRef": "26:7.5",
+          "endRef": "27:1.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 56,
+          "title": "Papers 27–28",
+          "startRef": "27:1.3",
+          "endRef": "28:0.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 57,
+          "title": "Paper 28: Ministering Spirits of the Superuniverses",
+          "startRef": "28:0.5",
+          "endRef": "28:5.17",
+          "paragraphs": 40
+        },
+        {
+          "n": 58,
+          "title": "Papers 28–29",
+          "startRef": "28:5.18",
+          "endRef": "29:0.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 59,
+          "title": "Paper 29: The Universe Power Directors",
+          "startRef": "29:0.9",
+          "endRef": "29:4.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 60,
+          "title": "Paper 29: The Universe Power Directors",
+          "startRef": "29:4.3",
+          "endRef": "29:5.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 61,
+          "title": "Papers 29–30",
+          "startRef": "29:5.5",
+          "endRef": "30:1.34",
+          "paragraphs": 40
+        },
+        {
+          "n": 62,
+          "title": "Paper 30: Personalities of the Grand Universe",
+          "startRef": "30:1.35",
+          "endRef": "30:1.74",
+          "paragraphs": 40
+        },
+        {
+          "n": 63,
+          "title": "Paper 30: Personalities of the Grand Universe",
+          "startRef": "30:1.75",
+          "endRef": "30:1.114",
+          "paragraphs": 40
+        },
+        {
+          "n": 64,
+          "title": "Paper 30: Personalities of the Grand Universe",
+          "startRef": "30:2.1",
+          "endRef": "30:2.40",
+          "paragraphs": 40
+        },
+        {
+          "n": 65,
+          "title": "Paper 30: Personalities of the Grand Universe",
+          "startRef": "30:2.41",
+          "endRef": "30:2.80",
+          "paragraphs": 40
+        },
+        {
+          "n": 66,
+          "title": "Paper 30: Personalities of the Grand Universe",
+          "startRef": "30:2.81",
+          "endRef": "30:2.120",
+          "paragraphs": 40
+        },
+        {
+          "n": 67,
+          "title": "Paper 30: Personalities of the Grand Universe",
+          "startRef": "30:2.121",
+          "endRef": "30:3.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 68,
+          "title": "Paper 30: Personalities of the Grand Universe",
+          "startRef": "30:3.4",
+          "endRef": "30:4.30",
+          "paragraphs": 40
+        },
+        {
+          "n": 69,
+          "title": "Papers 30–31",
+          "startRef": "30:4.31",
+          "endRef": "31:6.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 70,
+          "title": "Paper 31: The Corps of the Finality",
+          "startRef": "31:6.2",
+          "endRef": "31:10.16",
+          "paragraphs": 40
+        },
+        {
+          "n": 71,
+          "title": "Papers 31–32",
+          "startRef": "31:10.17",
+          "endRef": "32:3.11",
+          "paragraphs": 40
+        },
+        {
+          "n": 72,
+          "title": "Papers 32–33",
+          "startRef": "32:3.12",
+          "endRef": "33:3.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 73,
+          "title": "Paper 33: Administration of the Local Universe",
+          "startRef": "33:3.5",
+          "endRef": "33:8.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 74,
+          "title": "Paper 34: The Local Universe Mother Spirit",
+          "startRef": "34:0.1",
+          "endRef": "34:5.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 75,
+          "title": "Papers 34–35",
+          "startRef": "34:5.7",
+          "endRef": "35:2.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 76,
+          "title": "Paper 35: The Local Universe Sons of God",
+          "startRef": "35:2.7",
+          "endRef": "35:6.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 77,
+          "title": "Papers 35–36",
+          "startRef": "35:6.4",
+          "endRef": "36:1.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 78,
+          "title": "Paper 36: The Life Carriers",
+          "startRef": "36:1.4",
+          "endRef": "36:5.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 79,
+          "title": "Papers 36–37",
+          "startRef": "36:5.3",
+          "endRef": "37:2.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 80,
+          "title": "Paper 37: Personalities of the Local Universe",
+          "startRef": "37:2.6",
+          "endRef": "37:8.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 81,
+          "title": "Papers 37–38",
+          "startRef": "37:8.2",
+          "endRef": "38:2.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 82,
+          "title": "Papers 38–39",
+          "startRef": "38:3.1",
+          "endRef": "39:0.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 83,
+          "title": "Paper 39: The Seraphic Hosts",
+          "startRef": "39:0.2",
+          "endRef": "39:2.12",
+          "paragraphs": 40
+        },
+        {
+          "n": 84,
+          "title": "Paper 39: The Seraphic Hosts",
+          "startRef": "39:2.13",
+          "endRef": "39:5.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 85,
+          "title": "Papers 39–40",
+          "startRef": "39:5.6",
+          "endRef": "40:0.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 86,
+          "title": "Paper 40: The Ascending Sons of God",
+          "startRef": "40:0.4",
+          "endRef": "40:6.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 87,
+          "title": "Papers 40–41",
+          "startRef": "40:6.7",
+          "endRef": "41:0.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 88,
+          "title": "Paper 41: Physical Aspects of the Local Universe",
+          "startRef": "41:1.1",
+          "endRef": "41:6.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 89,
+          "title": "Papers 41–42",
+          "startRef": "41:6.3",
+          "endRef": "42:1.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 90,
+          "title": "Paper 42: Energy—Mind and Matter",
+          "startRef": "42:1.4",
+          "endRef": "42:3.11",
+          "paragraphs": 40
+        },
+        {
+          "n": 91,
+          "title": "Paper 42: Energy—Mind and Matter",
+          "startRef": "42:3.12",
+          "endRef": "42:6.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 92,
+          "title": "Paper 42: Energy—Mind and Matter",
+          "startRef": "42:7.1",
+          "endRef": "42:12.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 93,
+          "title": "Papers 42–43",
+          "startRef": "42:12.4",
+          "endRef": "43:3.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 94,
+          "title": "Paper 43: The Constellations",
+          "startRef": "43:3.5",
+          "endRef": "43:7.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 95,
+          "title": "Papers 43–44",
+          "startRef": "43:7.2",
+          "endRef": "44:0.17",
+          "paragraphs": 40
+        },
+        {
+          "n": 96,
+          "title": "Paper 44: The Celestial Artisans",
+          "startRef": "44:0.18",
+          "endRef": "44:4.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 97,
+          "title": "Paper 44: The Celestial Artisans",
+          "startRef": "44:4.2",
+          "endRef": "44:8.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 98,
+          "title": "Papers 44–45",
+          "startRef": "44:8.7",
+          "endRef": "45:3.19",
+          "paragraphs": 40
+        },
+        {
+          "n": 99,
+          "title": "Paper 45: The Local System Administration",
+          "startRef": "45:3.20",
+          "endRef": "45:6.9",
+          "paragraphs": 40
+        },
+        {
+          "n": 100,
+          "title": "Papers 45–46",
+          "startRef": "45:7.1",
+          "endRef": "46:4.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 101,
+          "title": "Paper 46: The Local System Headquarters",
+          "startRef": "46:4.9",
+          "endRef": "46:6.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 102,
+          "title": "Papers 46–47",
+          "startRef": "46:6.7",
+          "endRef": "47:3.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 103,
+          "title": "Paper 47: The Seven Mansion Worlds",
+          "startRef": "47:3.4",
+          "endRef": "47:9.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 104,
+          "title": "Papers 47–48",
+          "startRef": "47:9.5",
+          "endRef": "48:2.21",
+          "paragraphs": 40
+        },
+        {
+          "n": 105,
+          "title": "Paper 48: The Morontia Life",
+          "startRef": "48:2.22",
+          "endRef": "48:4.17",
+          "paragraphs": 40
+        },
+        {
+          "n": 106,
+          "title": "Paper 48: The Morontia Life",
+          "startRef": "48:4.18",
+          "endRef": "48:6.27",
+          "paragraphs": 40
+        },
+        {
+          "n": 107,
+          "title": "Paper 48: The Morontia Life",
+          "startRef": "48:6.28",
+          "endRef": "48:7.30",
+          "paragraphs": 40
+        },
+        {
+          "n": 108,
+          "title": "Papers 48–49",
+          "startRef": "48:7.31",
+          "endRef": "49:2.22",
+          "paragraphs": 40
+        },
+        {
+          "n": 109,
+          "title": "Paper 49: The Inhabited Worlds",
+          "startRef": "49:2.23",
+          "endRef": "49:5.21",
+          "paragraphs": 40
+        },
+        {
+          "n": 110,
+          "title": "Papers 49–50",
+          "startRef": "49:5.22",
+          "endRef": "50:2.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 111,
+          "title": "Paper 50: The Planetary Princes",
+          "startRef": "50:2.2",
+          "endRef": "50:6.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 112,
+          "title": "Papers 50–51",
+          "startRef": "50:6.5",
+          "endRef": "51:5.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 113,
+          "title": "Papers 51–52",
+          "startRef": "51:5.4",
+          "endRef": "52:1.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 114,
+          "title": "Paper 52: Planetary Mortal Epochs",
+          "startRef": "52:2.1",
+          "endRef": "52:5.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 115,
+          "title": "Papers 52–53",
+          "startRef": "52:5.7",
+          "endRef": "53:2.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 116,
+          "title": "Paper 53: The Lucifer Rebellion",
+          "startRef": "53:2.4",
+          "endRef": "53:7.11",
+          "paragraphs": 40
+        },
+        {
+          "n": 117,
+          "title": "Papers 53–54",
+          "startRef": "53:7.12",
+          "endRef": "54:3.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 118,
+          "title": "Papers 54–55",
+          "startRef": "54:3.2",
+          "endRef": "55:0.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 119,
+          "title": "Paper 55: The Spheres of Light and Life",
+          "startRef": "55:0.6",
+          "endRef": "55:3.15",
+          "paragraphs": 40
+        },
+        {
+          "n": 120,
+          "title": "Paper 55: The Spheres of Light and Life",
+          "startRef": "55:3.16",
+          "endRef": "55:5.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 121,
+          "title": "Paper 55: The Spheres of Light and Life",
+          "startRef": "55:5.3",
+          "endRef": "55:11.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 122,
+          "title": "Papers 55–56",
+          "startRef": "55:11.2",
+          "endRef": "56:6.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 123,
+          "title": "Paper 56: Universal Unity",
+          "startRef": "56:6.2",
+          "endRef": "56:10.9",
+          "paragraphs": 40
+        },
+        {
+          "n": 124,
+          "title": "Papers 56–57",
+          "startRef": "56:10.10",
+          "endRef": "57:3.12",
+          "paragraphs": 40
+        },
+        {
+          "n": 125,
+          "title": "Paper 57: The Origin of Urantia",
+          "startRef": "57:4.1",
+          "endRef": "57:7.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 126,
+          "title": "Papers 57–58",
+          "startRef": "57:7.7",
+          "endRef": "58:1.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 127,
+          "title": "Paper 58: Life Establishment on Urantia",
+          "startRef": "58:2.1",
+          "endRef": "58:7.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 128,
+          "title": "Papers 58–59",
+          "startRef": "58:7.6",
+          "endRef": "59:2.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 129,
+          "title": "Paper 59: The Marine-Life Era on Urantia",
+          "startRef": "59:2.4",
+          "endRef": "59:4.18",
+          "paragraphs": 40
+        },
+        {
+          "n": 130,
+          "title": "Papers 59–60",
+          "startRef": "59:5.1",
+          "endRef": "60:1.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 131,
+          "title": "Paper 60: Urantia During the Early Land-Life Era",
+          "startRef": "60:1.3",
+          "endRef": "60:3.13",
+          "paragraphs": 40
+        },
+        {
+          "n": 132,
+          "title": "Papers 60–61",
+          "startRef": "60:3.14",
+          "endRef": "61:2.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 133,
+          "title": "Paper 61: The Mammalian Era on Urantia",
+          "startRef": "61:2.8",
+          "endRef": "61:6.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 134,
+          "title": "Papers 61–62",
+          "startRef": "61:7.1",
+          "endRef": "62:3.10",
+          "paragraphs": 40
+        },
+        {
+          "n": 135,
+          "title": "Papers 62–63",
+          "startRef": "62:3.11",
+          "endRef": "63:1.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 136,
+          "title": "Paper 63: The First Human Family",
+          "startRef": "63:1.3",
+          "endRef": "63:6.9",
+          "paragraphs": 40
+        },
+        {
+          "n": 137,
+          "title": "Papers 63–64",
+          "startRef": "63:7.1",
+          "endRef": "64:4.12",
+          "paragraphs": 39
+        },
+        {
+          "n": 138,
+          "title": "Paper 64: The Evolutionary Races of Color",
+          "startRef": "64:4.13",
+          "endRef": "64:6.35",
+          "paragraphs": 40
+        },
+        {
+          "n": 139,
+          "title": "Papers 64–65",
+          "startRef": "64:7.1",
+          "endRef": "65:2.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 140,
+          "title": "Paper 65: The Overcontrol of Evolution",
+          "startRef": "65:2.4",
+          "endRef": "65:6.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 141,
+          "title": "Papers 65–66",
+          "startRef": "65:6.5",
+          "endRef": "66:3.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 142,
+          "title": "Paper 66: The Planetary Prince of Urantia",
+          "startRef": "66:3.4",
+          "endRef": "66:5.19",
+          "paragraphs": 40
+        },
+        {
+          "n": 143,
+          "title": "Paper 66: The Planetary Prince of Urantia",
+          "startRef": "66:5.20",
+          "endRef": "66:8.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 144,
+          "title": "Papers 66–67",
+          "startRef": "66:8.2",
+          "endRef": "67:5.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 145,
+          "title": "Papers 67–68",
+          "startRef": "67:5.4",
+          "endRef": "68:2.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 146,
+          "title": "Paper 68: The Dawn of Civilization",
+          "startRef": "68:2.5",
+          "endRef": "68:6.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 147,
+          "title": "Papers 68–69",
+          "startRef": "68:6.9",
+          "endRef": "69:5.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 148,
+          "title": "Paper 69: Primitive Human Institutions",
+          "startRef": "69:5.2",
+          "endRef": "69:9.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 149,
+          "title": "Papers 69–70",
+          "startRef": "69:9.2",
+          "endRef": "70:1.19",
+          "paragraphs": 40
+        },
+        {
+          "n": 150,
+          "title": "Paper 70: The Evolution of Human Government",
+          "startRef": "70:1.20",
+          "endRef": "70:4.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 151,
+          "title": "Paper 70: The Evolution of Human Government",
+          "startRef": "70:4.6",
+          "endRef": "70:8.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 152,
+          "title": "Paper 70: The Evolution of Human Government",
+          "startRef": "70:8.2",
+          "endRef": "70:10.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 153,
+          "title": "Paper 70: The Evolution of Human Government",
+          "startRef": "70:10.7",
+          "endRef": "70:12.16",
+          "paragraphs": 40
+        },
+        {
+          "n": 154,
+          "title": "Papers 70–71",
+          "startRef": "70:12.17",
+          "endRef": "71:2.9",
+          "paragraphs": 40
+        },
+        {
+          "n": 155,
+          "title": "Paper 71: Development of the State",
+          "startRef": "71:2.10",
+          "endRef": "71:5.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 156,
+          "title": "Papers 71–72",
+          "startRef": "71:5.2",
+          "endRef": "72:1.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 157,
+          "title": "Paper 72: Government on a Neighboring Planet",
+          "startRef": "72:1.3",
+          "endRef": "72:5.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 158,
+          "title": "Paper 72: Government on a Neighboring Planet",
+          "startRef": "72:5.6",
+          "endRef": "72:9.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 159,
+          "title": "Papers 72–73",
+          "startRef": "72:9.4",
+          "endRef": "73:3.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 160,
+          "title": "Papers 73–74",
+          "startRef": "73:4.1",
+          "endRef": "74:2.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 161,
+          "title": "Paper 74: Adam and Eve",
+          "startRef": "74:2.8",
+          "endRef": "74:7.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 162,
+          "title": "Papers 74–75",
+          "startRef": "74:7.7",
+          "endRef": "75:1.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 163,
+          "title": "Paper 75: The Default of Adam and Eve",
+          "startRef": "75:2.1",
+          "endRef": "75:7.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 164,
+          "title": "Papers 75–76",
+          "startRef": "75:7.6",
+          "endRef": "76:4.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 165,
+          "title": "Papers 76–77",
+          "startRef": "76:4.6",
+          "endRef": "77:3.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 166,
+          "title": "Paper 77: The Midway Creatures",
+          "startRef": "77:3.5",
+          "endRef": "77:7.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 167,
+          "title": "Papers 77–78",
+          "startRef": "77:7.7",
+          "endRef": "78:1.10",
+          "paragraphs": 40
+        },
+        {
+          "n": 168,
+          "title": "Paper 78: The Violet Race After the Days of Adam",
+          "startRef": "78:1.11",
+          "endRef": "78:6.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 169,
+          "title": "Papers 78–79",
+          "startRef": "78:7.1",
+          "endRef": "79:3.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 170,
+          "title": "Paper 79: Andite Expansion in the Orient",
+          "startRef": "79:3.3",
+          "endRef": "79:7.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 171,
+          "title": "Papers 79–80",
+          "startRef": "79:7.4",
+          "endRef": "80:3.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 172,
+          "title": "Paper 80: Andite Expansion in the Occident",
+          "startRef": "80:3.5",
+          "endRef": "80:8.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 173,
+          "title": "Papers 80–81",
+          "startRef": "80:8.4",
+          "endRef": "81:2.11",
+          "paragraphs": 40
+        },
+        {
+          "n": 174,
+          "title": "Paper 81: Development of Modern Civilization",
+          "startRef": "81:2.12",
+          "endRef": "81:6.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 175,
+          "title": "Paper 81: Development of Modern Civilization",
+          "startRef": "81:6.3",
+          "endRef": "81:6.42",
+          "paragraphs": 40
+        },
+        {
+          "n": 176,
+          "title": "Papers 81–82",
+          "startRef": "81:6.43",
+          "endRef": "82:4.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 177,
+          "title": "Papers 82–83",
+          "startRef": "82:4.5",
+          "endRef": "83:3.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 178,
+          "title": "Paper 83: The Marriage Institution",
+          "startRef": "83:3.4",
+          "endRef": "83:7.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 179,
+          "title": "Papers 83–84",
+          "startRef": "83:7.8",
+          "endRef": "84:3.9",
+          "paragraphs": 40
+        },
+        {
+          "n": 180,
+          "title": "Paper 84: Marriage and Family Life",
+          "startRef": "84:3.10",
+          "endRef": "84:7.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 181,
+          "title": "Papers 84–85",
+          "startRef": "84:7.7",
+          "endRef": "85:1.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 182,
+          "title": "Papers 85–86",
+          "startRef": "85:2.1",
+          "endRef": "86:2.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 183,
+          "title": "Paper 86: Early Evolution of Religion",
+          "startRef": "86:2.6",
+          "endRef": "86:7.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 184,
+          "title": "Papers 86–87",
+          "startRef": "86:7.3",
+          "endRef": "87:5.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 185,
+          "title": "Papers 87–88",
+          "startRef": "87:5.7",
+          "endRef": "88:1.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 186,
+          "title": "Paper 88: Fetishes, Charms, and Magic",
+          "startRef": "88:1.3",
+          "endRef": "88:6.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 187,
+          "title": "Papers 88–89",
+          "startRef": "88:6.6",
+          "endRef": "89:5.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 188,
+          "title": "Paper 89: Sin, Sacrifice, and Atonement",
+          "startRef": "89:5.6",
+          "endRef": "89:10.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 189,
+          "title": "Papers 89–90",
+          "startRef": "89:10.5",
+          "endRef": "90:4.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 190,
+          "title": "Papers 90–91",
+          "startRef": "90:4.6",
+          "endRef": "91:4.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 191,
+          "title": "Paper 91: The Evolution of Prayer",
+          "startRef": "91:4.2",
+          "endRef": "91:8.9",
+          "paragraphs": 40
+        },
+        {
+          "n": 192,
+          "title": "Papers 91–92",
+          "startRef": "91:8.10",
+          "endRef": "92:4.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 193,
+          "title": "Paper 92: The Later Evolution of Religion",
+          "startRef": "92:4.2",
+          "endRef": "92:6.16",
+          "paragraphs": 40
+        },
+        {
+          "n": 194,
+          "title": "Papers 92–93",
+          "startRef": "92:6.17",
+          "endRef": "93:3.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 195,
+          "title": "Paper 93: Machiventa Melchizedek",
+          "startRef": "93:3.8",
+          "endRef": "93:7.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 196,
+          "title": "Papers 93–94",
+          "startRef": "93:7.2",
+          "endRef": "94:2.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 197,
+          "title": "Paper 94: The Melchizedek Teachings in the Orient",
+          "startRef": "94:2.6",
+          "endRef": "94:6.11",
+          "paragraphs": 40
+        },
+        {
+          "n": 198,
+          "title": "Paper 94: The Melchizedek Teachings in the Orient",
+          "startRef": "94:6.12",
+          "endRef": "94:11.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 199,
+          "title": "Papers 94–95",
+          "startRef": "94:11.4",
+          "endRef": "95:2.10",
+          "paragraphs": 40
+        },
+        {
+          "n": 200,
+          "title": "Paper 95: The Melchizedek Teachings in the Levant",
+          "startRef": "95:3.1",
+          "endRef": "95:7.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 201,
+          "title": "Papers 95–96",
+          "startRef": "95:7.7",
+          "endRef": "96:5.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 202,
+          "title": "Papers 96–97",
+          "startRef": "96:5.3",
+          "endRef": "97:3.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 203,
+          "title": "Paper 97: Evolution of the God Concept Among the Hebrews",
+          "startRef": "97:3.6",
+          "endRef": "97:9.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 204,
+          "title": "Papers 97–98",
+          "startRef": "97:9.2",
+          "endRef": "98:0.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 205,
+          "title": "Paper 98: The Melchizedek Teachings in the Occident",
+          "startRef": "98:0.4",
+          "endRef": "98:5.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 206,
+          "title": "Papers 98–99",
+          "startRef": "98:5.5",
+          "endRef": "99:3.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 207,
+          "title": "Paper 99: The Social Problems of Religion",
+          "startRef": "99:3.7",
+          "endRef": "99:7.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 208,
+          "title": "Papers 99–100",
+          "startRef": "99:7.3",
+          "endRef": "100:5.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 209,
+          "title": "Papers 100–101",
+          "startRef": "100:5.5",
+          "endRef": "101:1.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 210,
+          "title": "Paper 101: The Real Nature of Religion",
+          "startRef": "101:1.3",
+          "endRef": "101:3.18",
+          "paragraphs": 40
+        },
+        {
+          "n": 211,
+          "title": "Paper 101: The Real Nature of Religion",
+          "startRef": "101:4.1",
+          "endRef": "101:6.16",
+          "paragraphs": 40
+        },
+        {
+          "n": 212,
+          "title": "Papers 101–102",
+          "startRef": "101:6.17",
+          "endRef": "102:2.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 213,
+          "title": "Paper 102: The Foundations of Religious Faith",
+          "startRef": "102:2.2",
+          "endRef": "102:6.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 214,
+          "title": "Papers 102–103",
+          "startRef": "102:6.9",
+          "endRef": "103:2.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 215,
+          "title": "Paper 103: The Reality of Religious Experience",
+          "startRef": "103:2.8",
+          "endRef": "103:6.15",
+          "paragraphs": 40
+        },
+        {
+          "n": 216,
+          "title": "Papers 103–104",
+          "startRef": "103:7.1",
+          "endRef": "104:1.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 217,
+          "title": "Paper 104: Growth of the Trinity Concept",
+          "startRef": "104:1.4",
+          "endRef": "104:4.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 218,
+          "title": "Paper 104: Growth of the Trinity Concept",
+          "startRef": "104:4.7",
+          "endRef": "104:4.46",
+          "paragraphs": 40
+        },
+        {
+          "n": 219,
+          "title": "Papers 104–105",
+          "startRef": "104:4.47",
+          "endRef": "105:3.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 220,
+          "title": "Paper 105: Deity and Reality",
+          "startRef": "105:3.5",
+          "endRef": "105:7.10",
+          "paragraphs": 40
+        },
+        {
+          "n": 221,
+          "title": "Papers 105–106",
+          "startRef": "105:7.11",
+          "endRef": "106:2.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 222,
+          "title": "Paper 106: Universe Levels of Reality",
+          "startRef": "106:3.1",
+          "endRef": "106:8.11",
+          "paragraphs": 40
+        },
+        {
+          "n": 223,
+          "title": "Papers 106–107",
+          "startRef": "106:8.12",
+          "endRef": "107:2.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 224,
+          "title": "Paper 107: Origin and Nature of Thought Adjusters",
+          "startRef": "107:2.2",
+          "endRef": "107:7.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 225,
+          "title": "Papers 107–108",
+          "startRef": "107:7.3",
+          "endRef": "108:4.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 226,
+          "title": "Papers 108–109",
+          "startRef": "108:4.3",
+          "endRef": "109:3.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 227,
+          "title": "Papers 109–110",
+          "startRef": "109:3.2",
+          "endRef": "110:1.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 228,
+          "title": "Paper 110: Relation of Adjusters to Individual Mortals",
+          "startRef": "110:1.5",
+          "endRef": "110:6.9",
+          "paragraphs": 40
+        },
+        {
+          "n": 229,
+          "title": "Papers 110–111",
+          "startRef": "110:6.10",
+          "endRef": "111:1.8",
+          "paragraphs": 39
+        },
+        {
+          "n": 230,
+          "title": "Paper 111: The Adjuster and the Soul",
+          "startRef": "111:1.9",
+          "endRef": "111:6.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 231,
+          "title": "Papers 111–112",
+          "startRef": "111:6.5",
+          "endRef": "112:1.12",
+          "paragraphs": 40
+        },
+        {
+          "n": 232,
+          "title": "Paper 112: Personality Survival",
+          "startRef": "112:1.13",
+          "endRef": "112:4.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 233,
+          "title": "Paper 112: Personality Survival",
+          "startRef": "112:4.7",
+          "endRef": "112:7.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 234,
+          "title": "Papers 112–113",
+          "startRef": "112:7.2",
+          "endRef": "113:3.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 235,
+          "title": "Papers 113–114",
+          "startRef": "113:3.2",
+          "endRef": "114:0.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 236,
+          "title": "Paper 114: Seraphic Planetary Government",
+          "startRef": "114:0.6",
+          "endRef": "114:6.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 237,
+          "title": "Papers 114–115",
+          "startRef": "114:6.9",
+          "endRef": "115:3.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 238,
+          "title": "Paper 115: The Supreme Being",
+          "startRef": "115:3.2",
+          "endRef": "115:7.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 239,
+          "title": "Papers 115–116",
+          "startRef": "115:7.6",
+          "endRef": "116:4.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 240,
+          "title": "Papers 116–117",
+          "startRef": "116:4.7",
+          "endRef": "117:0.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 241,
+          "title": "Paper 117: God the Supreme",
+          "startRef": "117:0.3",
+          "endRef": "117:4.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 242,
+          "title": "Paper 117: God the Supreme",
+          "startRef": "117:4.8",
+          "endRef": "117:6.19",
+          "paragraphs": 40
+        },
+        {
+          "n": 243,
+          "title": "Papers 117–118",
+          "startRef": "117:6.20",
+          "endRef": "118:1.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 244,
+          "title": "Paper 118: Supreme and Ultimate—Time and Space",
+          "startRef": "118:1.2",
+          "endRef": "118:7.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 245,
+          "title": "Paper 118: Supreme and Ultimate—Time and Space",
+          "startRef": "118:7.2",
+          "endRef": "118:10.13",
+          "paragraphs": 40
+        },
+        {
+          "n": 246,
+          "title": "Papers 118–119",
+          "startRef": "118:10.14",
+          "endRef": "119:4.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 247,
+          "title": "Papers 119–120",
+          "startRef": "119:4.2",
+          "endRef": "120:0.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 248,
+          "title": "Papers 120–121",
+          "startRef": "120:0.8",
+          "endRef": "121:1.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 249,
+          "title": "Paper 121: The Times of Michael’s Bestowal",
+          "startRef": "121:1.3",
+          "endRef": "121:5.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 250,
+          "title": "Paper 121: The Times of Michael’s Bestowal",
+          "startRef": "121:5.6",
+          "endRef": "121:8.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 251,
+          "title": "Papers 121–122",
+          "startRef": "121:8.7",
+          "endRef": "122:5.10",
+          "paragraphs": 40
+        },
+        {
+          "n": 252,
+          "title": "Paper 122: Birth and Infancy of Jesus",
+          "startRef": "122:5.11",
+          "endRef": "122:9.21",
+          "paragraphs": 40
+        },
+        {
+          "n": 253,
+          "title": "Papers 122–123",
+          "startRef": "122:9.22",
+          "endRef": "123:2.16",
+          "paragraphs": 40
+        },
+        {
+          "n": 254,
+          "title": "Paper 123: The Early Childhood of Jesus",
+          "startRef": "123:3.1",
+          "endRef": "123:6.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 255,
+          "title": "Papers 123–124",
+          "startRef": "123:6.7",
+          "endRef": "124:4.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 256,
+          "title": "Papers 124–125",
+          "startRef": "124:4.4",
+          "endRef": "125:1.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 257,
+          "title": "Paper 125: Jesus at Jerusalem",
+          "startRef": "125:1.4",
+          "endRef": "125:6.10",
+          "paragraphs": 40
+        },
+        {
+          "n": 258,
+          "title": "Papers 125–126",
+          "startRef": "125:6.11",
+          "endRef": "126:4.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 259,
+          "title": "Papers 126–127",
+          "startRef": "126:4.5",
+          "endRef": "127:2.11",
+          "paragraphs": 40
+        },
+        {
+          "n": 260,
+          "title": "Paper 127: The Adolescent Years",
+          "startRef": "127:2.12",
+          "endRef": "127:6.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 261,
+          "title": "Papers 127–128",
+          "startRef": "127:6.9",
+          "endRef": "128:3.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 262,
+          "title": "Paper 128: Jesus’ Early Manhood",
+          "startRef": "128:3.6",
+          "endRef": "128:7.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 263,
+          "title": "Papers 128–129",
+          "startRef": "128:7.7",
+          "endRef": "129:3.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 264,
+          "title": "Papers 129–130",
+          "startRef": "129:3.4",
+          "endRef": "130:3.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 265,
+          "title": "Paper 130: On the Way to Rome",
+          "startRef": "130:3.4",
+          "endRef": "130:7.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 266,
+          "title": "Papers 130–131",
+          "startRef": "130:8.1",
+          "endRef": "131:4.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 267,
+          "title": "Papers 131–132",
+          "startRef": "131:4.4",
+          "endRef": "132:0.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 268,
+          "title": "Paper 132: The Sojourn at Rome",
+          "startRef": "132:0.8",
+          "endRef": "132:5.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 269,
+          "title": "Papers 132–133",
+          "startRef": "132:5.5",
+          "endRef": "133:1.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 270,
+          "title": "Paper 133: The Return from Rome",
+          "startRef": "133:1.5",
+          "endRef": "133:5.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 271,
+          "title": "Papers 133–134",
+          "startRef": "133:5.9",
+          "endRef": "134:1.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 272,
+          "title": "Paper 134: The Transition Years",
+          "startRef": "134:1.5",
+          "endRef": "134:5.14",
+          "paragraphs": 40
+        },
+        {
+          "n": 273,
+          "title": "Paper 134: The Transition Years",
+          "startRef": "134:5.15",
+          "endRef": "134:9.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 274,
+          "title": "Papers 134–135",
+          "startRef": "134:9.4",
+          "endRef": "135:6.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 275,
+          "title": "Papers 135–136",
+          "startRef": "135:6.4",
+          "endRef": "136:0.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 276,
+          "title": "Paper 136: Baptism and the Forty Days",
+          "startRef": "136:1.1",
+          "endRef": "136:5.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 277,
+          "title": "Papers 136–137",
+          "startRef": "136:5.6",
+          "endRef": "137:1.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 278,
+          "title": "Paper 137: Tarrying Time in Galilee",
+          "startRef": "137:1.2",
+          "endRef": "137:4.17",
+          "paragraphs": 40
+        },
+        {
+          "n": 279,
+          "title": "Paper 137: Tarrying Time in Galilee",
+          "startRef": "137:5.1",
+          "endRef": "137:8.16",
+          "paragraphs": 40
+        },
+        {
+          "n": 280,
+          "title": "Papers 137–138",
+          "startRef": "137:8.17",
+          "endRef": "138:6.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 281,
+          "title": "Papers 138–139",
+          "startRef": "138:7.1",
+          "endRef": "139:1.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 282,
+          "title": "Paper 139: The Twelve Apostles",
+          "startRef": "139:1.5",
+          "endRef": "139:4.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 283,
+          "title": "Paper 139: The Twelve Apostles",
+          "startRef": "139:4.9",
+          "endRef": "139:8.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 284,
+          "title": "Paper 139: The Twelve Apostles",
+          "startRef": "139:8.3",
+          "endRef": "139:12.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 285,
+          "title": "Papers 139–140",
+          "startRef": "139:12.8",
+          "endRef": "140:3.20",
+          "paragraphs": 40
+        },
+        {
+          "n": 286,
+          "title": "Paper 140: The Ordination of the Twelve",
+          "startRef": "140:3.21",
+          "endRef": "140:6.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 287,
+          "title": "Paper 140: The Ordination of the Twelve",
+          "startRef": "140:6.5",
+          "endRef": "140:8.22",
+          "paragraphs": 40
+        },
+        {
+          "n": 288,
+          "title": "Papers 140–141",
+          "startRef": "140:8.23",
+          "endRef": "141:3.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 289,
+          "title": "Paper 141: Beginning the Public Work",
+          "startRef": "141:3.7",
+          "endRef": "141:9.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 290,
+          "title": "Papers 141–142",
+          "startRef": "141:9.3",
+          "endRef": "142:4.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 291,
+          "title": "Papers 142–143",
+          "startRef": "142:4.3",
+          "endRef": "143:0.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 292,
+          "title": "Paper 143: Going Through Samaria",
+          "startRef": "143:1.1",
+          "endRef": "143:5.12",
+          "paragraphs": 40
+        },
+        {
+          "n": 293,
+          "title": "Papers 143–144",
+          "startRef": "143:5.13",
+          "endRef": "144:3.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 294,
+          "title": "Paper 144: At Gilboa and in the Decapolis",
+          "startRef": "144:3.6",
+          "endRef": "144:5.11",
+          "paragraphs": 40
+        },
+        {
+          "n": 295,
+          "title": "Paper 144: At Gilboa and in the Decapolis",
+          "startRef": "144:5.12",
+          "endRef": "144:5.51",
+          "paragraphs": 40
+        },
+        {
+          "n": 296,
+          "title": "Paper 144: At Gilboa and in the Decapolis",
+          "startRef": "144:5.52",
+          "endRef": "144:5.91",
+          "paragraphs": 40
+        },
+        {
+          "n": 297,
+          "title": "Paper 144: At Gilboa and in the Decapolis",
+          "startRef": "144:5.92",
+          "endRef": "144:8.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 298,
+          "title": "Papers 144–145",
+          "startRef": "144:8.7",
+          "endRef": "145:3.13",
+          "paragraphs": 40
+        },
+        {
+          "n": 299,
+          "title": "Papers 145–146",
+          "startRef": "145:3.14",
+          "endRef": "146:3.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 300,
+          "title": "Papers 146–147",
+          "startRef": "146:3.2",
+          "endRef": "147:3.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 301,
+          "title": "Papers 147–148",
+          "startRef": "147:3.5",
+          "endRef": "148:0.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 302,
+          "title": "Paper 148: Training Evangelists at Bethsaida",
+          "startRef": "148:0.4",
+          "endRef": "148:6.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 303,
+          "title": "Papers 148–149",
+          "startRef": "148:6.9",
+          "endRef": "149:2.10",
+          "paragraphs": 40
+        },
+        {
+          "n": 304,
+          "title": "Papers 149–150",
+          "startRef": "149:2.11",
+          "endRef": "150:1.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 305,
+          "title": "Paper 150: The Third Preaching Tour",
+          "startRef": "150:2.1",
+          "endRef": "150:8.9",
+          "paragraphs": 40
+        },
+        {
+          "n": 306,
+          "title": "Papers 150–151",
+          "startRef": "150:8.10",
+          "endRef": "151:4.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 307,
+          "title": "Papers 151–152",
+          "startRef": "151:4.3",
+          "endRef": "152:3.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 308,
+          "title": "Papers 152–153",
+          "startRef": "152:3.3",
+          "endRef": "153:2.10",
+          "paragraphs": 40
+        },
+        {
+          "n": 309,
+          "title": "Papers 153–154",
+          "startRef": "153:2.11",
+          "endRef": "154:4.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 310,
+          "title": "Papers 154–155",
+          "startRef": "154:5.1",
+          "endRef": "155:4.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 311,
+          "title": "Papers 155–156",
+          "startRef": "155:4.2",
+          "endRef": "156:1.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 312,
+          "title": "Paper 156: The Sojourn at Tyre and Sidon",
+          "startRef": "156:1.3",
+          "endRef": "156:5.21",
+          "paragraphs": 40
+        },
+        {
+          "n": 313,
+          "title": "Papers 156–157",
+          "startRef": "156:5.22",
+          "endRef": "157:6.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 314,
+          "title": "Papers 157–158",
+          "startRef": "157:6.2",
+          "endRef": "158:3.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 315,
+          "title": "Papers 158–159",
+          "startRef": "158:3.5",
+          "endRef": "159:1.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 316,
+          "title": "Paper 159: The Decapolis Tour",
+          "startRef": "159:1.7",
+          "endRef": "159:5.10",
+          "paragraphs": 40
+        },
+        {
+          "n": 317,
+          "title": "Papers 159–160",
+          "startRef": "159:5.11",
+          "endRef": "160:3.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 318,
+          "title": "Papers 160–161",
+          "startRef": "160:3.3",
+          "endRef": "161:1.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 319,
+          "title": "Papers 161–162",
+          "startRef": "161:1.6",
+          "endRef": "162:2.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 320,
+          "title": "Paper 162: At the Feast of Tabernacles",
+          "startRef": "162:2.5",
+          "endRef": "162:9.6",
+          "paragraphs": 39
+        },
+        {
+          "n": 321,
+          "title": "Papers 162–163",
+          "startRef": "162:9.7",
+          "endRef": "163:4.13",
+          "paragraphs": 40
+        },
+        {
+          "n": 322,
+          "title": "Papers 163–164",
+          "startRef": "163:4.14",
+          "endRef": "164:3.11",
+          "paragraphs": 40
+        },
+        {
+          "n": 323,
+          "title": "Papers 164–165",
+          "startRef": "164:3.12",
+          "endRef": "165:2.10",
+          "paragraphs": 40
+        },
+        {
+          "n": 324,
+          "title": "Papers 165–166",
+          "startRef": "165:2.11",
+          "endRef": "166:1.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 325,
+          "title": "Paper 166: Last Visit to Northern Perea",
+          "startRef": "166:1.3",
+          "endRef": "166:5.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 326,
+          "title": "Papers 166–167",
+          "startRef": "166:5.4",
+          "endRef": "167:6.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 327,
+          "title": "Papers 167–168",
+          "startRef": "167:6.4",
+          "endRef": "168:2.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 328,
+          "title": "Papers 168–169",
+          "startRef": "168:2.4",
+          "endRef": "169:1.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 329,
+          "title": "Papers 169–170",
+          "startRef": "169:1.4",
+          "endRef": "170:1.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 330,
+          "title": "Paper 170: The Kingdom of Heaven",
+          "startRef": "170:1.2",
+          "endRef": "170:2.24",
+          "paragraphs": 40
+        },
+        {
+          "n": 331,
+          "title": "Paper 170: The Kingdom of Heaven",
+          "startRef": "170:2.25",
+          "endRef": "170:5.12",
+          "paragraphs": 40
+        },
+        {
+          "n": 332,
+          "title": "Papers 170–171",
+          "startRef": "170:5.13",
+          "endRef": "171:4.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 333,
+          "title": "Papers 171–172",
+          "startRef": "171:4.8",
+          "endRef": "172:1.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 334,
+          "title": "Paper 172: Going into Jerusalem",
+          "startRef": "172:1.4",
+          "endRef": "172:5.10",
+          "paragraphs": 40
+        },
+        {
+          "n": 335,
+          "title": "Papers 172–173",
+          "startRef": "172:5.11",
+          "endRef": "173:5.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 336,
+          "title": "Papers 174–175",
+          "startRef": "174:0.1",
+          "endRef": "175:0.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 337,
+          "title": "Paper 175: The Last Temple Discourse",
+          "startRef": "175:0.2",
+          "endRef": "175:4.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 338,
+          "title": "Papers 175–176",
+          "startRef": "175:4.9",
+          "endRef": "176:4.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 339,
+          "title": "Papers 176–177",
+          "startRef": "176:4.6",
+          "endRef": "177:5.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 340,
+          "title": "Papers 177–178",
+          "startRef": "177:5.2",
+          "endRef": "178:3.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 341,
+          "title": "Papers 178–179",
+          "startRef": "178:3.5",
+          "endRef": "179:5.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 342,
+          "title": "Papers 179–180",
+          "startRef": "179:5.5",
+          "endRef": "180:5.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 343,
+          "title": "Papers 180–181",
+          "startRef": "180:5.3",
+          "endRef": "181:2.9",
+          "paragraphs": 40
+        },
+        {
+          "n": 344,
+          "title": "Papers 181–182",
+          "startRef": "181:2.10",
+          "endRef": "182:1.16",
+          "paragraphs": 40
+        },
+        {
+          "n": 345,
+          "title": "Papers 182–183",
+          "startRef": "182:1.17",
+          "endRef": "183:1.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 346,
+          "title": "Papers 183–184",
+          "startRef": "183:1.2",
+          "endRef": "184:1.9",
+          "paragraphs": 40
+        },
+        {
+          "n": 347,
+          "title": "Paper 184: Before the Sanhedrin Court",
+          "startRef": "184:2.1",
+          "endRef": "184:5.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 348,
+          "title": "Papers 184–185",
+          "startRef": "184:5.3",
+          "endRef": "185:3.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 349,
+          "title": "Papers 185–186",
+          "startRef": "185:3.3",
+          "endRef": "186:0.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 350,
+          "title": "Papers 186–187",
+          "startRef": "186:1.1",
+          "endRef": "187:0.3",
+          "paragraphs": 40
+        },
+        {
+          "n": 351,
+          "title": "Paper 187: The Crucifixion",
+          "startRef": "187:0.4",
+          "endRef": "187:5.5",
+          "paragraphs": 40
+        },
+        {
+          "n": 352,
+          "title": "Papers 187–188",
+          "startRef": "187:5.6",
+          "endRef": "188:4.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 353,
+          "title": "Papers 188–189",
+          "startRef": "188:4.5",
+          "endRef": "189:2.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 354,
+          "title": "Papers 189–190",
+          "startRef": "189:2.3",
+          "endRef": "190:1.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 355,
+          "title": "Papers 190–191",
+          "startRef": "190:1.5",
+          "endRef": "191:1.1",
+          "paragraphs": 40
+        },
+        {
+          "n": 356,
+          "title": "Papers 191–192",
+          "startRef": "191:1.2",
+          "endRef": "192:1.7",
+          "paragraphs": 40
+        },
+        {
+          "n": 357,
+          "title": "Papers 192–193",
+          "startRef": "192:1.8",
+          "endRef": "193:2.2",
+          "paragraphs": 40
+        },
+        {
+          "n": 358,
+          "title": "Papers 193–194",
+          "startRef": "193:2.3",
+          "endRef": "194:1.4",
+          "paragraphs": 40
+        },
+        {
+          "n": 359,
+          "title": "Paper 194: Bestowal of the Spirit of Truth",
+          "startRef": "194:1.5",
+          "endRef": "194:3.19",
+          "paragraphs": 40
+        },
+        {
+          "n": 360,
+          "title": "Papers 194–195",
+          "startRef": "194:3.20",
+          "endRef": "195:1.8",
+          "paragraphs": 40
+        },
+        {
+          "n": 361,
+          "title": "Paper 195: After Pentecost",
+          "startRef": "195:1.9",
+          "endRef": "195:5.12",
+          "paragraphs": 40
+        },
+        {
+          "n": 362,
+          "title": "Paper 195: After Pentecost",
+          "startRef": "195:5.13",
+          "endRef": "195:7.21",
+          "paragraphs": 40
+        },
+        {
+          "n": 363,
+          "title": "Paper 195: After Pentecost",
+          "startRef": "195:7.22",
+          "endRef": "195:10.14",
+          "paragraphs": 40
+        },
+        {
+          "n": 364,
+          "title": "Papers 195–196",
+          "startRef": "195:10.15",
+          "endRef": "196:2.6",
+          "paragraphs": 40
+        },
+        {
+          "n": 365,
+          "title": "Paper 196: The Faith of Jesus",
+          "startRef": "196:2.7",
+          "endRef": "196:3.35",
+          "paragraphs": 40
+        }
+      ]
+    },
+    {
+      "id": "jesus",
+      "title": "The Life and Teachings of Jesus in 90 Days",
+      "blurb": "Papers 120-196, from \"The Bestowal of Michael on Urantia\" to \"The Faith of Jesus\", in 90 daily portions.",
+      "days": [
+        {
+          "n": 1,
+          "title": "Papers 120–121",
+          "startRef": "120:0.1",
+          "endRef": "121:1.8",
+          "paragraphs": 53
+        },
+        {
+          "n": 2,
+          "title": "Paper 121: The Times of Michael’s Bestowal",
+          "startRef": "121:1.9",
+          "endRef": "121:6.5",
+          "paragraphs": 52
+        },
+        {
+          "n": 3,
+          "title": "Papers 121–122",
+          "startRef": "121:6.6",
+          "endRef": "122:5.1",
+          "paragraphs": 53
+        },
+        {
+          "n": 4,
+          "title": "Paper 122: Birth and Infancy of Jesus",
+          "startRef": "122:5.2",
+          "endRef": "122:9.24",
+          "paragraphs": 52
+        },
+        {
+          "n": 5,
+          "title": "Papers 122–123",
+          "startRef": "122:9.25",
+          "endRef": "123:4.6",
+          "paragraphs": 53
+        },
+        {
+          "n": 6,
+          "title": "Papers 123–124",
+          "startRef": "123:4.7",
+          "endRef": "124:3.1",
+          "paragraphs": 52
+        },
+        {
+          "n": 7,
+          "title": "Papers 124–125",
+          "startRef": "124:3.2",
+          "endRef": "125:1.4",
+          "paragraphs": 53
+        },
+        {
+          "n": 8,
+          "title": "Papers 125–126",
+          "startRef": "125:1.5",
+          "endRef": "126:1.6",
+          "paragraphs": 52
+        },
+        {
+          "n": 9,
+          "title": "Papers 126–127",
+          "startRef": "126:1.7",
+          "endRef": "127:1.5",
+          "paragraphs": 53
+        },
+        {
+          "n": 10,
+          "title": "Paper 127: The Adolescent Years",
+          "startRef": "127:1.6",
+          "endRef": "127:6.6",
+          "paragraphs": 52
+        },
+        {
+          "n": 11,
+          "title": "Papers 127–128",
+          "startRef": "127:6.7",
+          "endRef": "128:4.7",
+          "paragraphs": 53
+        },
+        {
+          "n": 12,
+          "title": "Papers 128–129",
+          "startRef": "128:4.8",
+          "endRef": "129:1.12",
+          "paragraphs": 52
+        },
+        {
+          "n": 13,
+          "title": "Papers 129–130",
+          "startRef": "129:1.13",
+          "endRef": "130:2.9",
+          "paragraphs": 53
+        },
+        {
+          "n": 14,
+          "title": "Papers 130–131",
+          "startRef": "130:2.10",
+          "endRef": "131:0.2",
+          "paragraphs": 52
+        },
+        {
+          "n": 15,
+          "title": "Paper 131: The World’s Religions",
+          "startRef": "131:1.1",
+          "endRef": "131:8.6",
+          "paragraphs": 53
+        },
+        {
+          "n": 16,
+          "title": "Papers 131–132",
+          "startRef": "131:9.1",
+          "endRef": "132:4.5",
+          "paragraphs": 52
+        },
+        {
+          "n": 17,
+          "title": "Papers 132–133",
+          "startRef": "132:4.6",
+          "endRef": "133:2.5",
+          "paragraphs": 53
+        },
+        {
+          "n": 18,
+          "title": "Paper 133: The Return from Rome",
+          "startRef": "133:3.1",
+          "endRef": "133:7.7",
+          "paragraphs": 52
+        },
+        {
+          "n": 19,
+          "title": "Papers 133–134",
+          "startRef": "133:7.8",
+          "endRef": "134:5.5",
+          "paragraphs": 53
+        },
+        {
+          "n": 20,
+          "title": "Paper 134: The Transition Years",
+          "startRef": "134:5.6",
+          "endRef": "134:9.6",
+          "paragraphs": 52
+        },
+        {
+          "n": 21,
+          "title": "Papers 134–135",
+          "startRef": "134:9.7",
+          "endRef": "135:9.1",
+          "paragraphs": 53
+        },
+        {
+          "n": 22,
+          "title": "Papers 135–136",
+          "startRef": "135:9.2",
+          "endRef": "136:4.7",
+          "paragraphs": 52
+        },
+        {
+          "n": 23,
+          "title": "Papers 136–137",
+          "startRef": "136:4.8",
+          "endRef": "137:1.2",
+          "paragraphs": 53
+        },
+        {
+          "n": 24,
+          "title": "Paper 137: Tarrying Time in Galilee",
+          "startRef": "137:1.3",
+          "endRef": "137:7.3",
+          "paragraphs": 52
+        },
+        {
+          "n": 25,
+          "title": "Papers 137–138",
+          "startRef": "137:7.4",
+          "endRef": "138:3.7",
+          "paragraphs": 53
+        },
+        {
+          "n": 26,
+          "title": "Papers 138–139",
+          "startRef": "138:3.8",
+          "endRef": "139:1.2",
+          "paragraphs": 52
+        },
+        {
+          "n": 27,
+          "title": "Paper 139: The Twelve Apostles",
+          "startRef": "139:1.3",
+          "endRef": "139:5.4",
+          "paragraphs": 53
+        },
+        {
+          "n": 28,
+          "title": "Paper 139: The Twelve Apostles",
+          "startRef": "139:5.5",
+          "endRef": "139:11.1",
+          "paragraphs": 52
+        },
+        {
+          "n": 29,
+          "title": "Papers 139–140",
+          "startRef": "139:11.2",
+          "endRef": "140:3.16",
+          "paragraphs": 53
+        },
+        {
+          "n": 30,
+          "title": "Paper 140: The Ordination of the Twelve",
+          "startRef": "140:3.17",
+          "endRef": "140:6.12",
+          "paragraphs": 52
+        },
+        {
+          "n": 31,
+          "title": "Paper 140: The Ordination of the Twelve",
+          "startRef": "140:6.13",
+          "endRef": "140:10.7",
+          "paragraphs": 53
+        },
+        {
+          "n": 32,
+          "title": "Papers 140–141",
+          "startRef": "140:10.8",
+          "endRef": "141:7.13",
+          "paragraphs": 52
+        },
+        {
+          "n": 33,
+          "title": "Papers 141–142",
+          "startRef": "141:7.14",
+          "endRef": "142:5.4",
+          "paragraphs": 53
+        },
+        {
+          "n": 34,
+          "title": "Papers 142–143",
+          "startRef": "142:5.5",
+          "endRef": "143:3.1",
+          "paragraphs": 52
+        },
+        {
+          "n": 35,
+          "title": "Papers 143–144",
+          "startRef": "143:3.2",
+          "endRef": "144:2.2",
+          "paragraphs": 53
+        },
+        {
+          "n": 36,
+          "title": "Paper 144: At Gilboa and in the Decapolis",
+          "startRef": "144:2.3",
+          "endRef": "144:5.14",
+          "paragraphs": 52
+        },
+        {
+          "n": 37,
+          "title": "Paper 144: At Gilboa and in the Decapolis",
+          "startRef": "144:5.15",
+          "endRef": "144:5.67",
+          "paragraphs": 53
+        },
+        {
+          "n": 38,
+          "title": "Paper 144: At Gilboa and in the Decapolis",
+          "startRef": "144:5.68",
+          "endRef": "144:6.11",
+          "paragraphs": 52
+        },
+        {
+          "n": 39,
+          "title": "Papers 144–145",
+          "startRef": "144:6.12",
+          "endRef": "145:3.14",
+          "paragraphs": 53
+        },
+        {
+          "n": 40,
+          "title": "Papers 145–146",
+          "startRef": "145:3.15",
+          "endRef": "146:4.3",
+          "paragraphs": 52
+        },
+        {
+          "n": 41,
+          "title": "Papers 146–147",
+          "startRef": "146:4.4",
+          "endRef": "147:6.4",
+          "paragraphs": 53
+        },
+        {
+          "n": 42,
+          "title": "Papers 147–148",
+          "startRef": "147:6.5",
+          "endRef": "148:6.6",
+          "paragraphs": 52
+        },
+        {
+          "n": 43,
+          "title": "Papers 148–149",
+          "startRef": "148:6.7",
+          "endRef": "149:4.4",
+          "paragraphs": 53
+        },
+        {
+          "n": 44,
+          "title": "Papers 149–150",
+          "startRef": "149:4.5",
+          "endRef": "150:5.4",
+          "paragraphs": 52
+        },
+        {
+          "n": 45,
+          "title": "Papers 150–151",
+          "startRef": "150:5.5",
+          "endRef": "151:3.14",
+          "paragraphs": 53
+        },
+        {
+          "n": 46,
+          "title": "Papers 151–152",
+          "startRef": "151:3.15",
+          "endRef": "152:5.4",
+          "paragraphs": 53
+        },
+        {
+          "n": 47,
+          "title": "Papers 152–153",
+          "startRef": "152:5.5",
+          "endRef": "153:5.5",
+          "paragraphs": 52
+        },
+        {
+          "n": 48,
+          "title": "Papers 154–155",
+          "startRef": "154:0.1",
+          "endRef": "155:3.3",
+          "paragraphs": 53
+        },
+        {
+          "n": 49,
+          "title": "Papers 155–156",
+          "startRef": "155:3.4",
+          "endRef": "156:1.8",
+          "paragraphs": 52
+        },
+        {
+          "n": 50,
+          "title": "Papers 156–157",
+          "startRef": "156:2.1",
+          "endRef": "157:1.5",
+          "paragraphs": 53
+        },
+        {
+          "n": 51,
+          "title": "Papers 157–158",
+          "startRef": "157:2.1",
+          "endRef": "158:1.10",
+          "paragraphs": 52
+        },
+        {
+          "n": 52,
+          "title": "Papers 158–159",
+          "startRef": "158:2.1",
+          "endRef": "159:2.3",
+          "paragraphs": 53
+        },
+        {
+          "n": 53,
+          "title": "Papers 159–160",
+          "startRef": "159:2.4",
+          "endRef": "160:1.3",
+          "paragraphs": 52
+        },
+        {
+          "n": 54,
+          "title": "Paper 160: Rodan of Alexandria",
+          "startRef": "160:1.4",
+          "endRef": "160:5.10",
+          "paragraphs": 53
+        },
+        {
+          "n": 55,
+          "title": "Papers 160–162",
+          "startRef": "160:5.11",
+          "endRef": "162:2.5",
+          "paragraphs": 52
+        },
+        {
+          "n": 56,
+          "title": "Papers 162–163",
+          "startRef": "162:2.6",
+          "endRef": "163:2.6",
+          "paragraphs": 53
+        },
+        {
+          "n": 57,
+          "title": "Papers 163–164",
+          "startRef": "163:2.7",
+          "endRef": "164:2.2",
+          "paragraphs": 52
+        },
+        {
+          "n": 58,
+          "title": "Papers 164–165",
+          "startRef": "164:2.3",
+          "endRef": "165:2.10",
+          "paragraphs": 53
+        },
+        {
+          "n": 59,
+          "title": "Papers 165–166",
+          "startRef": "165:2.11",
+          "endRef": "166:2.3",
+          "paragraphs": 52
+        },
+        {
+          "n": 60,
+          "title": "Papers 166–167",
+          "startRef": "166:2.4",
+          "endRef": "167:4.3",
+          "paragraphs": 53
+        },
+        {
+          "n": 61,
+          "title": "Papers 167–168",
+          "startRef": "167:4.4",
+          "endRef": "168:1.15",
+          "paragraphs": 52
+        },
+        {
+          "n": 62,
+          "title": "Papers 168–169",
+          "startRef": "168:2.1",
+          "endRef": "169:1.13",
+          "paragraphs": 53
+        },
+        {
+          "n": 63,
+          "title": "Papers 169–170",
+          "startRef": "169:1.14",
+          "endRef": "170:2.6",
+          "paragraphs": 52
+        },
+        {
+          "n": 64,
+          "title": "Paper 170: The Kingdom of Heaven",
+          "startRef": "170:2.7",
+          "endRef": "170:5.7",
+          "paragraphs": 53
+        },
+        {
+          "n": 65,
+          "title": "Papers 170–171",
+          "startRef": "170:5.8",
+          "endRef": "171:6.2",
+          "paragraphs": 52
+        },
+        {
+          "n": 66,
+          "title": "Papers 171–172",
+          "startRef": "171:6.3",
+          "endRef": "172:3.9",
+          "paragraphs": 53
+        },
+        {
+          "n": 67,
+          "title": "Papers 172–173",
+          "startRef": "172:3.10",
+          "endRef": "173:4.3",
+          "paragraphs": 52
+        },
+        {
+          "n": 68,
+          "title": "Papers 173–175",
+          "startRef": "173:4.4",
+          "endRef": "175:1.4",
+          "paragraphs": 53
+        },
+        {
+          "n": 69,
+          "title": "Papers 175–176",
+          "startRef": "175:1.5",
+          "endRef": "176:2.1",
+          "paragraphs": 52
+        },
+        {
+          "n": 70,
+          "title": "Papers 176–177",
+          "startRef": "176:2.2",
+          "endRef": "177:4.3",
+          "paragraphs": 53
+        },
+        {
+          "n": 71,
+          "title": "Papers 177–178",
+          "startRef": "177:4.4",
+          "endRef": "178:3.6",
+          "paragraphs": 52
+        },
+        {
+          "n": 72,
+          "title": "Papers 179–180",
+          "startRef": "179:0.1",
+          "endRef": "180:1.6",
+          "paragraphs": 53
+        },
+        {
+          "n": 73,
+          "title": "Papers 180–181",
+          "startRef": "180:2.1",
+          "endRef": "181:1.6",
+          "paragraphs": 52
+        },
+        {
+          "n": 74,
+          "title": "Papers 181–182",
+          "startRef": "181:1.7",
+          "endRef": "182:1.16",
+          "paragraphs": 53
+        },
+        {
+          "n": 75,
+          "title": "Papers 182–183",
+          "startRef": "182:1.17",
+          "endRef": "183:3.7",
+          "paragraphs": 52
+        },
+        {
+          "n": 76,
+          "title": "Papers 183–184",
+          "startRef": "183:3.8",
+          "endRef": "184:3.12",
+          "paragraphs": 53
+        },
+        {
+          "n": 77,
+          "title": "Papers 184–185",
+          "startRef": "184:3.13",
+          "endRef": "185:2.15",
+          "paragraphs": 52
+        },
+        {
+          "n": 78,
+          "title": "Papers 185–186",
+          "startRef": "185:2.16",
+          "endRef": "186:2.3",
+          "paragraphs": 53
+        },
+        {
+          "n": 79,
+          "title": "Papers 186–187",
+          "startRef": "186:2.4",
+          "endRef": "187:3.1",
+          "paragraphs": 52
+        },
+        {
+          "n": 80,
+          "title": "Papers 187–188",
+          "startRef": "187:3.2",
+          "endRef": "188:3.15",
+          "paragraphs": 53
+        },
+        {
+          "n": 81,
+          "title": "Papers 188–189",
+          "startRef": "188:3.16",
+          "endRef": "189:2.9",
+          "paragraphs": 52
+        },
+        {
+          "n": 82,
+          "title": "Papers 189–190",
+          "startRef": "189:3.1",
+          "endRef": "190:5.2",
+          "paragraphs": 53
+        },
+        {
+          "n": 83,
+          "title": "Papers 190–192",
+          "startRef": "190:5.3",
+          "endRef": "192:0.4",
+          "paragraphs": 52
+        },
+        {
+          "n": 84,
+          "title": "Papers 192–193",
+          "startRef": "192:0.5",
+          "endRef": "193:4.1",
+          "paragraphs": 53
+        },
+        {
+          "n": 85,
+          "title": "Papers 193–194",
+          "startRef": "193:4.2",
+          "endRef": "194:2.16",
+          "paragraphs": 52
+        },
+        {
+          "n": 86,
+          "title": "Papers 194–195",
+          "startRef": "194:2.17",
+          "endRef": "195:0.16",
+          "paragraphs": 53
+        },
+        {
+          "n": 87,
+          "title": "Paper 195: After Pentecost",
+          "startRef": "195:0.17",
+          "endRef": "195:5.14",
+          "paragraphs": 52
+        },
+        {
+          "n": 88,
+          "title": "Paper 195: After Pentecost",
+          "startRef": "195:6.1",
+          "endRef": "195:8.13",
+          "paragraphs": 53
+        },
+        {
+          "n": 89,
+          "title": "Papers 195–196",
+          "startRef": "195:9.1",
+          "endRef": "196:1.6",
+          "paragraphs": 52
+        },
+        {
+          "n": 90,
+          "title": "Paper 196: The Faith of Jesus",
+          "startRef": "196:1.7",
+          "endRef": "196:3.35",
+          "paragraphs": 53
+        }
+      ]
+    },
+    {
+      "id": "central",
+      "title": "The Central Universe in 30 Days",
+      "blurb": "Papers 1-31, from \"The Universal Father\" to \"The Corps of the Finality\", in 30 daily portions.",
+      "days": [
+        {
+          "n": 1,
+          "title": "Papers 1–2",
+          "startRef": "1:0.1",
+          "endRef": "2:2.4",
+          "paragraphs": 88
+        },
+        {
+          "n": 2,
+          "title": "Papers 2–3",
+          "startRef": "2:2.5",
+          "endRef": "3:4.5",
+          "paragraphs": 88
+        },
+        {
+          "n": 3,
+          "title": "Papers 3–5",
+          "startRef": "3:4.6",
+          "endRef": "5:1.10",
+          "paragraphs": 87
+        },
+        {
+          "n": 4,
+          "title": "Papers 5–6",
+          "startRef": "5:1.11",
+          "endRef": "6:4.6",
+          "paragraphs": 88
+        },
+        {
+          "n": 5,
+          "title": "Papers 6–8",
+          "startRef": "6:4.7",
+          "endRef": "8:0.1",
+          "paragraphs": 88
+        },
+        {
+          "n": 6,
+          "title": "Papers 8–9",
+          "startRef": "8:0.2",
+          "endRef": "9:5.3",
+          "paragraphs": 88
+        },
+        {
+          "n": 7,
+          "title": "Papers 9–10",
+          "startRef": "9:5.4",
+          "endRef": "10:5.1",
+          "paragraphs": 88
+        },
+        {
+          "n": 8,
+          "title": "Papers 10–11",
+          "startRef": "10:5.2",
+          "endRef": "11:7.6",
+          "paragraphs": 87
+        },
+        {
+          "n": 9,
+          "title": "Papers 11–12",
+          "startRef": "11:7.7",
+          "endRef": "12:6.3",
+          "paragraphs": 88
+        },
+        {
+          "n": 10,
+          "title": "Papers 12–13",
+          "startRef": "12:6.4",
+          "endRef": "13:3.1",
+          "paragraphs": 88
+        },
+        {
+          "n": 11,
+          "title": "Papers 13–14",
+          "startRef": "13:3.2",
+          "endRef": "14:6.8",
+          "paragraphs": 88
+        },
+        {
+          "n": 12,
+          "title": "Papers 14–15",
+          "startRef": "14:6.9",
+          "endRef": "15:4.4",
+          "paragraphs": 88
+        },
+        {
+          "n": 13,
+          "title": "Paper 15: The Seven Superuniverses",
+          "startRef": "15:4.5",
+          "endRef": "15:10.12",
+          "paragraphs": 87
+        },
+        {
+          "n": 14,
+          "title": "Papers 15–16",
+          "startRef": "15:10.13",
+          "endRef": "16:4.13",
+          "paragraphs": 88
+        },
+        {
+          "n": 15,
+          "title": "Papers 16–17",
+          "startRef": "16:4.14",
+          "endRef": "17:2.2",
+          "paragraphs": 88
+        },
+        {
+          "n": 16,
+          "title": "Papers 17–18",
+          "startRef": "17:2.3",
+          "endRef": "18:5.5",
+          "paragraphs": 88
+        },
+        {
+          "n": 17,
+          "title": "Papers 18–20",
+          "startRef": "18:6.1",
+          "endRef": "20:1.1",
+          "paragraphs": 88
+        },
+        {
+          "n": 18,
+          "title": "Papers 20–21",
+          "startRef": "20:1.2",
+          "endRef": "21:2.11",
+          "paragraphs": 87
+        },
+        {
+          "n": 19,
+          "title": "Papers 21–22",
+          "startRef": "21:2.12",
+          "endRef": "22:5.2",
+          "paragraphs": 88
+        },
+        {
+          "n": 20,
+          "title": "Papers 22–23",
+          "startRef": "22:5.3",
+          "endRef": "23:3.7",
+          "paragraphs": 88
+        },
+        {
+          "n": 21,
+          "title": "Papers 23–25",
+          "startRef": "23:3.8",
+          "endRef": "25:1.3",
+          "paragraphs": 88
+        },
+        {
+          "n": 22,
+          "title": "Papers 25–26",
+          "startRef": "25:1.4",
+          "endRef": "26:1.8",
+          "paragraphs": 88
+        },
+        {
+          "n": 23,
+          "title": "Papers 26–27",
+          "startRef": "26:1.9",
+          "endRef": "27:0.5",
+          "paragraphs": 87
+        },
+        {
+          "n": 24,
+          "title": "Papers 27–28",
+          "startRef": "27:0.6",
+          "endRef": "28:5.17",
+          "paragraphs": 88
+        },
+        {
+          "n": 25,
+          "title": "Papers 28–29",
+          "startRef": "28:5.18",
+          "endRef": "29:4.10",
+          "paragraphs": 88
+        },
+        {
+          "n": 26,
+          "title": "Papers 29–30",
+          "startRef": "29:4.11",
+          "endRef": "30:1.50",
+          "paragraphs": 88
+        },
+        {
+          "n": 27,
+          "title": "Paper 30: Personalities of the Grand Universe",
+          "startRef": "30:1.51",
+          "endRef": "30:2.24",
+          "paragraphs": 88
+        },
+        {
+          "n": 28,
+          "title": "Paper 30: Personalities of the Grand Universe",
+          "startRef": "30:2.25",
+          "endRef": "30:2.111",
+          "paragraphs": 87
+        },
+        {
+          "n": 29,
+          "title": "Paper 30: Personalities of the Grand Universe",
+          "startRef": "30:2.112",
+          "endRef": "30:4.29",
+          "paragraphs": 88
+        },
+        {
+          "n": 30,
+          "title": "Papers 30–31",
+          "startRef": "30:4.30",
+          "endRef": "31:10.22",
+          "paragraphs": 88
+        }
+      ]
+    }
+  ]
+}
