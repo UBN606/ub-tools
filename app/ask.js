@@ -56,6 +56,12 @@ export function answer(E, question, { max = 5 } = {}) {
   // (57:8.1: a billion years, "the actual beginning of Urantia history"), not a birth
   // narrative: birth-term machinery would only add noise here.
   const worldAgeQ = ageQ && (subjects.some((s) => /^Urantia$/i.test(s)) || /\burantia\b/i.test(question))
+  // "How old was Jesus when he died?" is answered by the book's own lifespan
+  // statement (189:1.2: "almost thirty-six years"), with the birth date
+  // (122:8.1: August 21, 7 B.C.) and the crucifixion date (185:0.1: Friday,
+  // April 7, A.D. 30) as the bookends. The generic birth machinery and the
+  // death->survival mappings would only add noise here.
+  const jesusDeathAgeQ = ageQ && /\bjesus\b/i.test(question) && /\b(die|died|dies|dying|death)\b|\bcrucif/i.test(question)
   // The question's most distinctive words (longer words are rarely glue like "at the time
   // of"), with book-term substitutions where the book says it differently ("earth" ->
   // "Urantia"): where they co-occur often names the passage ("morontia ... resurrection").
@@ -72,7 +78,11 @@ export function answer(E, question, { max = 5 } = {}) {
   // strictly more specific ("Urantia" alone also matches mansion-world procedure).
   const distinctiveSet = new Set(distinctive.map((w) => w.toLowerCase()))
   const queries = []
-  if (words.length) queries.push({ q: words.join(' '), weight: 1, label: words.join(' '), ownWords: true })
+  // On the Jesus-death-age question the reader's own words are search-noise:
+  // "old" is an adjective and "died" pulls resurrection narratives (194:4.6),
+  // while the book's answer ("almost thirty-six years") shares only "Jesus".
+  // The directed lifespan boost below plus the birth machinery carry it.
+  if (words.length && !jesusDeathAgeQ) queries.push({ q: words.join(' '), weight: 1, label: words.join(' '), ownWords: true })
   // The reader's words in the book's language ("metronita" -> "morontia"): pairs the mapped
   // term with the question's other content words ("morontia song"), which the separate
   // single-term mapped query can't do. Light verbs are dropped: the search is AND-like,
@@ -85,7 +95,7 @@ export function answer(E, question, { max = 5 } = {}) {
     const m = BOOK_TERMS[w.toLowerCase()]
     return m && m.length === 1 ? m[0] : w
   }).filter((w) => !GLUE.has(w.toLowerCase()))
-  if (substituted.length >= 2 && substituted.join(' ') !== words.join(' '))
+  if (substituted.length >= 2 && substituted.join(' ') !== words.join(' ') && !jesusDeathAgeQ)
     queries.push({ q: substituted.join(' '), weight: 1, label: substituted.join(' '), ownWords: true })
   if (distinctiveOn) {
     queries.push({ q: distinctive.join(' '), weight: 1.5, label: distinctive.join(' '), ownWords: true })
@@ -106,15 +116,22 @@ export function answer(E, question, { max = 5 } = {}) {
     for (const w of m[1].toLowerCase().split(/[^a-z0-9']+/).filter(Boolean))
       if (w.length >= 7 && !QUESTION_WORDS.has(w) && !parenSpecific.includes(w)) parenSpecific.push(w)
   for (const t of parenSpecific) queries.push({ q: t, weight: 3, label: `clarified:"${t}"` })
-  // With a subject to pair with birth terms, the plain birth/born searches add only noise.
-  const skipBirth = ageQ && subjects.length > 0
+  // Bare "birth"/"born" searches only match birth-word noise on age questions
+  // (103:2.1's "birth of religion"): subjects pair with birth terms directly
+  // ("Jesus born"), the planet's age has its own statement, and subject-less
+  // questions answer from the subject's own passages.
   // A mapped term the reader actually typed ("universe") is covered by the distinctive
   // query; a substituted book-term ("wisest" -> "all-wisdom") is not — paired with the
   // question's other words, the distinctive query drowns the rare term out, so the
   // book-term needs its own query to reach its one or two paragraphs.
   const typedWords = new Set(words.map((w) => w.toLowerCase()))
+  // On the Jesus-death-age question the reader's death words ("died") are about
+  // dating the lifespan, not the afterlife: the survival/mansion-worlds
+  // mappings would drown the book's own "almost thirty-six years" statement.
+  const DEATH_TERMS = new Set(['survival', 'mansion worlds', 'resurrection halls'])
   for (const t of mapped) {
-    if (skipBirth && (t === 'birth' || t === 'born')) continue
+    if (ageQ && (t === 'birth' || t === 'born')) continue
+    if (jesusDeathAgeQ && DEATH_TERMS.has(t)) continue
     if (distinctiveOn && distinctiveSet.has(t.toLowerCase()) && typedWords.has(t.toLowerCase())) continue
     queries.push({ q: t, weight: SPECIFIC.has(t) ? 3 : 1.2, label: t })
   }
@@ -192,6 +209,16 @@ export function answer(E, question, { max = 5 } = {}) {
         score.set(ref, (score.get(ref) || 0) + 2)
         if (!why.has(ref)) why.set(ref, new Set())
         why.get(ref).add('dated Urantia passage')
+      }
+    }
+  }
+  if (jesusDeathAgeQ && E.byRef) {
+    // The book states the lifespan outright: "almost thirty-six years".
+    for (const [ref, p] of E.byRef) {
+      if (/almost thirty-six years/i.test(p.text)) {
+        score.set(ref, (score.get(ref) || 0) + 5)
+        if (!why.has(ref)) why.set(ref, new Set())
+        why.get(ref).add('stated lifespan')
       }
     }
   }

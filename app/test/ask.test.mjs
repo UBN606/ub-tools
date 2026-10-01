@@ -138,3 +138,27 @@ test('email: Morontia Nursery leads with the finaliters\' world', () => {
   const r = answer(E, 'Where is the Morontia Nursery?')
   assert.equal(r.refs[0], '45:6.7')
 })
+
+// Open Ask items (Oct 1, 2026): the short morontia wording, Jesus's age at
+// death, and narrowing of generic "how old was X?" questions.
+test('short morontia wording leads with the morontia-creatures paragraph', () => {
+  const r = answer(E, 'Why were morontia creatures on earth?')
+  assert.equal(r.refs[0], '191:3.1')
+})
+
+test('"How old was Jesus when he died?" leads with the stated lifespan', () => {
+  for (const q of ['How old was Jesus when he died?', 'How old was Jesus when he died on the cross?']) {
+    const r = answer(E, q)
+    assert.equal(r.refs[0], '189:1.2', `for ${q}: top 5 were ${r.refs.slice(0, 5).join(',')}`)
+    assert.ok(r.refs.slice(0, 5).includes('122:8.1'), `for ${q}: top 5 were ${r.refs.slice(0, 5).join(',')}`)
+  }
+})
+
+test('generic "how old was X?" no longer leads with birth-word noise', () => {
+  // 103:2.1 is about the "birth" of religion: it only ever ranked here because
+  // the bare birth/born searches matched the word "birth".
+  for (const q of ['How old was Moses?', 'How old was Abraham?']) {
+    const r = answer(E, q)
+    assert.ok(!r.refs.slice(0, 3).includes('103:2.1'), `for ${q}: top 3 were ${r.refs.slice(0, 3).join(',')}`)
+  }
+})
