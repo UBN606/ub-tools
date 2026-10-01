@@ -6,7 +6,10 @@ import { renderReadAlong } from './readalong.js'
 import { loadTopics, findTopics } from './topics.js'
 import { THEME_KEY, SIZE_KEY, SIZE_DEFAULT, resolveTheme, oppositeTheme, parseStoredTheme, parseStoredSize, stepSize, applyTheme, applySize, migrateLegacyBig, themeToggleState } from './a11y.js'
 import { answer, speech, listener, englishVoices, whenVoices, chooseVoice } from './ask.js'
-import { askLabels, forwardText } from './ask-format.js'
+import { askLabels, forwardText, toggleLangs } from './ask-format.js'
+import { detectLang } from './lang-detect.js'
+import { answerIn, buildByRef } from './ask-i18n.js'
+import { loadTranslation } from './load-translation.js'
 import { sendMissed } from './feedback.js'
 
 const $ = (id) => document.getElementById(id)
@@ -257,7 +260,7 @@ function submit() {
   const q = $('q').value.trim()
   if (!q) return
   if (mode === 'places') return runPlaces(q)
-  if (mode === 'ask' && !REF_ONLY.test(q)) return runAsk(q)
+  if (mode === 'ask' && !REF_ONLY.test(q)) return runAsk(q, 5, detectLang(q))
   if (REF_ONLY.test(q)) {
     const refs = q.match(/\d{1,3}:\d{1,2}\.\d{1,3}/g)
     renderList(refs.map((r) => ({ ref: r })), { title: refs.length === 1 ? 'Reference' : `${refs.length} references`, sub: '' })
@@ -315,9 +318,64 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) stopR
 
 // ---------- ask ----------
 function runAsk(q, max = 5, lang = 'en') {
+  if (lang !== 'en') return runAskI18n(q, max, lang)
   stopReading()
   const L = askLabels(lang)
   const r = answer(E, q, { max })
+  renderAnswer({ q, max, lang, L, r, getPars: (refs) => E.search.getParagraphs(refs), showTopics: true, showSilence: true, showDeeper: true })
+}
+
+// A question asked in Spanish, French, or Korean gets an answer in that language.
+// The official translation is fetched from urantia.org on first use, parsed in the
+// browser, and cached in IndexedDB; Ask then runs against the translation.
+const ASK_LOADING = {
+  es: 'Cargando el texto en espa\u00f1ol\u2026',
+  fr: 'Chargement du texte fran\u00e7ais\u2026',
+  ko: '\ud55c\uad6d\uc5b4 \ud14d\uc2a4\ud2b8\ub97c \ubd88\ub7ec\uc624\ub294 \uc911\u2026',
+}
+async function runAskI18n(q, max, lang) {
+  stopReading()
+  const L = askLabels(lang)
+  const box = $('results')
+  box.innerHTML = `<p class="answer-loading">${esc(ASK_LOADING[lang] || 'Loading\u2026')}</p>`
+  let papers
+  try {
+    papers = await loadTranslation(lang, { authorProvider: englishAuthorFor })
+  } catch (e) {
+    box.innerHTML = `<p class="empty">${esc(e.message)}</p>`
+    return
+  }
+  const byRef = buildByRef(papers)
+  const getPars = (refs) => refs.map((ref) => {
+    const p = byRef.get(ref)
+    if (!p) return { ref, error: 'Reference not found' }
+    return { ref: p.ref, page: p.pageref, paper: p.paper, paperTitle: p.paperTitle, section: p.sectionTitle || '', author: p.author, text: p.text }
+  })
+  const r = answerIn(lang, papers, q, { max })
+  renderAnswer({ q, max, lang, L, r, getPars, showTopics: false, showSilence: false, showDeeper: false })
+}
+
+// The Spanish text doesn't name its authors; the parser backfills them from the
+// English book (already loaded), mapped to Spanish. Built once, on first need.
+let authorByPaper = null
+function englishAuthorFor(pidx) {
+  if (!authorByPaper) {
+    authorByPaper = new Map()
+    for (const ref of E.order) {
+      const n = Number(ref.slice(0, ref.indexOf(':')))
+      if (!authorByPaper.has(n)) {
+        const p = E.byRef.get(ref)
+        authorByPaper.set(n, (p && p.author) || '')
+      }
+    }
+  }
+  return authorByPaper.get(pidx) || ''
+}
+
+// One rendering path for every Ask language: the clearest passage featured as
+// the answer, supporting quotes below, every quote with its exact citation,
+// and a language toggle so the reader can switch.
+function renderAnswer({ q, max, lang, L, r, getPars, showTopics, showSilence, showDeeper }) {
   const box = $('results')
   const plain = (t) => t.replace(/<[^>]+>/g, '')
   const missedNote = FEEDBACK_ENDPOINT
@@ -326,25 +384,28 @@ function runAsk(q, max = 5, lang = 'en') {
   const missedBtn = FEEDBACK_ENDPOINT ? 'Add detail by email' : (FEEDBACK_EMAIL ? 'Tell us your question' : 'Copy your question to send us')
   const missed = `<div class="missed">${missedNote}<button type="button" class="soft" id="missed">${missedBtn}</button></div>`
   if (!r.refs.length) { box.innerHTML = `<p class="empty">${esc(L.empty)}</p>${missed}`; wireMissed(q); return }
-  const pars = E.search.getParagraphs(r.refs).filter((p) => !p.error)
+  const pars = getPars(r.refs).filter((p) => !p.error)
   if (!pars.length) { box.innerHTML = `<p class="empty">${esc(L.empty)}</p>${missed}`; wireMissed(q); return }
-  const silence = r.quiet.length ? `<div class="silence"><strong>The book says little about this directly.</strong> ${r.quiet.map((x) => x.total === 0 ? `It never uses the word "${esc(x.word)}".` : `It uses the word "${esc(x.word)}" only ${x.total === 1 ? 'once' : `${x.total} times`}: ${x.refs.map((ref) => `<button type="button" class="linkish" data-open="${esc(ref)}">${esc(ref)}</button>`).join(', ')}.`).join(' ')} Below are the passages closest to your question. They may not answer it.</div>` : ''
-  const topicsFound = findTopics(r.words, r.mapped)
+  const silence = showSilence && r.quiet.length ? `<div class="silence"><strong>The book says little about this directly.</strong> ${r.quiet.map((x) => x.total === 0 ? `It never uses the word "${esc(x.word)}".` : `It uses the word "${esc(x.word)}" only ${x.total === 1 ? 'once' : `${x.total} times`}: ${x.refs.map((ref) => `<button type="button" class="linkish" data-open="${esc(ref)}">${esc(ref)}</button>`).join(', ')}.`).join(' ')} Below are the passages closest to your question. They may not answer it.</div>` : ''
+  const topicsFound = showTopics ? findTopics(r.words, r.mapped) : []
   const index = topicsFound.length ? `<div class="index-hint">${topicsFound.map((t, k) => `<button type="button" class="soft" data-topic="${k}">The book's index: ${esc(t.label)} (${t.refs.length} passages)</button>`).join('')}</div>` : ''
   // Forward-ready: the clearest passage is presented as the answer, the rest as
   // supporting quotes, every quote carrying its exact paragraph citation.
   const actions = (i, p) => `<div class="a-actions">${speech.ok ? `<button type="button" class="soft" data-say="${i}">Listen</button>` : ''}<button type="button" class="soft" data-open="${esc(p.ref)}">See it in the book</button><button type="button" class="soft" data-study="${i}">Add to study list</button><button type="button" class="soft" data-link="${esc(refLink(p.ref))}">Copy link</button></div>${shareRowHTML()}<p class="a-note" aria-live="polite"></p>`
   const featuredCard = (p) => `<li class="featured"><p class="a-eyebrow">${esc(L.theAnswer)}</p><p class="a-text">${esc(plain(p.text))}</p><p class="a-cite"><span class="cite-chip">${esc(p.ref)}</span><span class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</span></p>${actions(0, p)}</li>`
   const supportingCard = (p, i) => `<li><p class="a-ref"><span class="cite-chip">${esc(p.ref)}</span></p><p class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</p><p class="a-text">${esc(plain(p.text))}</p><p class="a-why">${esc(L.foundWhy)} ${[...(r.why.get(p.ref) || [])].map(esc).join(', ')}</p>${actions(i, p)}</li>`
+  const langRow = `<div class="lang-row"><span class="lang-label">${esc(L.alsoIn)}</span>${toggleLangs(lang).map((t) => `<button type="button" class="soft lang-pick" data-lang="${t.code}">${esc(t.label)}</button>`).join('')}</div>`
   box.innerHTML = `<div class="answer-head"><h2>${esc(L.head)}</h2><div class="head-actions">${speech.ok ? '<button type="button" class="soft strong" id="read-all">Listen to the answer</button>' : ''}<button type="button" class="soft" id="print">Print the answer</button><button type="button" class="soft" id="copy-all">${esc(L.copyAnswer)}</button></div></div>
+${langRow}
 <p class="print-question">Question: ${esc(q)}</p>${silence}${index}
 <ol class="answer">${featuredCard(pars[0])}</ol>
 ${pars.length > 1 ? `<h3 class="more-head">${esc(L.more)}</h3><ol class="answer supporting">${pars.slice(1).map((p, k) => supportingCard(p, k + 1)).join('')}</ol>` : ''}
 ${r.more.length ? `<button type="button" class="soft more" id="more">Show more passages</button>` : ''}
-${goDeeper(pars.map((p) => p.ref))}
+${showDeeper ? goDeeper(pars.map((p) => p.ref)) : ''}
 ${missed}
 <p class="print-foot">From ${esc(L.book)}, as found by UB Tools Studio: https://ubn606.github.io/ub-tools/app/ . URANTIA BOOK NETWORK, urantiabooknetwork.com</p>`
   $('more')?.addEventListener('click', () => { runAsk(q, max + 10, lang); $('results').querySelectorAll('.answer li')[max]?.scrollIntoView({ block: 'start' }) })
+  box.querySelectorAll('.lang-pick').forEach((b) => b.addEventListener('click', () => runAsk(q, max, b.dataset.lang)))
   box.querySelectorAll('[data-topic]').forEach((b) => b.addEventListener('click', () => { const t = topicsFound[Number(b.dataset.topic)]; renderList(t.refs.map((ref) => ({ ref })), { title: `The book's index: ${esc(t.label)}`, sub: `${t.refs.length} passages the index lists. Tap one to read it.` }) }))
   wireMissed(q)
   const cards = [...box.querySelectorAll('.answer li')]
