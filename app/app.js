@@ -326,7 +326,8 @@ function runAsk(q, max = 5, lang = 'en') {
 }
 
 // A question asked in Spanish, French, or Korean gets an answer in that language.
-// The official translation is fetched from urantia.org on first use, parsed in the
+// The official translation is loaded at runtime (a same-origin copy for local
+// use if present, otherwise the official urantia.org file), parsed in the
 // browser, and cached in IndexedDB; Ask then runs against the translation.
 const ASK_LOADING = {
   es: 'Cargando el texto en espa\u00f1ol\u2026',

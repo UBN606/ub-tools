@@ -8,7 +8,7 @@ import assert from 'node:assert/strict'
 import { deflateRawSync } from 'node:zlib'
 import {
   readFirstFile, extractSingleTxt, loadTranslation, clearTranslationCache,
-  TRANSLATION_URLS,
+  TRANSLATION_URLS, LOCAL_URLS,
 } from '../load-translation.js'
 import { toggleLangs } from '../ask-format.js'
 
@@ -132,7 +132,7 @@ test('loadTranslation fetches the official URL, extracts, parses, and caches', a
     fetchFn,
     parseFn: (txt, lang) => { parsedWith = [txt, lang]; return parsed },
   })
-  assert.equal(okFetch.lastUrl, TRANSLATION_URLS.es)
+  assert.equal(okFetch.lastUrl, LOCAL_URLS.es)
   assert.deepEqual(parsedWith, ['texto oficial de prueba', 'es'])
   assert.equal(got, parsed)
   const saved = await store.get('ub-i18n-es')
@@ -184,9 +184,23 @@ test('loadTranslation rejects unknown languages', async () => {
   await assert.rejects(() => loadTranslation('xx', { storage: memStore() }), /unknown language/)
 })
 
+test('loadTranslation falls through local, official, then proxies', async () => {
+  clearTranslationCache()
+  const tried = []
+  const fetchFn = async (url) => {
+    tried.push(url)
+    if (tried.length < 3) throw new TypeError('Failed to fetch')
+    return { ok: true, arrayBuffer: async () => { const z = makeZip('x'); return z.buffer.slice(z.byteOffset, z.byteOffset + z.byteLength) } }
+  }
+  await loadTranslation('es', { storage: memStore(), fetchFn, parseFn: () => fakePapers() })
+  assert.equal(tried[0], LOCAL_URLS.es)
+  assert.equal(tried[1], TRANSLATION_URLS.es)
+  assert.match(tried[2], /^https:\/\/api\./)
+})
+
 test('official translation URLs point at urantia.org zips', () => {
   for (const [lang, url] of Object.entries(TRANSLATION_URLS)) {
-    assert.match(url, /^https:\/\/urantia\.org\/.*-txt\.zip$/, `bad URL for ${lang}`)
+    assert.match(url, /^https:\/\/(www\.)?urantia\.org\/.*-txt\.zip$/, `bad URL for ${lang}`)
   }
   assert.equal(Object.keys(TRANSLATION_URLS).sort().join(','), 'es,fr,ko')
 })

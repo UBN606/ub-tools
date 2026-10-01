@@ -7,18 +7,31 @@
 // comes straight from the official source to the reader.
 //
 // Note (2026-10-01): urantia.org does not send CORS headers, so a direct
-// browser fetch is blocked. The loader tries the official URL first, then
-// falls back to a public CORS proxy for the same official file. If the
-// Foundation ever adds Access-Control-Allow-Origin to their downloads, the
-// direct fetch just starts working.
+// browser fetch is blocked. The loader tries, in order: an optional
+// same-origin copy (./i18n/, for local/dev — never committed), the official
+// URL, then public CORS proxies for the same official file. If the Foundation
+// ever adds Access-Control-Allow-Origin to their downloads, the direct fetch
+// just starts working — that plus their permission is the clean production
+// path.
 import { parseTranslation } from './parse-i18n.js'
 
 export const TRANSLATION_URLS = {
-  es: 'https://urantia.org/sites/default/files/book/es/uf-spa-419-1993-1.9-txt.zip',
-  fr: 'https://urantia.org/sites/default/files/book/fr/uf-fre-001-1960-3.5-txt.zip',
-  ko: 'https://urantia.org/sites/default/files/book/ko/uf-kor-001-2000-1.4-txt.zip',
+  es: 'https://www.urantia.org/sites/default/files/book/es/uf-spa-419-1993-1.9-txt.zip',
+  fr: 'https://www.urantia.org/sites/default/files/book/fr/uf-fre-001-1960-3.5-txt.zip',
+  ko: 'https://www.urantia.org/sites/default/files/book/ko/uf-kor-001-2000-1.4-txt.zip',
 }
-const CORS_PROXY = (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+// Optional same-origin copies for local/dev use (never committed to the repo —
+// see .gitignore). Tried before the network so the feature works fully offline
+// when the official zips sit next to the app.
+export const LOCAL_URLS = {
+  es: './i18n/ub-i18n-es.zip',
+  fr: './i18n/ub-i18n-fr.zip',
+  ko: './i18n/ub-i18n-ko.zip',
+}
+const CORS_PROXIES = [
+  (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  (url) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+]
 
 const LANG_NAMES = { es: 'Spanish', fr: 'French', ko: 'Korean' }
 const LOAD_ERROR = (lang) =>
@@ -139,11 +152,11 @@ export async function loadTranslation(lang, { storage, fetchFn = fetch, parseFn 
     }
   } catch { /* fall through to fetch */ }
   const url = TRANSLATION_URLS[lang]
+  const attempts = [LOCAL_URLS[lang], url, ...CORS_PROXIES.map((p) => p(url))].filter(Boolean)
   let buf = null
-  try {
-    buf = await fetchBytes(fetchFn, url)
-  } catch {
-    try { buf = await fetchBytes(fetchFn, CORS_PROXY(url)) } catch { buf = null }
+  for (const attempt of attempts) {
+    try { buf = await fetchBytes(fetchFn, attempt); break }
+    catch { /* try the next source */ }
   }
   if (!buf) throw new Error(LOAD_ERROR(lang))
   let papers = null
