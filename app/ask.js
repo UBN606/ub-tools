@@ -24,8 +24,9 @@ export const BOOK_TERMS = {
   fear: ['fear'], worry: ['anxiety', 'worry'], healing: ['healing'], miracle: ['miracles'], miracles: ['miracles'],
   'how old': ['birth', 'born'],
   earth: ['Urantia'],
+  filosofia: ['philosophy'], metronita: ['morontia'],
 }
-const QUESTION_WORDS = new Set('what whats who whom whose when where why how which does do did is are was were will would can could should shall may might the a an of to in on for from with about into and or but if then than that this these those it its be been being have has had i me my we our you your they them their he him his she her there here say says said tell book urantia ub please'.split(' '))
+const QUESTION_WORDS = new Set('what whats who whom whose when where why how which does do did is are was were will would can could should shall may might the a an of to in on for from with about into and or but if then than that this these those it its be been being have has had i me my we our you your they them their he him his she her there here say says said tell define defined definition book urantia ub please'.split(' '))
 
 // The question's own content words, and the book's terms they map to. Possessives are
 // stripped ("Eve's" -> "Eve") so the words match the book's text.
@@ -64,12 +65,34 @@ export function answer(E, question, { max = 5 } = {}) {
   const distinctiveSet = new Set(distinctive.map((w) => w.toLowerCase()))
   const queries = []
   if (words.length) queries.push({ q: words.join(' '), weight: 1, label: words.join(' '), ownWords: true })
+  // The reader's words in the book's language ("metronita" -> "morontia"): pairs the mapped
+  // term with the question's other content words ("morontia song"), which the separate
+  // single-term mapped query can't do. Light verbs are dropped: the search is AND-like,
+  // so glue ("come find") would exclude the very paragraphs we want.
+  const GLUE = new Set(('come comes came coming find finds found finding get gets got getting go goes went going make makes made making take takes took taking see sees saw seeing look looks looked looking want wants wanted needing need needs needed know knows knew knowing think thinks thought thinking give gives gave given ' +
+    // Spanish stopwords: the substituted query is English book-language; Spanish glue would
+    // AND-exclude the paragraphs we want.
+    'que es la el de del en un una los las para con por se su sus como pero este esta eso son hay muy sobre entre donde cuando porque cual cuales mi tu te lo le les nos libro libros').split(' '))
+  const substituted = words.map((w) => {
+    const m = BOOK_TERMS[w.toLowerCase()]
+    return m && m.length === 1 ? m[0] : w
+  }).filter((w) => !GLUE.has(w.toLowerCase()))
+  if (substituted.length >= 2 && substituted.join(' ') !== words.join(' '))
+    queries.push({ q: substituted.join(' '), weight: 1, label: substituted.join(' '), ownWords: true })
   if (distinctiveOn) {
     queries.push({ q: distinctive.join(' '), weight: 1.5, label: distinctive.join(' '), ownWords: true })
   }
   // Specific subjects outrank general ones: a question about a child who dies is about the
   // probationary nursery first, the mansion worlds second.
   const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools'])
+  // A parenthetical clarification names the term the reader means ("What are Spoor Nega?
+  // (means Spornagia)"): long parenthetical words get their own high-weight query so the
+  // misspelled words outside the parens can't drown them out.
+  const parenSpecific = []
+  for (const m of question.matchAll(/\(([^)]+)\)/g))
+    for (const w of m[1].toLowerCase().split(/[^a-z0-9']+/).filter(Boolean))
+      if (w.length >= 7 && !QUESTION_WORDS.has(w) && !parenSpecific.includes(w)) parenSpecific.push(w)
+  for (const t of parenSpecific) queries.push({ q: t, weight: 3, label: `clarified:"${t}"` })
   // With a subject to pair with birth terms, the plain birth/born searches add only noise.
   const skipBirth = ageQ && subjects.length > 0
   for (const t of mapped) {

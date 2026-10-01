@@ -65,3 +65,34 @@ test('broad questions still answer through the term mappings', () => {
   const melch = answer(E, 'who was Melchizedek?')
   assert.deepEqual(melch.refs, ['119:1.5', '35:1.2', '35:1.3', '35:3.22', '93:9.11'])
 })
+
+test("'define' is structural: the philosophy question answers about philosophy", () => {
+  const r = answer(E, 'How does the Urantia Book define philosophy?')
+  assert.ok(!r.refs.slice(0, 3).includes('94:8.16'), `top 3 were: ${r.refs.slice(0, 3).join(',')}`)
+  assert.ok(r.refs.slice(0, 5).includes('103:6.14'), `top 5 were: ${r.refs.join(',')}`)
+})
+
+test("Spanish 'filosofia' maps to philosophy", () => {
+  const { mapped } = toBookTerms('que es la filosofia para el libro de urantia')
+  assert.ok(mapped.includes('philosophy'), `mapped were: ${mapped.join(',')}`)
+  const r = answer(E, 'que es la filosofia para el libro de urantia')
+  assert.ok(r.refs.slice(0, 5).includes('103:6.14'), `top 5 were: ${r.refs.join(',')}`)
+})
+
+test("parenthetical clarification names the term: 'Spoor Nega? (means Spornagia)'", () => {
+  const r = answer(E, 'What are Spoor Nega? (means Spornagia)')
+  assert.equal(r.refs[0], '37:10.3')
+  assert.ok(r.refs.slice(0, 3).includes('46:7.2'), `top 3 were: ${r.refs.slice(0, 3).join(',')}`)
+})
+
+test("'metronita' misspelling maps to morontia and pairs with song", () => {
+  const { mapped } = toBookTerms('where I come find the metronita song?')
+  assert.ok(mapped.includes('morontia'), `mapped were: ${mapped.join(',')}`)
+  const r = answer(E, 'where I come find the metronita song?')
+  assert.equal(r.refs[0], '47:10.2')
+})
+
+test("'salvaged children' reaches the probationary nursery", () => {
+  const r = answer(E, 'What are "salvaged children"?')
+  assert.equal(r.refs[0], '47:2.1')
+})
