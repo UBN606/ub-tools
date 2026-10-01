@@ -28,7 +28,7 @@ const FEEDBACK_EMAIL = 'discosteed8@gmail.com'
 // Auto-logging endpoint for missed questions (Google Apps Script web app).
 // Empty = off (the email button above is the only feedback). Paste the URL
 // here after deploying server/feedback-logger/Code.gs, then push.
-const FEEDBACK_ENDPOINT = ''
+const FEEDBACK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzuup7n0SofxW1vRWIL6GVRjDtRSWEJKzSqPMgUf7ht6TqzVbJuXqSin59ta-lM9qE3/exec'
 // "Go deeper" links to Urantia Book Network articles: at most one quiet line, only when an article
 // cites a paragraph of the answer. OFF until the corrected site is deployed (Derek, 2026-09-28):
 // the live site still carries errors fixed on the w1-receipts branch.
