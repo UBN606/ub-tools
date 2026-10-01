@@ -6,6 +6,7 @@ import { renderReadAlong } from './readalong.js'
 import { loadTopics, findTopics } from './topics.js'
 import { THEME_KEY, SIZE_KEY, SIZE_DEFAULT, resolveTheme, oppositeTheme, parseStoredTheme, parseStoredSize, stepSize, applyTheme, applySize, migrateLegacyBig, themeToggleState } from './a11y.js'
 import { answer, speech, listener, englishVoices, whenVoices, chooseVoice } from './ask.js'
+import { askLabels, forwardText } from './ask-format.js'
 import { sendMissed } from './feedback.js'
 
 const $ = (id) => document.getElementById(id)
@@ -313,8 +314,9 @@ addEventListener('pagehide', stopReading)
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopReading() })
 
 // ---------- ask ----------
-function runAsk(q, max = 5) {
+function runAsk(q, max = 5, lang = 'en') {
   stopReading()
+  const L = askLabels(lang)
   const r = answer(E, q, { max })
   const box = $('results')
   const plain = (t) => t.replace(/<[^>]+>/g, '')
@@ -323,19 +325,26 @@ function runAsk(q, max = 5) {
     : `<p>Didn't find what you were looking for?</p>`
   const missedBtn = FEEDBACK_ENDPOINT ? 'Add detail by email' : (FEEDBACK_EMAIL ? 'Tell us your question' : 'Copy your question to send us')
   const missed = `<div class="missed">${missedNote}<button type="button" class="soft" id="missed">${missedBtn}</button></div>`
-  if (!r.refs.length) { box.innerHTML = `<p class="empty">The book does not speak to that in these words. Try asking with other words.</p>${missed}`; wireMissed(q); return }
+  if (!r.refs.length) { box.innerHTML = `<p class="empty">${esc(L.empty)}</p>${missed}`; wireMissed(q); return }
   const pars = E.search.getParagraphs(r.refs).filter((p) => !p.error)
+  if (!pars.length) { box.innerHTML = `<p class="empty">${esc(L.empty)}</p>${missed}`; wireMissed(q); return }
   const silence = r.quiet.length ? `<div class="silence"><strong>The book says little about this directly.</strong> ${r.quiet.map((x) => x.total === 0 ? `It never uses the word "${esc(x.word)}".` : `It uses the word "${esc(x.word)}" only ${x.total === 1 ? 'once' : `${x.total} times`}: ${x.refs.map((ref) => `<button type="button" class="linkish" data-open="${esc(ref)}">${esc(ref)}</button>`).join(', ')}.`).join(' ')} Below are the passages closest to your question. They may not answer it.</div>` : ''
   const topicsFound = findTopics(r.words, r.mapped)
   const index = topicsFound.length ? `<div class="index-hint">${topicsFound.map((t, k) => `<button type="button" class="soft" data-topic="${k}">The book's index: ${esc(t.label)} (${t.refs.length} passages)</button>`).join('')}</div>` : ''
-  box.innerHTML = `<div class="answer-head"><h2>What the book says</h2><div class="head-actions">${speech.ok ? '<button type="button" class="soft strong" id="read-all">Listen to the answer</button>' : ''}<button type="button" class="soft" id="print">Print the answer</button><button type="button" class="soft" id="copy-all">Copy the answer</button></div></div>
+  // Forward-ready: the clearest passage is presented as the answer, the rest as
+  // supporting quotes, every quote carrying its exact paragraph citation.
+  const actions = (i, p) => `<div class="a-actions">${speech.ok ? `<button type="button" class="soft" data-say="${i}">Listen</button>` : ''}<button type="button" class="soft" data-open="${esc(p.ref)}">See it in the book</button><button type="button" class="soft" data-study="${i}">Add to study list</button><button type="button" class="soft" data-link="${esc(refLink(p.ref))}">Copy link</button></div>${shareRowHTML()}<p class="a-note" aria-live="polite"></p>`
+  const featuredCard = (p) => `<li class="featured"><p class="a-eyebrow">${esc(L.theAnswer)}</p><p class="a-text">${esc(plain(p.text))}</p><p class="a-cite"><span class="cite-chip">${esc(p.ref)}</span><span class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</span></p>${actions(0, p)}</li>`
+  const supportingCard = (p, i) => `<li><p class="a-ref"><span class="cite-chip">${esc(p.ref)}</span></p><p class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</p><p class="a-text">${esc(plain(p.text))}</p><p class="a-why">${esc(L.foundWhy)} ${[...(r.why.get(p.ref) || [])].map(esc).join(', ')}</p>${actions(i, p)}</li>`
+  box.innerHTML = `<div class="answer-head"><h2>${esc(L.head)}</h2><div class="head-actions">${speech.ok ? '<button type="button" class="soft strong" id="read-all">Listen to the answer</button>' : ''}<button type="button" class="soft" id="print">Print the answer</button><button type="button" class="soft" id="copy-all">${esc(L.copyAnswer)}</button></div></div>
 <p class="print-question">Question: ${esc(q)}</p>${silence}${index}
-<ol class="answer">${pars.map((p, i) => `<li><p class="a-ref">${esc(p.ref)}</p><p class="a-where">${esc(p.paperTitle)}. ${esc(p.section)}.</p><p class="a-text">${esc(plain(p.text))}</p><p class="a-why">Found because it speaks of: ${[...(r.why.get(p.ref) || [])].map(esc).join(', ')}</p><div class="a-actions">${speech.ok ? `<button type="button" class="soft" data-say="${i}">Listen</button>` : ''}<button type="button" class="soft" data-open="${esc(p.ref)}">See it in the book</button><button type="button" class="soft" data-study="${i}">Add to study list</button><button type="button" class="soft" data-link="${esc(refLink(p.ref))}">Copy link</button></div>${shareRowHTML()}<p class="a-note" aria-live="polite"></p></li>`).join('')}</ol>
+<ol class="answer">${featuredCard(pars[0])}</ol>
+${pars.length > 1 ? `<h3 class="more-head">${esc(L.more)}</h3><ol class="answer supporting">${pars.slice(1).map((p, k) => supportingCard(p, k + 1)).join('')}</ol>` : ''}
 ${r.more.length ? `<button type="button" class="soft more" id="more">Show more passages</button>` : ''}
 ${goDeeper(pars.map((p) => p.ref))}
 ${missed}
-<p class="print-foot">From The Urantia Book, as found by UB Tools Studio: https://ubn606.github.io/ub-tools/app/ . URANTIA BOOK NETWORK, urantiabooknetwork.com</p>`
-  $('more')?.addEventListener('click', () => { runAsk(q, max + 10); $('results').querySelectorAll('.answer li')[max]?.scrollIntoView({ block: 'start' }) })
+<p class="print-foot">From ${esc(L.book)}, as found by UB Tools Studio: https://ubn606.github.io/ub-tools/app/ . URANTIA BOOK NETWORK, urantiabooknetwork.com</p>`
+  $('more')?.addEventListener('click', () => { runAsk(q, max + 10, lang); $('results').querySelectorAll('.answer li')[max]?.scrollIntoView({ block: 'start' }) })
   box.querySelectorAll('[data-topic]').forEach((b) => b.addEventListener('click', () => { const t = topicsFound[Number(b.dataset.topic)]; renderList(t.refs.map((ref) => ({ ref })), { title: `The book's index: ${esc(t.label)}`, sub: `${t.refs.length} passages the index lists. Tap one to read it.` }) }))
   wireMissed(q)
   const cards = [...box.querySelectorAll('.answer li')]
@@ -354,7 +363,7 @@ ${missed}
     setTimeout(() => { btn.textContent = 'Copy link' }, 2500)
   }))
   $('print').addEventListener('click', () => { stopReading(); print() })
-  $('copy-all').addEventListener('click', async (e) => { const btn = e.currentTarget; const ok = await copyText([q, ...quotes.map(citeLine)].join('\n\n')); btn.textContent = ok ? 'Copied' : 'Copy blocked'; setTimeout(() => { $('copy-all') && ($('copy-all').textContent = 'Copy the answer') }, 2500) })
+  $('copy-all').addEventListener('click', async (e) => { const btn = e.currentTarget; const ok = await copyText(forwardText(lang, q, quotes)); btn.textContent = ok ? L.copied : 'Copy blocked'; setTimeout(() => { $('copy-all') && ($('copy-all').textContent = L.copyAnswer) }, 2500) })
 }
 
 function showShareMenu(card, m) {

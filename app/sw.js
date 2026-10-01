@@ -14,7 +14,8 @@ const SHELL = [
   './', './index.html', './manifest.webmanifest',
   './style.css', './app.js', './engine.js', './tools.js', './explore.js',
   './quiz.js', './plans.js', './readalong.js', './deep-link.js', './a11y.js',
-  './share.js', './topics.js', './ask.js', './embed-quote.js',
+  './share.js', './topics.js', './ask.js', './ask-format.js', './embed-quote.js',
+  './lang-detect.js', './parse-i18n.js', './ask-i18n.js',
   './plans-data.json', './quiz-bank.json', './pronounce.json', './ubn-articles.json',
   './icons/icon-192.png', './icons/icon-512.png',
 ]
