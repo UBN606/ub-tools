@@ -109,8 +109,15 @@ test('applyTheme / applySize write to the document', () => {
 })
 
 test('themeToggleState describes the button for each theme', () => {
-  assert.deepEqual(themeToggleState('dark'), { pressed: true, label: 'Light mode', shortLabel: '☀ Light' })
-  assert.deepEqual(themeToggleState('light'), { pressed: false, label: 'Dark mode', shortLabel: '☾ Dark' })
+  const dark = themeToggleState('dark')
+  const light = themeToggleState('light')
+  assert.equal(dark.pressed, true)
+  assert.equal(dark.label, 'Light mode')
+  assert.ok(dark.shortLabel.includes('<svg') && dark.shortLabel.includes('Light'), 'dark theme shows a sun icon + Light')
+  assert.ok(!dark.shortLabel.includes('☀') && !dark.shortLabel.includes('☾'), 'no font glyphs (they misrender)')
+  assert.equal(light.pressed, false)
+  assert.equal(light.label, 'Dark mode')
+  assert.ok(light.shortLabel.includes('<svg') && light.shortLabel.includes('Dark'), 'light theme shows a moon icon + Dark')
 })
 
 // ---------- contrast ----------

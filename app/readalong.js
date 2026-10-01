@@ -165,6 +165,7 @@ export function renderReadAlong(container, E, deps = {}) {
         </select>
       </label>
     </div>
+    <p class="ra-why">No MP3 yet? <a href="https://www.urantia.org/audio" target="_blank" rel="noopener">Download the free human-narrated reading</a>, then choose the paper's file above.</p>
     <audio id="ra-audio" class="ra-audio" controls preload="metadata"></audio>
     <div class="ra-text" id="ra-text"></div>
   </div>

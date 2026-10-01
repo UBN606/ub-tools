@@ -83,12 +83,17 @@ export function applySize(doc, level) {
   return n
 }
 
-// Button label/pressed state for the theme toggle.
+// Inline SVG icons for the theme toggle (font glyphs like ☾ render as "C"
+// in the header font on some systems).
+const ICON_MOON = '<svg class="ticon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M20 13.2A8.2 8.2 0 1 1 10.8 4a6.6 6.6 0 0 0 9.2 9.2z"/></svg>'
+const ICON_SUN = '<svg class="ticon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>'
+
+// Button label/pressed state for the theme toggle. shortLabel is HTML.
 export function themeToggleState(theme) {
   const dark = theme === 'dark'
   return {
     pressed: dark,
     label: dark ? 'Light mode' : 'Dark mode',
-    shortLabel: dark ? '☀ Light' : '☾ Dark',
+    shortLabel: dark ? `${ICON_SUN} Light` : `${ICON_MOON} Dark`,
   }
 }

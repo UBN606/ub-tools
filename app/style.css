@@ -560,3 +560,21 @@ html[data-theme="dark"] .stop-bar,html[data-theme="dark"] .p-stop,html[data-them
 .x-steps { margin: 10px 0 0; padding-left: 22px; font-size: 14px; color: var(--ink); display: grid; gap: 8px; }
 .x-steps code { font-size: 13px; }
 .foot-dev { font-size: 12px; opacity: .7; }
+
+/* Theme toggle icons */
+.ticon { vertical-align: -1.5px; }
+
+/* Primary actions (Plans "Start", Listen fallback voice): filled, unmistakable */
+.soft.strong {
+  color: #F6F7F9; font-weight: 700; border: 0;
+  background: linear-gradient(160deg, #5A7399 0%, var(--lapis) 55%, #3B5377 100%);
+  box-shadow: 6px 8px 16px rgba(58, 78, 110, .38), -4px -4px 10px var(--lift-light), inset 1px 1px 0 rgba(255, 255, 255, .25);
+}
+.soft.strong:active { transform: translateY(1px); box-shadow: inset 3px 3px 7px rgba(20, 30, 50, .45), -2px -2px 6px var(--lift-light); }
+
+/* Topic chips: one scrollable row with a fade hinting there's more */
+.chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 6px;
+  -webkit-mask-image: linear-gradient(to right, #000 92%, transparent);
+  mask-image: linear-gradient(to right, #000 92%, transparent); }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: 0 0 auto; }

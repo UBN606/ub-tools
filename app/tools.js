@@ -89,7 +89,7 @@ function entityCard(t, esc) {
     <span>${esc(t.blurb)}</span>
     <div class="e-search">
       <label class="sr" for="e-q">Look up a name</label>
-      <input id="e-q" type="search" placeholder="Try Gabriel, Jerusalem, or Seraphim" autocomplete="off">
+      <input id="e-q" type="search" placeholder="Try Gabriel or Jerusalem" autocomplete="off">
       <div class="e-results" id="e-results" aria-live="polite"><p class="why">Type a name above.</p></div>
     </div>
   </div>`

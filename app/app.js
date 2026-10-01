@@ -211,7 +211,7 @@ const applyDisplay = () => {
   const st = themeToggleState(theme)
   themeBtn.setAttribute('aria-pressed', String(st.pressed))
   themeBtn.setAttribute('aria-label', st.label)
-  themeBtn.textContent = st.shortLabel
+  themeBtn.innerHTML = st.shortLabel
   sizeDec.disabled = size <= 0
   sizeInc.disabled = size >= 3
   sizeReset.setAttribute('aria-pressed', String(size === SIZE_DEFAULT))
