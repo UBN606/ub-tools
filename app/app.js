@@ -6,6 +6,7 @@ import { renderReadAlong } from './readalong.js'
 import { loadTopics, findTopics } from './topics.js'
 import { THEME_KEY, SIZE_KEY, SIZE_DEFAULT, resolveTheme, oppositeTheme, parseStoredTheme, parseStoredSize, stepSize, applyTheme, applySize, migrateLegacyBig, themeToggleState } from './a11y.js'
 import { answer, speech, listener, englishVoices, whenVoices, chooseVoice } from './ask.js'
+import { sendMissed } from './feedback.js'
 
 const $ = (id) => document.getElementById(id)
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
@@ -24,6 +25,10 @@ const label = (id) => LABELS[id] || id.replace(/^name:/, '').replace(/^"(.+)".*$
 
 // Where "Didn't find it?" sends the question. Derek sets this address.
 const FEEDBACK_EMAIL = 'discosteed8@gmail.com'
+// Auto-logging endpoint for missed questions (Google Apps Script web app).
+// Empty = off (the email button above is the only feedback). Paste the URL
+// here after deploying server/feedback-logger/Code.gs, then push.
+const FEEDBACK_ENDPOINT = ''
 // "Go deeper" links to Urantia Book Network articles: at most one quiet line, only when an article
 // cites a paragraph of the answer. OFF until the corrected site is deployed (Derek, 2026-09-28):
 // the live site still carries errors fixed on the w1-receipts branch.
@@ -313,7 +318,11 @@ function runAsk(q, max = 5) {
   const r = answer(E, q, { max })
   const box = $('results')
   const plain = (t) => t.replace(/<[^>]+>/g, '')
-  const missed = `<div class="missed"><p>Didn't find what you were looking for?</p><button type="button" class="soft" id="missed">${FEEDBACK_EMAIL ? 'Tell us your question' : 'Copy your question to send us'}</button></div>`
+  const missedNote = FEEDBACK_ENDPOINT
+    ? `<p>Didn't find what you were looking for? Your question was saved so we can improve the search.</p>`
+    : `<p>Didn't find what you were looking for?</p>`
+  const missedBtn = FEEDBACK_ENDPOINT ? 'Add detail by email' : (FEEDBACK_EMAIL ? 'Tell us your question' : 'Copy your question to send us')
+  const missed = `<div class="missed">${missedNote}<button type="button" class="soft" id="missed">${missedBtn}</button></div>`
   if (!r.refs.length) { box.innerHTML = `<p class="empty">The book does not speak to that in these words. Try asking with other words.</p>${missed}`; wireMissed(q); return }
   const pars = E.search.getParagraphs(r.refs).filter((p) => !p.error)
   const silence = r.quiet.length ? `<div class="silence"><strong>The book says little about this directly.</strong> ${r.quiet.map((x) => x.total === 0 ? `It never uses the word "${esc(x.word)}".` : `It uses the word "${esc(x.word)}" only ${x.total === 1 ? 'once' : `${x.total} times`}: ${x.refs.map((ref) => `<button type="button" class="linkish" data-open="${esc(ref)}">${esc(ref)}</button>`).join(', ')}.`).join(' ')} Below are the passages closest to your question. They may not answer it.</div>` : ''
@@ -403,6 +412,7 @@ try { if (!localStorage.getItem('seen-help')) { localStorage.setItem('seen-help'
 
 // ---------- didn't find it ----------
 function wireMissed(q) {
+  if (FEEDBACK_ENDPOINT) sendMissed(FEEDBACK_ENDPOINT, q) // automatic; never blocks the UI
   $('missed')?.addEventListener('click', async (e) => {
     const btn = e.currentTarget
     const body = `My question: ${q}\n\nWhat I hoped to find:\n`
