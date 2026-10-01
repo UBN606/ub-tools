@@ -96,3 +96,45 @@ test("'salvaged children' reaches the probationary nursery", () => {
   const r = answer(E, 'What are "salvaged children"?')
   assert.equal(r.refs[0], '47:2.1')
 })
+
+// Reader-email regressions (Oct 2026): questions from Derek's inbox that the tool
+// must answer with the book's own words, no AI involved.
+test('email: "exchange my mind for Jesus\'s mind" leads with 48:6.26', () => {
+  const r = answer(E, "where does the ub say I can exchange my mind for Jesus's mind?")
+  assert.equal(r.refs[0], '48:6.26')
+})
+
+test('email: "How old is Earth?" leads with the billion-year age statement', () => {
+  const r = answer(E, 'How old is Earth?')
+  assert.equal(r.refs[0], '57:8.1')
+})
+
+test('email: "How old is Urantia?" and "age of the Earth" lead with 57:8.1 too', () => {
+  assert.equal(answer(E, 'How old is Urantia?').refs[0], '57:8.1')
+  assert.equal(answer(E, 'What is the age of the Earth?').refs[0], '57:8.1')
+})
+
+test('email: Jesus\'s siblings leads with "eight brothers and sisters"', () => {
+  const r = answer(E, 'How many brothers and sisters did Jesus have?')
+  assert.equal(r.refs[0], '127:2.8')
+})
+
+test('email: highest and wisest personality leads with all-wisdom', () => {
+  const r = answer(E, 'who is the highest and wisest guiding personality in the universe?')
+  assert.equal(r.refs[0], '3:2.9')
+})
+
+test('email: "the god in me" leads with the indwelling Adjuster', () => {
+  const r = answer(E, 'Tell me about the god in me')
+  assert.equal(r.refs[0], '1:2.8')
+})
+
+test('email: eternity and infinity lead with the eternity-infinity ellipse', () => {
+  const r = answer(E, 'Is eternity at the opposite end of infinity?')
+  assert.equal(r.refs[0], '105:0.1')
+})
+
+test('email: Morontia Nursery leads with the finaliters\' world', () => {
+  const r = answer(E, 'Where is the Morontia Nursery?')
+  assert.equal(r.refs[0], '45:6.7')
+})

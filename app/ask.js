@@ -24,6 +24,10 @@ export const BOOK_TERMS = {
   fear: ['fear'], worry: ['anxiety', 'worry'], healing: ['healing'], miracle: ['miracles'], miracles: ['miracles'],
   'how old': ['birth', 'born'],
   earth: ['Urantia'],
+  brothers: ['brother'], sisters: ['sister'], 'brothers and sisters': ['family'],
+  'god in me': ['Thought Adjuster', 'indwells'], 'within me': ['Thought Adjuster'], 'inside me': ['Thought Adjuster'],
+  wisest: ['all-wisdom'],
+  'morontia nursery': ['probation nursery'],
   filosofia: ['philosophy'], metronita: ['morontia'],
 }
 const QUESTION_WORDS = new Set('what whats who whom whose when where why how which does do did is are was were will would can could should shall may might the a an of to in on for from with about into and or but if then than that this these those it its be been being have has had i me my we our you your they them their he him his she her there here say says said tell define defined definition book urantia ub please'.split(' '))
@@ -45,9 +49,13 @@ export function toBookTerms(question) {
 export function answer(E, question, { max = 5 } = {}) {
   const { words, mapped } = toBookTerms(question)
   // "How old was X?" is answered by X's birth narrative: pair the subject with birth terms,
-  // and favor the book's birth sections about that subject.
-  const ageQ = /\bhow old\b/i.test(question)
+  // and favor the book's birth sections about that subject. "What is the age of X?" too.
+  const ageQ = /\bhow old\b|\bage of\b/i.test(question)
   const subjects = ageQ ? [...new Set(mapped.filter((t) => /^[A-Z][a-z]+$/.test(t)))] : []
+  // "How old is the Earth/Urantia?" is answered by the book's age-of-the-planet statement
+  // (57:8.1: a billion years, "the actual beginning of Urantia history"), not a birth
+  // narrative: birth-term machinery would only add noise here.
+  const worldAgeQ = ageQ && (subjects.some((s) => /^Urantia$/i.test(s)) || /\burantia\b/i.test(question))
   // The question's most distinctive words (longer words are rarely glue like "at the time
   // of"), with book-term substitutions where the book says it differently ("earth" ->
   // "Urantia"): where they co-occur often names the passage ("morontia ... resurrection").
@@ -82,6 +90,11 @@ export function answer(E, question, { max = 5 } = {}) {
   if (distinctiveOn) {
     queries.push({ q: distinctive.join(' '), weight: 1.5, label: distinctive.join(' '), ownWords: true })
   }
+  // The book's own term for the eternity-infinity relationship: when the question names
+  // both, it is asking about their relationship (105:0.1's "eternity-infinity" ellipse),
+  // not about either one alone.
+  if (words.includes('eternity') && words.includes('infinity'))
+    queries.push({ q: 'eternity-infinity', weight: 2.5, label: 'eternity-infinity' })
   // Specific subjects outrank general ones: a question about a child who dies is about the
   // probationary nursery first, the mansion worlds second.
   const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools'])
@@ -95,12 +108,17 @@ export function answer(E, question, { max = 5 } = {}) {
   for (const t of parenSpecific) queries.push({ q: t, weight: 3, label: `clarified:"${t}"` })
   // With a subject to pair with birth terms, the plain birth/born searches add only noise.
   const skipBirth = ageQ && subjects.length > 0
+  // A mapped term the reader actually typed ("universe") is covered by the distinctive
+  // query; a substituted book-term ("wisest" -> "all-wisdom") is not — paired with the
+  // question's other words, the distinctive query drowns the rare term out, so the
+  // book-term needs its own query to reach its one or two paragraphs.
+  const typedWords = new Set(words.map((w) => w.toLowerCase()))
   for (const t of mapped) {
     if (skipBirth && (t === 'birth' || t === 'born')) continue
-    if (distinctiveOn && distinctiveSet.has(t.toLowerCase())) continue
+    if (distinctiveOn && distinctiveSet.has(t.toLowerCase()) && typedWords.has(t.toLowerCase())) continue
     queries.push({ q: t, weight: SPECIFIC.has(t) ? 3 : 1.2, label: t })
   }
-  if (subjects.length) {
+  if (subjects.length && !worldAgeQ) {
     for (const s of subjects.slice(0, 2)) queries.push({ q: `${s} born`, weight: 2, label: `${s} born`, limit: 60 })
   }
   const score = new Map(), why = new Map()
@@ -123,8 +141,33 @@ export function answer(E, question, { max = 5 } = {}) {
       if (!why.has(x.ref)) why.set(x.ref, new Set())
       why.get(x.ref).add(label)
     })
+    if (ownWords && E.byRef && !mapped.some((t) => SPECIFIC.has(t))) {
+      // Whole-word refinement: the search matches word-starts, so "exchanger" and
+      // "simple-minded" can tie with the paragraph that uses the question's exact words
+      // ("exchange ... the mind of Jesus"). When only a handful of the paragraphs already
+      // scored contain every content word as a whole word, they are the answer.
+      // (Broad questions match dozens and are unaffected. Questions the SPECIFIC
+      // mappings redirect — "salvaged children" -> the probationary nursery — keep
+      // their redirect: the explanation outranks the passing mention.)
+      const terms = q.split(' ').filter((t) => t.length >= 4)
+      if (terms.length >= 2) {
+        const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const res = terms.map((t) => new RegExp(`\\b${esc(t)}\\b`, 'i'))
+        const hits = []
+        for (const ref of score.keys()) {
+          const p = E.byRef.get(ref)
+          if (p && res.every((re) => re.test(p.text))) hits.push(ref)
+        }
+        if (hits.length && hits.length <= 8) {
+          for (const ref of hits) {
+            score.set(ref, (score.get(ref) || 0) + 2.5)
+            why.get(ref).add('exact words')
+          }
+        }
+      }
+    }
   }
-  if (subjects.length && E.byRef) {
+  if (subjects.length && !worldAgeQ && E.byRef) {
     // The book's birth narratives live in birth-titled sections: they answer "how old" even
     // when the subject is named there less often than in later discourses.
     const subRe = new RegExp(`\\b(${subjects.map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`, 'i')
@@ -133,6 +176,22 @@ export function answer(E, question, { max = 5 } = {}) {
         score.set(ref, (score.get(ref) || 0) + 3)
         if (!why.has(ref)) why.set(ref, new Set())
         why.get(ref).add(`${subjects.join('/')} birth`)
+      }
+    }
+  }
+  if (worldAgeQ && E.byRef) {
+    // The book dates the planet itself: 57:8.1 states a billion years as "the actual
+    // beginning of Urantia history". Dated Urantia passages about later events (Adam's
+    // arrival, Melchizedek) are supporting context, not the answer.
+    for (const [ref, p] of E.byRef) {
+      if (/beginning of Urantia history/i.test(p.text)) {
+        score.set(ref, (score.get(ref) || 0) + 5)
+        if (!why.has(ref)) why.set(ref, new Set())
+        why.get(ref).add('age of Urantia')
+      } else if (/\bUrantia\b/i.test(p.text) && /\d[\d,]*\*?\s*years ago/i.test(p.text)) {
+        score.set(ref, (score.get(ref) || 0) + 2)
+        if (!why.has(ref)) why.set(ref, new Set())
+        why.get(ref).add('dated Urantia passage')
       }
     }
   }
