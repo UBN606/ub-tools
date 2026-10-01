@@ -542,3 +542,21 @@ html[data-theme="dark"] .stop-bar,html[data-theme="dark"] .p-stop,html[data-them
 .soft:disabled{opacity:.45;cursor:default}
 .a11y-btns{display:flex;gap:8px;align-items:center}
 .size-group{display:flex;gap:6px;align-items:center}
+
+/* Tools view: who's-who search, install steps, quiet footer */
+.e-search { margin-top: 12px; }
+#e-q { width: 100%; box-sizing: border-box; font: 400 16px/1.4 var(--sans); color: var(--ink);
+  background: var(--paper); border: 0; border-radius: var(--r-control); padding: 12px 14px;
+  box-shadow: inset 3px 3px 7px var(--press-dark), inset -3px -3px 7px var(--press-light); }
+#e-q::placeholder { color: var(--graphite); opacity: .8; }
+.e-results { margin-top: 10px; display: grid; gap: 10px; }
+.e-row { padding: 10px 12px; border-radius: 14px; background: var(--paper);
+  box-shadow: inset 2px 2px 5px var(--press-dark), inset -2px -2px 5px var(--press-light); }
+.e-row p { margin: 0 0 6px; }
+.e-kind { font-size: 12px; font-weight: 600; color: var(--lapis); text-transform: uppercase; letter-spacing: .04em; }
+.x-details { margin-top: 12px; }
+.x-details summary { list-style: none; display: inline-flex; }
+.x-details summary::-webkit-details-marker { display: none; }
+.x-steps { margin: 10px 0 0; padding-left: 22px; font-size: 14px; color: var(--ink); display: grid; gap: 8px; }
+.x-steps code { font-size: 13px; }
+.foot-dev { font-size: 12px; opacity: .7; }

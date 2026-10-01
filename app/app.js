@@ -113,7 +113,7 @@ function placeTopThumb() {
 }
 function initView(v) {
   if (v === 'explore') renderExploreView($('explore-slab'), { esc, openRef, copyText, setView })
-  if (v === 'tools') renderToolsView($('tools-slab'), { esc, setView })
+  if (v === 'tools') renderToolsView($('tools-slab'), { esc, setView, openRef })
   if (v === 'plans') renderPlansView($('plans-slab'), E, { esc, store, openRef: (ref) => { setView('read'); openRef(ref) } })
   if (v === 'quiz') {
     renderQuizView($('quiz-slab'), E, { esc, store })
@@ -589,3 +589,10 @@ $('t-share').querySelectorAll('.share-btn').forEach((btn) => btn.addEventListene
   shareTo(btn.dataset.to, p, $('q').value.trim() || p.ref, tNote, () => { stopReading(); document.body.classList.add('print-one'); print(); document.body.classList.remove('print-one') })
 }))
 addEventListener('afterprint', () => document.body.classList.remove('print-one'))
+
+// PWA: installable + offline shell. Only on http(s); file:// has no SW.
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {})
+  })
+}

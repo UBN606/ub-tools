@@ -323,7 +323,7 @@
   ];
   /*__END_BANK__*/
 
-  var UB_TOOLS_URL = 'https://github.com/UBN606/ub-tools';
+  var UB_TOOLS_URL = 'https://ubn606.github.io/ub-tools/app/';
   var STYLE_ID = 'ubq-widget-styles';
   var THEMES = { light: 1, dark: 1, auto: 1 };
 

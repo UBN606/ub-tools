@@ -150,7 +150,7 @@ test('mount() renders namespaced HTML with citation and verified link', () => {
   assert.ok(el.innerHTML.includes('class="ubq-widget ubq-light"'), 'namespaced widget classes');
   assert.ok(el.innerHTML.includes('class="ubq-quote"'), 'blockquote class');
   assert.ok(el.innerHTML.includes(`(The Urantia Book, ${item.c})`), 'citation rendered');
-  assert.ok(el.innerHTML.includes('https://github.com/UBN606/ub-tools'), 'UB Tools link present');
+  assert.ok(el.innerHTML.includes('https://ubn606.github.io/ub-tools/app/'), 'Studio link present');
   assert.ok(el.innerHTML.includes('Verified with UB Tools'), 'verified label present');
   assert.ok(el.innerHTML.includes(item.q), 'quote text rendered');
 });
