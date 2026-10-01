@@ -6,6 +6,7 @@
 // Everyday word -> the book's own terms. Add a line when a common question finds nothing.
 export const BOOK_TERMS = {
   die: ['survival', 'mansion worlds', 'resurrection halls'], death: ['survival', 'mansion worlds', 'resurrection halls'],
+  died: ['survival', 'mansion worlds', 'resurrection halls'], dies: ['survival', 'mansion worlds', 'resurrection halls'],
   dead: ['survival', 'mansion worlds'], dying: ['survival', 'mansion worlds'], afterlife: ['mansion worlds', 'survival'],
   heaven: ['mansion worlds', 'Paradise'], hell: ['hell'], 'life after death': ['mansion worlds', 'survival'],
   god: ['Universal Father'], father: ['Universal Father'], creator: ['Universal Father', 'Creator Son'],
@@ -21,17 +22,19 @@ export const BOOK_TERMS = {
   fetus: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], unborn: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], miscarriage: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], baby: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], babies: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], infant: ['Adjusterless children', 'infant-receiving schools'], infants: ['Adjusterless children', 'infant-receiving schools'], child: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], adjusterless: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], 'thought adjuster': ['Thought Adjuster'], adjuster: ['Thought Adjuster'],
   universe: ['universe'], purpose: ['purpose of life', 'perfection'], meaning: ['meaning of life', 'values'], happiness: ['happiness', 'joy'],
   fear: ['fear'], worry: ['anxiety', 'worry'], healing: ['healing'], miracle: ['miracles'], miracles: ['miracles'],
+  'how old': ['birth', 'born'],
 }
 const QUESTION_WORDS = new Set('what whats who whom whose when where why how which does do did is are was were will would can could should shall may might the a an of to in on for from with about into and or but if then than that this these those it its be been being have has had i me my we our you your they them their he him his she her there here say says said tell book urantia ub please'.split(' '))
 
-// The question's own content words, and the book's terms they map to.
+// The question's own content words, and the book's terms they map to. Possessives are
+// stripped ("Eve's" -> "Eve") so the words match the book's text.
 export function toBookTerms(question) {
   const q = question.toLowerCase().replace(/[‘’]/g, "'").replace(/[^a-z'\s-]/g, ' ').replace(/\s+/g, ' ').trim()
   const mapped = []
   for (const [k, terms] of Object.entries(BOOK_TERMS)) {
     if (new RegExp(`\\b${k}\\b`).test(q)) mapped.push(...terms)
   }
-  const words = q.split(' ').filter((w) => w.length > 2 && !QUESTION_WORDS.has(w.replace(/'s$/, '')))
+  const words = q.split(' ').filter((w) => w.length > 2 && !QUESTION_WORDS.has(w.replace(/'s$/, ''))).map((w) => w.replace(/'s$/, ''))
   return { words, mapped: [...new Set(mapped)] }
 }
 
@@ -39,21 +42,56 @@ export function toBookTerms(question) {
 // paragraphs found by how many of those searches found them, and how well.
 export function answer(E, question, { max = 5 } = {}) {
   const { words, mapped } = toBookTerms(question)
+  // "How old was X?" is answered by X's birth narrative: pair the subject with birth terms,
+  // and favor the book's birth sections about that subject.
+  const ageQ = /\bhow old\b/i.test(question)
+  const subjects = ageQ ? [...new Set(mapped.filter((t) => /^[A-Z][a-z]+$/.test(t)))] : []
   const queries = []
-  if (words.length) queries.push({ q: words.join(' '), weight: 1, label: words.join(' ') })
+  if (words.length) queries.push({ q: words.join(' '), weight: 1, label: words.join(' '), ownWords: true })
   // Specific subjects outrank general ones: a question about a child who dies is about the
   // probationary nursery first, the mansion worlds second.
   const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools'])
-  for (const t of mapped) queries.push({ q: t, weight: SPECIFIC.has(t) ? 3 : 1.2, label: t })
+  // With a subject to pair with birth terms, the plain birth/born searches add only noise.
+  const skipBirth = ageQ && subjects.length > 0
+  for (const t of mapped) {
+    if (skipBirth && (t === 'birth' || t === 'born')) continue
+    queries.push({ q: t, weight: SPECIFIC.has(t) ? 3 : 1.2, label: t })
+  }
+  if (subjects.length) {
+    for (const s of subjects.slice(0, 2)) queries.push({ q: `${s} born`, weight: 2, label: `${s} born`, limit: 60 })
+  }
   const score = new Map(), why = new Map()
-  for (const { q, weight, label } of queries) {
-    const r = E.search.searchUB({ query: q, limit: 40 })
+  for (const { q, weight, label, ownWords, limit } of queries) {
+    const lim = limit || 40
+    const r = E.search.searchUB({ query: q, limit: lim })
+    if (ownWords) {
+      // The search scores a paragraph 50+ only when every one of the question's words is in
+      // it. When that is true of just a handful of paragraphs, they are almost certainly the
+      // answer ("Adam and Eve's hair color" -> 76:4.1), so they outrank the looser topic
+      // expansions. Broad questions match dozens of paragraphs and are unaffected.
+      const direct = r.results.filter((x) => x.score >= 50)
+      if (direct.length && direct.length <= 8) {
+        for (const x of direct) score.set(x.ref, (score.get(x.ref) || 0) + 2)
+      }
+    }
     r.results.forEach((x, i) => {
-      const s = (x.score / 100 + (40 - i) / 160) * weight
+      const s = (x.score / 100 + (lim - i) / (4 * lim)) * weight
       score.set(x.ref, (score.get(x.ref) || 0) + s)
       if (!why.has(x.ref)) why.set(x.ref, new Set())
       why.get(x.ref).add(label)
     })
+  }
+  if (subjects.length && E.byRef) {
+    // The book's birth narratives live in birth-titled sections: they answer "how old" even
+    // when the subject is named there less often than in later discourses.
+    const subRe = new RegExp(`\\b(${subjects.map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`, 'i')
+    for (const [ref, p] of E.byRef) {
+      if (p.sectionTitle && p.sectionTitle.toLowerCase().includes('birth') && subRe.test(p.text)) {
+        score.set(ref, (score.get(ref) || 0) + 3)
+        if (!why.has(ref)) why.set(ref, new Set())
+        why.get(ref).add(`${subjects.join('/')} birth`)
+      }
+    }
   }
   const all = [...score.entries()].sort((a, b) => b[1] - a[1]).map(([ref]) => ref)
   // Where the book is silent: a word of the question that the book uses rarely or never.
