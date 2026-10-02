@@ -285,6 +285,8 @@ html.big .modes button, html.big .go, html.big .soft { font-size: 17px; }
 @media (max-width: 560px) {
   .bar { flex-wrap: wrap; }
   .bar-right { flex-wrap: wrap; gap: 8px; }
+  .topnav { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); width: 100%; }
+  .topnav button { padding: 11px 4px; font-size: 13px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .modes { grid-template-columns: repeat(2, 1fr); }
   .well-actions { width: 100%; }
   .well-actions .go { flex: 1; }
