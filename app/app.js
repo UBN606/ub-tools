@@ -11,6 +11,7 @@ import { askLabels, forwardText, toggleLangs } from './ask-format.js'
 import { detectLang } from './lang-detect.js'
 import { answerIn, buildByRef } from './ask-i18n.js'
 import { loadTranslation } from './load-translation.js'
+import { READ_LANG_KEY, normalizeReadLang, resolveReadParagraph, whereLine } from './read-lang.js'
 import { sendMissed } from './feedback.js'
 
 const $ = (id) => document.getElementById(id)
@@ -631,7 +632,37 @@ function renderList(items, { title, sub, empty, progressKey, read }) {
 }
 
 // ---------- the tablet ----------
-function openRef(ref) {
+// The Read tablet can show the official Spanish translation (Derek, 2026-10-02):
+// same refs, same prev/next, the browser downloads the text from urantia.org
+// on first use and caches it in IndexedDB. Nothing translated lives in the repo.
+let readLang = normalizeReadLang(store.get(READ_LANG_KEY, 'en'))
+let esByRef = null
+let esLoading = null
+let openRefSeq = 0
+async function ensureEs() {
+  if (esByRef) return esByRef
+  if (!esLoading) {
+    esLoading = loadTranslation('es', { authorProvider: englishAuthorFor })
+      .then((papers) => { esByRef = buildByRef(papers); return esByRef })
+      .catch((e) => { esLoading = null; throw e })
+  }
+  return esLoading
+}
+function paintLangRow() {
+  document.querySelectorAll('#t-lang-row .lang-pick').forEach((b) => {
+    const active = b.dataset.lang === readLang
+    b.setAttribute('aria-current', String(active))
+    b.disabled = active
+  })
+}
+async function setReadLang(lang) {
+  readLang = normalizeReadLang(lang)
+  store.set(READ_LANG_KEY, readLang)
+  paintLangRow()
+  if (current) await openRef(current)
+}
+async function openRef(ref) {
+  const seq = ++openRefSeq
   const exact = E.search.getParagraphs([ref])[0]
   current = ref
   store.set('last-read-ref', ref)
@@ -640,14 +671,30 @@ function openRef(ref) {
   const inner = document.querySelector('.tablet-inner')
   inner.style.animation = 'none'; void inner.offsetWidth; inner.style.animation = ''
   $('t-note').textContent = ''
-  if (exact.error) {
+  paintLangRow()
+  let resolved = resolveReadParagraph(ref, readLang, exact, esByRef)
+  if (readLang === 'es' && !esByRef) {
     $('t-ref').textContent = ref
     $('t-where').textContent = ''
-    $('t-text').textContent = `${exact.error}. References look like Paper:Section.Paragraph, for example 180:2.1.`
+    $('t-text').textContent = 'Loading the Spanish text\u2026'
+    try {
+      await ensureEs()
+    } catch (e) {
+      tNote("Couldn't load the Spanish text \u2014 check your connection and try again.")
+    }
+    if (seq !== openRefSeq || current !== ref) return
+    resolved = resolveReadParagraph(ref, readLang, exact, esByRef)
+    if (resolved.fallback && !resolved.par.error) tNote('Spanish text not found for this paragraph \u2014 showing English.')
+  }
+  const par = resolved.par
+  if (par.error) {
+    $('t-ref').textContent = ref
+    $('t-where').textContent = ''
+    $('t-text').textContent = `${par.error}. References look like Paper:Section.Paragraph, for example 180:2.1.`
   } else {
-    $('t-ref').textContent = exact.ref
-    $('t-where').textContent = `Paper ${exact.paper}, ${exact.paperTitle}. ${exact.section}. Page ${exact.page}.`
-    $('t-text').innerHTML = esc(exact.text).replace(/&lt;(\/?)(em|i|b|strong)&gt;/g, '<$1$2>')
+    $('t-ref').textContent = par.ref
+    $('t-where').textContent = whereLine(resolved)
+    $('t-text').innerHTML = esc(par.text).replace(/&lt;(\/?)(em|i|b|strong)&gt;/g, '<$1$2>')
   }
   const i = E.order.indexOf(ref)
   $('t-prev').disabled = i <= 0
@@ -661,6 +708,8 @@ function closeTablet() {
   $('panel').classList.remove('reading')
   document.querySelectorAll('[data-open]').forEach((b) => b.setAttribute('aria-current', 'false'))
 }
+document.querySelectorAll('#t-lang-row .lang-pick').forEach((b) =>
+  b.addEventListener('click', () => setReadLang(b.dataset.lang)))
 $('tablet-close').addEventListener('click', closeTablet)
 $('tablet').addEventListener('click', (e) => { if (e.target === $('tablet')) closeTablet() })
 addEventListener('keydown', (e) => { if (e.key === 'Escape' && current) closeTablet() })
