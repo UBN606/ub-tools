@@ -284,6 +284,7 @@ html.big .hint, html.big .answer .a-where { font-size: 17px; }
 html.big .modes button, html.big .go, html.big .soft { font-size: 17px; }
 @media (max-width: 560px) {
   .bar { flex-wrap: wrap; }
+  .bar-right { flex-wrap: wrap; gap: 8px; }
   .modes { grid-template-columns: repeat(2, 1fr); }
   .well-actions { width: 100%; }
   .well-actions .go { flex: 1; }
