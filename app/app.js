@@ -6,6 +6,7 @@ import { renderReadAlong } from './readalong.js'
 import { loadTopics, findTopics } from './topics.js'
 import { THEME_KEY, SIZE_KEY, SIZE_DEFAULT, resolveTheme, oppositeTheme, parseStoredTheme, parseStoredSize, stepSize, applyTheme, applySize, migrateLegacyBig, themeToggleState } from './a11y.js'
 import { answer, speech, listener, englishVoices, whenVoices, chooseVoice } from './ask.js'
+import { EDGE_VOICES, EDGE_DEFAULT, edgeOptionValue, edgeAvailable } from './edge-voices.js'
 import { sendMissed } from './feedback.js'
 
 const $ = (id) => document.getElementById(id)
@@ -199,9 +200,19 @@ whenVoices(() => {
   let saved = null
   try { saved = localStorage.getItem('voice') } catch {}
   const sel = $('voice')
-  sel.innerHTML = list.map((v) => `<option value="${esc(v.name)}">${esc(v.name.replace(/^Microsoft /, '').replace(/ Online \(Natural\).*$/, ' (natural)').replace(/ - English.*$/, ''))}</option>`).join('')
-  sel.value = list.some((v) => v.name === saved) ? saved : list[0].name
+  const localOpts = (edgeFirst) =>
+    list.map((v) => `<option value="${esc(v.name)}">${esc(v.name.replace(/^Microsoft /, '').replace(/ Online \(Natural\).*$/, ' (natural)').replace(/ - English.*$/, ''))}</option>`).join('')
+  const paint = (edgeVoices) => {
+    const edgeOpts = edgeVoices.map((v) => `<option value="${esc(edgeOptionValue(v.id))}">${esc(v.label)} (Edge)</option>`).join('')
+    sel.innerHTML = edgeOpts + localOpts()
+    const values = [...edgeVoices.map((v) => edgeOptionValue(v.id)), ...list.map((v) => v.name)]
+    sel.value = values.includes(saved) ? saved : (edgeVoices.length ? edgeOptionValue(EDGE_DEFAULT) : list[0].name)
+  }
+  paint([])
   $('voice-wrap').hidden = false
+  // The website's Edge neural voices (Andrew, Ava, …) appear at the top of the
+  // menu when its TTS endpoint answers; otherwise the menu stays device-only.
+  edgeAvailable().then((ok) => { if (ok) paint(EDGE_VOICES) })
 })
 $('voice').addEventListener('change', (e) => { chooseVoice(e.target.value); speech.say('This is how I will read to you.') })
 // --- display accessibility: theme + text size (see a11y.js) ---
@@ -305,8 +316,8 @@ $('p-stop').addEventListener('click', stopReading)
 $('p-prev').addEventListener('click', () => { if (player.i > 0) { player.gen++; speech.stop(); playAt(player.i - 1) } })
 $('p-next').addEventListener('click', () => { if (player.i < player.items.length - 1) { player.gen++; speech.stop(); playAt(player.i + 1) } })
 $('p-pause').addEventListener('click', () => {
-  if (player.paused) { speechSynthesis.resume(); player.paused = false; $('p-pause').textContent = 'Pause' }
-  else { speechSynthesis.pause(); player.paused = true; $('p-pause').textContent = 'Resume' }
+  if (player.paused) { speech.resume(); player.paused = false; $('p-pause').textContent = 'Pause' }
+  else { speech.pause(); player.paused = true; $('p-pause').textContent = 'Resume' }
 })
 addEventListener('keydown', (e) => { if (e.key === 'Escape' && player.items.length) stopReading() })
 addEventListener('pagehide', stopReading)

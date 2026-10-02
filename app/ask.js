@@ -2,6 +2,7 @@
 // be misquoted and nothing costs money. Everyday words are mapped to the book's own terms
 // ("heaven" -> mansion worlds, "conscience" -> Thought Adjuster), the tools' own search finds the
 // paragraphs, and the best few are shown whole, with citations, ready to be read aloud.
+import { edgeAudio, edgeVoiceId } from './edge-voices.js'
 
 // Everyday word -> the book's own terms. Add a line when a common question finds nothing.
 export const BOOK_TERMS = {
@@ -173,7 +174,30 @@ try { chosen = localStorage.getItem('voice') } catch {}
 export function chooseVoice(name) { chosen = name; try { localStorage.setItem('voice', name) } catch {} }
 export const speech = {
   ok: typeof speechSynthesis !== 'undefined',
+  _edge: null, // the playing Edge-voice <audio>, if any
   say(text, onEnd) {
+    this.stop()
+    const eid = edgeVoiceId(chosen)
+    if (eid) {
+      // Microsoft Edge neural voice via the website's TTS endpoint. Any failure
+      // (rate limit, offline, CORS) falls back to the device voice for this utterance.
+      this.speaking = true
+      this.onchange?.(true)
+      const done = () => { this.speaking = false; this.onchange?.(false); onEnd?.() }
+      edgeAudio(spoken(text), eid).then(
+        (audio) => {
+          this._edge = audio
+          audio.onended = () => { this._edge = null; done() }
+          audio.onerror = () => { this._edge = null; this.sayLocal(text, onEnd) }
+          audio.play().catch(() => { this._edge = null; this.sayLocal(text, onEnd) })
+        },
+        () => this.sayLocal(text, onEnd),
+      )
+      return
+    }
+    this.sayLocal(text, onEnd)
+  },
+  sayLocal(text, onEnd) {
     if (!this.ok) return
     speechSynthesis.cancel()
     const u = new SpeechSynthesisUtterance(spoken(text))
@@ -187,7 +211,22 @@ export const speech = {
     this.onchange?.(true)
     speechSynthesis.speak(u)
   },
-  stop() { if (this.ok) speechSynthesis.cancel(); if (this.speaking) { this.speaking = false; this.onchange?.(false) } },
+  pause() {
+    if (this._edge) this._edge.pause()
+    else if (this.ok) speechSynthesis.pause()
+  },
+  resume() {
+    if (this._edge) this._edge.play().catch(() => {})
+    else if (this.ok) speechSynthesis.resume()
+  },
+  stop() {
+    if (this.ok) speechSynthesis.cancel()
+    if (this._edge) {
+      this._edge.pause()
+      this._edge = null
+    }
+    if (this.speaking) { this.speaking = false; this.onchange?.(false) }
+  },
   speaking: false,
   onchange: null,
 }
