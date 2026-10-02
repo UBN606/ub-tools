@@ -522,7 +522,9 @@ html[data-theme="dark"] .chip{background:linear-gradient(160deg,#3B3E45,#33363D)
 html[data-theme="dark"] .tablet-inner{background:linear-gradient(165deg,#34373D,#2D3036)}
 html[data-theme="dark"] .player{background:linear-gradient(160deg,#36393F,#2E3138)}
 html[data-theme="dark"] .player .p-wrap{box-shadow:12px 16px 36px rgba(0,0,0,.5)}
-html[data-theme="dark"] .soft,html[data-theme="dark"] .close,html[data-theme="dark"] .mic,html[data-theme="dark"] .p-controls button,html[data-theme="dark"] .ra-select,html[data-theme="dark"] .voice-pick select,html[data-theme="dark"] .s-print,html[data-theme="dark"] .s-copy{background:linear-gradient(160deg,#3B3E45,#32353C)}
+html[data-theme="dark"] .soft,html[data-theme="dark"] .close,html[data-theme="dark"] .mic,html[data-theme="dark"] .p-controls button,html[data-theme="dark"] .ra-select,html[data-theme="dark"] #ra-file,html[data-theme="dark"] .voice-pick select,html[data-theme="dark"] .s-print,html[data-theme="dark"] .s-copy{background:linear-gradient(160deg,#3B3E45,#32353C)}
+html[data-theme="dark"] #ra-file::file-selector-button{background:linear-gradient(160deg,#43464D,#383B42);color:var(--ink);border:0;border-radius:10px;padding:8px 14px;margin-right:10px;cursor:pointer}
+#ra-file::file-selector-button{background:linear-gradient(160deg,#F9F8F6,#ECEAE6);color:var(--ink);border:0;border-radius:10px;padding:8px 14px;margin-right:10px;cursor:pointer}
 html[data-theme="dark"] .help{background:linear-gradient(165deg,#34373D,#2C2F35)}
 html[data-theme="dark"] .help{box-shadow:20px 24px 50px rgba(0,0,0,.5)}
 html[data-theme="dark"] .help::backdrop{background:rgba(8,9,12,.7)}
