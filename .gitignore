@@ -1,5 +1,8 @@
 # Downloaded by fetch-data.js from Urantiapedia (CC BY-SA 4.0); never committed here
 source-texts/
+# Official Foundation translation zips for local/dev Ask testing (rights);
+# the app fetches these at runtime — they must never be committed.
+app/i18n/
 node_modules/
 __pycache__/
 *.pyc
