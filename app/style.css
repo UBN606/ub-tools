@@ -367,6 +367,7 @@ html.big .share-btn { font-size: 18px; padding: 14px 17px; }
 @media (max-width: 560px) {
   .modes-thumb { display: none; }
   .modes button[aria-selected="true"] { background: linear-gradient(160deg, #FBFAF8, #EFEDE9); box-shadow: 4px 5px 10px var(--lift-dark), -3px -3px 7px var(--lift-light); }
+  html[data-theme="dark"] .modes button[aria-selected="true"] { background: linear-gradient(160deg, #3B3E45, #33363D); }
 }
 
 /* ---------- How to use ---------- */
@@ -525,6 +526,7 @@ html[data-theme="dark"] .soft,html[data-theme="dark"] .close,html[data-theme="da
 html[data-theme="dark"] .help{background:linear-gradient(165deg,#34373D,#2C2F35)}
 html[data-theme="dark"] .help{box-shadow:20px 24px 50px rgba(0,0,0,.5)}
 html[data-theme="dark"] .help::backdrop{background:rgba(8,9,12,.7)}
+html[data-theme="dark"] .go{background:linear-gradient(160deg,#46586F 0%,#3B5377 55%,#2E4260 100%)}
 html[data-theme="dark"] .tablet .tablet-inner{background:linear-gradient(165deg,#34373D,#2D3036)}
 @media (max-width:820px){html[data-theme="dark"] .tablet.open .tablet-backdrop{background:rgba(10,11,14,.6)}}
 html[data-theme="dark"] .answer li.now-reading,html[data-theme="dark"] .ra-para.ra-now-para{background:#33302A}
