@@ -285,8 +285,8 @@ html.big .modes button, html.big .go, html.big .soft { font-size: 17px; }
 @media (max-width: 560px) {
   .bar { flex-wrap: wrap; }
   .bar-right { flex-wrap: wrap; gap: 8px; }
-  .topnav { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); width: 100%; }
-  .topnav button { padding: 11px 4px; font-size: 13px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topnav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+  .topnav button { padding: 12px 8px; font-size: 14px; white-space: nowrap; }
   .modes { grid-template-columns: repeat(2, 1fr); }
   .well-actions { width: 100%; }
   .well-actions .go { flex: 1; }
@@ -425,7 +425,7 @@ html.big .a-why { font-size: 16px; }
 }
 .topnav button[aria-current="true"] { color: var(--ink); }
 .topnav-thumb {
-  position: absolute; z-index: 0; top: 5px; bottom: 5px; left: 5px; width: 0; border-radius: 12px;
+  position: absolute; z-index: 0; top: 5px; left: 5px; width: 0; height: 0; border-radius: 12px;
   background: linear-gradient(160deg, #FBFAF8, #EFEDE9);
   box-shadow: 4px 5px 10px var(--lift-dark), -3px -3px 7px var(--lift-light);
   transition: transform .35s cubic-bezier(.3, .9, .3, 1), width .35s cubic-bezier(.3, .9, .3, 1);
@@ -564,6 +564,14 @@ html[data-theme="dark"] .stop-bar,html[data-theme="dark"] .p-stop,html[data-them
 .e-row { padding: 10px 12px; border-radius: 14px; background: var(--paper);
   box-shadow: inset 2px 2px 5px var(--press-dark), inset -2px -2px 5px var(--press-light); }
 .e-row p { margin: 0 0 6px; }
+.e-browse { margin-top: 12px; }
+.e-browse > summary { cursor: pointer; list-style: none; text-align: center; }
+.e-browse > summary::-webkit-details-marker { display: none; }
+.e-az { margin-top: 10px; display: grid; gap: 14px; max-height: 320px; overflow-y: auto; padding-right: 4px; }
+.e-az-group h4 { margin: 0 0 6px; font: 700 15px/1.2 var(--sans); color: var(--lapis); }
+.e-az-name { display: inline-block; margin: 0 6px 6px 0; padding: 8px 12px; border: 0; border-radius: 999px; cursor: pointer;
+  font: 500 14px/1.2 var(--sans); color: var(--ink); background: var(--paper);
+  box-shadow: 2px 3px 6px var(--lift-dark), -2px -2px 5px var(--lift-light); }
 .e-kind { font-size: 12px; font-weight: 600; color: var(--lapis); text-transform: uppercase; letter-spacing: .04em; }
 .x-details { margin-top: 12px; }
 .x-details summary { list-style: none; display: inline-flex; }

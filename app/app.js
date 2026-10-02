@@ -115,7 +115,8 @@ function placeTopThumb() {
   const thumb = document.querySelector('.topnav-thumb')
   if (!on || !thumb) return
   thumb.style.width = `${on.offsetWidth}px`
-  thumb.style.transform = `translateX(${on.offsetLeft - 5}px)`
+  thumb.style.height = `${on.offsetHeight}px`
+  thumb.style.transform = `translate(${on.offsetLeft - 5}px, ${on.offsetTop - 5}px)`
 }
 function initView(v) {
   if (v === 'explore') renderExploreView($('explore-slab'), { esc, openRef, copyText, setView })

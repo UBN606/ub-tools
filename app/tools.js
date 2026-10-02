@@ -91,6 +91,10 @@ function entityCard(t, esc) {
       <label class="sr" for="e-q">Look up a name</label>
       <input id="e-q" type="search" placeholder="Try Gabriel or Jerusalem" autocomplete="off">
       <div class="e-results" id="e-results" aria-live="polite"><p class="why">Type a name above.</p></div>
+      <details class="e-browse">
+        <summary class="soft">Browse everyone A–Z</summary>
+        <div class="e-az" id="e-az"><p class="why">Loading…</p></div>
+      </details>
     </div>
   </div>`
 }
@@ -158,4 +162,35 @@ export async function renderToolsView(box, { esc, setView, openRef }) {
       b.addEventListener('click', () => { setView('read'); openRef(b.dataset.ref) }))
   }
   input.addEventListener('input', draw)
+
+  // --- who's-who A–Z browse ---
+  const az = grid.querySelector('#e-az')
+  if (az && entries.length) {
+    const sorted = [...entries].sort((a, b) => a.name.localeCompare(b.name))
+    const groups = new Map()
+    for (const e of sorted) {
+      const letter = (e.name[0] || '#').toUpperCase()
+      if (!groups.has(letter)) groups.set(letter, [])
+      groups.get(letter).push(e)
+    }
+    az.innerHTML = [...groups].map(([letter, list]) => `
+      <div class="e-az-group">
+        <h4>${esc(letter)}</h4>
+        ${list.map((e, i) => `<button type="button" class="e-az-name" data-az="${esc(letter)}-${i}">${esc(e.name)}</button>`).join('')}
+      </div>`).join('')
+    const showEntry = (e) => {
+      results.innerHTML = `<div class="e-row">
+        <p><strong>${esc(e.name)}</strong> <span class="e-kind">${esc(e.kind)}</span></p>
+        ${e.note ? `<p class="why">${esc(e.note)}</p>` : ''}
+        <div class="x-actions">${e.refs.map((r) => `<button type="button" class="soft" data-ref="${esc(r)}">Read ${esc(r)}</button>`).join('')}</div>
+      </div>`
+      results.querySelectorAll('[data-ref]').forEach((b) =>
+        b.addEventListener('click', () => { setView('read'); openRef(b.dataset.ref) }))
+      results.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    }
+    az.querySelectorAll('.e-az-name').forEach((b) => {
+      const [letter, idx] = b.dataset.az.split('-')
+      b.addEventListener('click', () => showEntry(groups.get(letter)[+idx]))
+    })
+  }
 }
