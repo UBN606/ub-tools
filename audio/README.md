@@ -156,6 +156,27 @@ window where highlighting feels locked to the voice.
 Lesson for the full run: **low-confidence paragraphs are guilty until proven
 innocent** — each one gets a second-model check before it ships.
 
+## Full-book alignment run (October 2026)
+
+All **197 papers** were aligned on the ASUS laptop (faster-whisper
+`small`+`base` paragraph fusion, same pipeline as the v1 sample) against the
+Urantia Foundation unabridged reading, and harvested into `aligned/`:
+
+- **1,085,092 book words** with timestamps; **96.7%** carry measured
+  transcription timestamps (`x: true`), the rest are interpolated estimates
+  (`x: false`).
+- Mean paper exact-match rate **96.9%**. Automated QC passed 189 papers.
+- The 5 QC "FAIL"s (papers 31, 56, 120, 134, 144) are false alarms: each is
+  only missing a decorative `* * *` separator paragraph
+  (e.g. `31:10.21b`) that the narrator doesn't read — no spoken words are
+  unaccounted for. The lowest-confidence paragraph in the set is `0:12.10`,
+  the single word "*Acknowledgment*" (a heading absorbed into surrounding
+  narration, flagged `x: false`).
+- 1,358 QC warnings (speaking-rate / confidence flags) were logged during
+  the run; the flagged paragraphs are kept with their `x` flags intact —
+  low-confidence paragraphs remain guilty until proven innocent
+  (`qc_clips.py` for the human listening pass).
+
 ## Scaling to all 197 papers
 
 Measured on this VM (2 CPUs, faster-whisper `small`): Paper 1 (45.1 min
