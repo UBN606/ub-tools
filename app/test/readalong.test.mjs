@@ -174,3 +174,20 @@ test('wordAtTime works across the synthetic fixture', () => {
   assert.equal(wordAtTime(words, 2.75), 7)
   assert.equal(wordAtTime(words, 99), words.length - 1)
 })
+
+// ---------- audioUrlForPaper (built-in narration stream) ----------
+
+import { audioUrlForPaper } from '../readalong.js'
+
+test('audioUrlForPaper: Foreword and Papers map to the UF24K mirror files', () => {
+  assert.equal(audioUrlForPaper(0), 'https://truthbook.com/wp-content/uploads/AudioFiles/UF24K/U0.mp3')
+  assert.equal(audioUrlForPaper(1), 'https://truthbook.com/wp-content/uploads/AudioFiles/UF24K/U1.mp3')
+  assert.equal(audioUrlForPaper(196), 'https://truthbook.com/wp-content/uploads/AudioFiles/UF24K/U196.mp3')
+})
+
+test('audioUrlForPaper: out-of-range paper numbers return null', () => {
+  assert.equal(audioUrlForPaper(-1), null)
+  assert.equal(audioUrlForPaper(197), null)
+  assert.equal(audioUrlForPaper(1.5), null)
+  assert.equal(audioUrlForPaper('1'), null)
+})

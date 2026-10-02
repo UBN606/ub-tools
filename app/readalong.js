@@ -1,9 +1,14 @@
 // readalong.js — read-along player: word-by-word highlighting synced to
-// HUMAN narration audio that the listener downloads themselves.
+// HUMAN narration audio that plays right in the page. No downloads, no
+// file-picking: press Play and the words light up.
 //
-// Rights model: this repo NEVER hosts audio. The player fetches only
-// ../audio/aligned/DocNNN.json (word timestamps, our own computed data),
-// and the user supplies their own MP3 via <input type="file">. The file is
+// Rights model: this repo NEVER hosts audio. The player streams the
+// narration from TruthBook's mirror of the Foundation's unabridged reading
+// (https://truthbook.com/wp-content/uploads/AudioFiles/UF24K/U0.mp3 …
+// U196.mp3 — the exact files the alignment run downloaded, so the timings
+// match byte-for-byte) and fetches only ../audio/aligned/DocNNN.json (word
+// timestamps, our own computed data). A "use your own audio file" fallback
+// remains for anyone with a different copy of the paper's MP3; that file is
 // played from a local object URL — nothing is uploaded anywhere.
 //
 // Data schema (audio/aligned/DocNNN.json, written by audio/align.py):
@@ -20,6 +25,15 @@ const ALIGNMENT_URL = (paperNum) =>
   new URL(`../audio/aligned/Doc${String(paperNum).padStart(3, '0')}.json`, import.meta.url)
 
 const MAX_PAPER = 196 // 0 = Foreword, 1..196 = Papers 1..196
+
+// The narration stream: the UF24K mirror files the alignment run downloaded
+// (see audio/SOURCES.md). Timings are valid only for this recording.
+// Pure function, tested in app/test/readalong.test.mjs.
+const NARRATION_HOST = 'https://truthbook.com/wp-content/uploads/AudioFiles/UF24K'
+export function audioUrlForPaper(paperNum) {
+  if (!Number.isInteger(paperNum) || paperNum < 0 || paperNum > MAX_PAPER) return null
+  return `${NARRATION_HOST}/U${paperNum}.mp3`
+}
 
 // ---------- loading ----------
 
@@ -139,7 +153,7 @@ export function renderReadAlong(container, E, deps = {}) {
 
   container.innerHTML = `
 <div class="ra">
-  <p class="ra-why">Follow the book's own words as a human narrator reads them. Your MP3 stays on your computer — nothing is uploaded.</p>
+  <p class="ra-why">Follow the book's own words as the human narrator reads them — press Play and the words light up in sync.</p>
   <div class="ra-controls">
     <label class="ra-label">Paper
       <select id="ra-paper" class="ra-select">${papers
@@ -150,10 +164,7 @@ export function renderReadAlong(container, E, deps = {}) {
   <p class="ra-status" id="ra-status" role="status" aria-live="polite"></p>
   <div class="ra-sync" id="ra-sync" hidden>
     <div class="ra-controls">
-      <label class="ra-label">Your MP3 for this paper
-        <input id="ra-file" type="file" accept="audio/*">
-      </label>
-      <button type="button" class="soft" id="ra-play">Play</button>
+      <button type="button" class="soft strong" id="ra-play">▶ Play</button>
       <button type="button" class="soft" id="ra-stop">Stop</button>
       <label class="ra-label">Speed
         <select id="ra-rate" class="ra-select">
@@ -165,9 +176,15 @@ export function renderReadAlong(container, E, deps = {}) {
         </select>
       </label>
     </div>
-    <p class="ra-why">No MP3 yet? <a href="https://www.urantia.org/audio" target="_blank" rel="noopener">Download the free human-narrated reading</a>, then choose the paper's file above.</p>
     <audio id="ra-audio" class="ra-audio" controls preload="metadata"></audio>
     <div class="ra-text" id="ra-text"></div>
+    <details class="ra-own">
+      <summary>Use your own audio file instead</summary>
+      <label class="ra-label">Choose an MP3 of this paper
+        <input id="ra-file" type="file" accept="audio/*">
+      </label>
+      <button type="button" class="soft" id="ra-builtin">Back to the built-in narration</button>
+    </details>
   </div>
   <div class="ra-fallback" id="ra-fallback" hidden>
     <p id="ra-fallback-msg"></p>
@@ -223,7 +240,7 @@ export function renderReadAlong(container, E, deps = {}) {
     textBox.replaceChildren(frag)
     const estimates = flat.length && flat.some((f) => f.span.dataset.x === '0')
     say(
-      `Word timings loaded for ${paperLabel(papers.find((x) => x.n === paperNum) || { n: paperNum, title: '' })} — ${flat.length.toLocaleString()} words. Choose your MP3, then press Play.` +
+      `Word timings loaded for ${paperLabel(papers.find((x) => x.n === paperNum) || { n: paperNum, title: '' })} — ${flat.length.toLocaleString()} words. Press Play.` +
         (estimates ? ' Fainter highlights are timing estimates, not measured from the voice.' : ''),
     )
   }
@@ -278,6 +295,7 @@ export function renderReadAlong(container, E, deps = {}) {
     playing = null
     syncBox.hidden = false
     renderParagraphs(data, paperNum)
+    useBuiltIn(paperNum)
   }
 
   on(paperSel, 'change', () => {
@@ -295,12 +313,25 @@ export function renderReadAlong(container, E, deps = {}) {
     )
   })
 
-  // ---- audio (local object URL only) ----
+  // ---- audio: built-in narration stream, with "your own file" fallback ----
   audio = container.querySelector('#ra-audio')
   const fileInput = container.querySelector('#ra-file')
   const playBtn = container.querySelector('#ra-play')
   const stopBtn = container.querySelector('#ra-stop')
   const rateSel = container.querySelector('#ra-rate')
+  const ownBox = container.querySelector('.ra-own')
+
+  // Point the player at the built-in narration for this paper. A custom file
+  // belongs to one paper, so changing papers always returns to the stream.
+  function useBuiltIn(paperNum) {
+    if (audioURL) {
+      URL.revokeObjectURL(audioURL)
+      audioURL = null
+    }
+    fileInput.value = ''
+    audio.src = audioUrlForPaper(paperNum)
+    audio.playbackRate = Number(rateSel.value)
+  }
 
   on(fileInput, 'change', () => {
     const f = fileInput.files && fileInput.files[0]
@@ -311,11 +342,12 @@ export function renderReadAlong(container, E, deps = {}) {
     audio.playbackRate = Number(rateSel.value)
     say(`Loaded “${f.name}”. Press Play — the words will light up in sync.`)
   })
+  on(container.querySelector('#ra-builtin'), 'click', () => {
+    useBuiltIn(Number(paperSel.value))
+    say('Back to the built-in narration. Press Play.')
+  })
   on(playBtn, 'click', () => {
-    if (!audio.src) {
-      say('Choose your MP3 file first.')
-      return
-    }
+    if (!audio.getAttribute('src')) useBuiltIn(Number(paperSel.value))
     if (audio.paused) audio.play()
     else audio.pause()
   })
@@ -337,6 +369,11 @@ export function renderReadAlong(container, E, deps = {}) {
   on(audio, 'ended', clearHighlight)
   on(audio, 'play', () => { playBtn.textContent = 'Pause' })
   on(audio, 'pause', () => { playBtn.textContent = 'Play' })
+  on(audio, 'error', () => {
+    // The stream failed (offline, mirror hiccup). Offer the file fallback.
+    say('The built-in narration would not load — check your connection, or use your own audio file below.')
+    ownBox.open = true
+  })
 
   load(Number(paperSel.value))
 

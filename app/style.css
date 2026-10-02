@@ -460,6 +460,10 @@ html.big .a-why { font-size: 16px; }
 .ra-word.ra-now { background: #F6E7C1; box-shadow: inset 0 -3px 0 var(--fix); }
 .ra-word[data-x="0"].ra-now { background: #F1EAD9; box-shadow: inset 0 -3px 0 rgba(138,90,31,.35); }
 .ra-fallback p { color: var(--graphite); font-size: 16px; max-width: 60ch; }
+.ra-own { margin: 14px 0 4px; }
+.ra-own summary { cursor: pointer; font: 600 14px/1.4 var(--sans); color: var(--graphite); }
+.ra-own .ra-label { margin: 10px 12px 10px 0; }
+.ra-own #ra-builtin { margin-left: 8px; }
 html.big .ra-text-line { font-size: 24px; }
 html.big .ra-select, html.big .ra-label { font-size: 18px; }
 
