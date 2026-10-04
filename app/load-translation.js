@@ -19,6 +19,7 @@ export const TRANSLATION_URLS = {
   es: 'https://www.urantia.org/sites/default/files/book/es/uf-spa-419-1993-1.9-txt.zip',
   fr: 'https://www.urantia.org/sites/default/files/book/fr/uf-fre-001-1960-3.5-txt.zip',
   ko: 'https://www.urantia.org/sites/default/files/book/ko/uf-kor-001-2000-1.4-txt.zip',
+  pl: 'https://www.urantia.org/sites/default/files/book/pl/uf-pol-001-2010-1.5-txt.zip',
 }
 // Optional same-origin copies for local/dev use (never committed to the repo —
 // see .gitignore). Tried before the network so the feature works fully offline
@@ -27,13 +28,14 @@ export const LOCAL_URLS = {
   es: './i18n/ub-i18n-es.zip',
   fr: './i18n/ub-i18n-fr.zip',
   ko: './i18n/ub-i18n-ko.zip',
+  pl: './i18n/ub-i18n-pl.zip',
 }
 const CORS_PROXIES = [
   (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
   (url) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
 ]
 
-const LANG_NAMES = { es: 'Spanish', fr: 'French', ko: 'Korean' }
+const LANG_NAMES = { es: 'Spanish', fr: 'French', ko: 'Korean', pl: 'Polish' }
 const LOAD_ERROR = (lang) =>
   `Couldn't load the ${LANG_NAMES[lang] || ''} text — check your connection and try again.`.replace('  ', ' ')
 

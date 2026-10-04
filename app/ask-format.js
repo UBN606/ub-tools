@@ -60,6 +60,19 @@ export const ASK_LABELS = {
     via: 'UB Tools Studio 제공',
     alsoIn: '다른 언어로 보기:',
   },
+  pl: {
+    head: 'Co mówi książka',
+    theAnswer: 'Odpowiedź książki',
+    more: 'Więcej z tego, co mówi książka',
+    book: 'Księga Urantii',
+    copyAnswer: 'Kopiuj odpowiedź',
+    copied: 'Skopiowano',
+    empty: 'Książka nie mówi o tym w tych słowach. Spróbuj zapytać innymi słowami.',
+    garbled: 'To nie brzmiało wyraźnie. Spróbuj zapytać inaczej.',
+    foundWhy: 'Znaleziono, ponieważ mówi o:',
+    via: 'przez UB Tools Studio',
+    alsoIn: 'Także w:',
+  },
 }
 
 export const askLabels = (lang) => ASK_LABELS[lang] || ASK_LABELS.en
@@ -67,7 +80,7 @@ export const askLabels = (lang) => ASK_LABELS[lang] || ASK_LABELS.en
 // The language toggle row under an answer: every Ask language but the current
 // one, in plain words, no flags. [{ code, label }]
 export function toggleLangs(current) {
-  const order = ['en', 'es'] // FR/KO ship after ranking review
+  const order = ['en', 'es', 'pl'] // FR/KO ship after ranking review
   return order.filter((l) => l !== current).map((code) => ({
     code,
     label: code === 'en' ? 'English' : LANGS[code].label,

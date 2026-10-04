@@ -12,6 +12,10 @@ const foldAccent = (s) => s.toLowerCase()
   .replace(/[áàäâ]/g, 'a').replace(/[éèëê]/g, 'e').replace(/[íìïî]/g, 'i')
   .replace(/[óòöô]/g, 'o').replace(/[úùüû]/g, 'u').replace(/ñ/g, 'n').replace(/ç/g, 'c')
   .replace(/œ/g, 'oe')
+const foldPl = (s) => s.toLowerCase()
+  .replace(/ą/g, 'a').replace(/ć/g, 'c').replace(/ę/g, 'e')
+  .replace(/ł/g, 'l').replace(/ń/g, 'n').replace(/ó/g, 'o')
+  .replace(/ś/g, 's').replace(/ź/g, 'z').replace(/ż/g, 'z')
 // Korean: strip the particles endings leave on words (하나님은 -> 하나님), so the
 // question's words meet the book's words. Only when the stem stays meaningful.
 const KO_ENDINGS = ['에서는', '에게는', '에서', '에게', '한테', '부터', '까지', '으로', '로', '와', '과',
@@ -137,6 +141,90 @@ export const LANGS = {
     minLen: 2, distinctiveLen: 3, rareLen: 4, parenMinLen: 2,
     bStart: '(?<![\\p{L}\\p{N}])', bCont: '[\\p{L}\\p{N}]*', bEnd: '(?![\\p{L}\\p{N}])',
     flags: 'giu', splitRe: /[^\p{L}\p{N}]+/u,
+  },
+pl: {
+    label: 'Polski', name: 'Polish',
+    fold: foldPl, foldWord: (w) => w,
+    STOP: new Set(('i w z do na nie sie jest sa to ten ta te ci te tamten tamta tamto ow owa owo ' +
+      'ktory ktora ktore jaki jaka jakie czyj czyja czyje moj moja moje twoj twoja twoje swoj swoja swoje ' +
+      'nasz nasza nasze wasz wasza wasze jego jej ich sobie siebie ' +
+      'jak co gdzie kiedy dlaczego czy ale oraz lub albo ani ni az aby zeby gdyby jesli jezeli gdy poki dopoki zanim ' +
+      'poniewaz dlatego wiec juz jeszcze tylko takze moze musi mozna bardzo tez rowniez malo duzo wiele kilka ' +
+      'wszyscy wszystko kazdy zadna nikt nic ktos cos ' +
+      'od dla przez przy po pod nad przed za bez mimo oprocz wsrod miedzy ' +
+      'a o u e teraz tutaj tam wtedy zawsze nigdy czesto rzadko ' +
+      'sam sama samo byl byla bylo beda bede bedziesz bedzie bedziemy bedziecie ' +
+      'jestem jestes jestesmy jestescie ma maja miec mam masz mamy macie ' +
+      'pana pani prosze dziekuje przepraszam tak nie').split(' ')),
+    QUESTION_WORDS: new Set(('co kto kiedy gdzie jak dlaczego czy ile ktory ktora ktore czym kim czego komu czemu ' +
+      'skad dokad jaki jaka jakie czyj czyja czyje po co na co ile lat w jakim wieku co to jest kto to jest ' +
+      'jak to dlaczego tak prosze wyjasnij wyjasnij opowiedz powiedz mi znaczy znaczenie definicja ' +
+      'ksiega urantii urantia księga').split(' ')),
+    BOOK_TERMS: {
+      bog: ['Bóg', 'Ojciec'], boga: ['Bóg', 'Ojciec'], bogiem: ['Bóg', 'Ojciec'], bogu: ['Bóg', 'Ojciec'],
+      ojciec: ['Ojciec', 'Bóg'], ojca: ['Ojciec', 'Bóg'], ojcu: ['Ojciec', 'Bóg'],
+      stworca: ['Stwórca', 'Bóg'], stworce: ['Stwórca', 'Bóg'],
+      dusza: ['dusza'], duszy: ['dusza'], dusze: ['dusza'],
+      duch: ['duch'], ducha: ['duch'], duchem: ['duch'],
+      aniol: ['anioł'], aniola: ['anioł'], aniolowie: ['anioł'], aniolow: ['anioł'],
+      niebo: ['niebo'], niebie: ['niebo'], niebios: ['niebo'], niebiosa: ['niebo'],
+      pieklo: ['piekło'], piekle: ['piekło'],
+      raj: ['Raj'], raju: ['Raj'],
+      milosc: ['miłość'], milosci: ['miłość'], kochac: ['miłość'], kocha: ['miłość'],
+      modlitwa: ['modlitwa'], modlitwy: ['modlitwa'], modlic: ['modlitwa'], modle: ['modlitwa'],
+      wiara: ['wiara'], wiary: ['wiara'], wierzyc: ['wiara'], wierze: ['wiara'],
+      grzech: ['grzech'], grzechu: ['grzech'], grzechy: ['grzech'],
+      zlo: ['zło'], zla: ['zło'],
+      diabel: ['diabeł'], diabla: ['diabeł'],
+      szatan: ['szatan'], szatana: ['szatan'],
+      przebaczenie: ['przebaczenie'], przebaczyc: ['przebaczenie'], wybaczyc: ['przebaczenie'],
+      cierpienie: ['cierpienie'], cierpiec: ['cierpienie'], cierpi: ['cierpienie'],
+      bol: ['ból'], bolu: ['ból'],
+      smierc: ['śmierć', 'życie wieczne'], smierci: ['śmierć', 'życie wieczne'],
+      umrzec: ['śmierć', 'życie wieczne'], umiera: ['śmierć', 'życie wieczne'],
+      umierac: ['śmierć', 'życie wieczne'], zmarl: ['śmierć', 'życie wieczne'],
+      zycie: ['życie'], zycia: ['życie'], zyciu: ['życie'],
+      wiecznosc: ['wieczność', 'życie wieczne'], wieczny: ['wieczność'], wieczna: ['wieczność'],
+      jezus: ['Jezus'], jezusa: ['Jezus'], jezusie: ['Jezus'],
+      chrystus: ['Chrystus'], chrystusa: ['Chrystus'],
+      syn: ['Syn'], syna: ['Syn'],
+      apostol: ['apostoł'], apostolowie: ['apostoł'],
+      uczen: ['uczeń'], uczniowie: ['uczeń'],
+      krolestwo: ['królestwo'], krolestwa: ['królestwo'],
+      prawda: ['prawda'], prawdy: ['prawda'],
+      dobro: ['dobro'], dobra: ['dobro'],
+      piekno: ['piękno'], piekna: ['piękno'],
+      osobowosc: ['osobowość'], osobowosci: ['osobowość'],
+      sumienie: ['sumienie'], sumienia: ['sumienie'],
+      mysl: ['myśl'], mysli: ['myśl'],
+      wszechswiat: ['wszechświat'], wszechswiata: ['wszechświat'],
+      urantia: ['Urantia'], urantii: ['Urantia'],
+      ksiega: ['Księga'], ksiegi: ['Księga'],
+      filozofia: ['filozofia'], filozofii: ['filozofia'],
+      malzenstwo: ['małżeństwo'], malzenstwa: ['małżeństwo'],
+      rodzina: ['rodzina'], rodziny: ['rodzina'],
+      dzieci: ['dzieci'], dziecko: ['dzieci'],
+      adam: ['Adam'], adama: ['Adam'],
+      ewa: ['Ewa'], ewy: ['Ewa'],
+      szczescie: ['szczęście'], szczescia: ['szczęście'],
+      strach: ['strach'], strachu: ['strach'],
+      cud: ['cud'], cuda: ['cud'], cudow: ['cud'],
+      uzdrowienie: ['uzdrowienie'],
+      cel: ['cel'], celu: ['cel'],
+      sens: ['sens'], sensu: ['sens'],
+      'ile lat': ['narodziny', 'urodzony'], 'w jakim wieku': ['narodziny', 'urodzony'],
+    },
+    GLUE: new Set(('robic robi zrobic zrobi isc idzie pojsc przyjsc odejsc chciec chce wiedziec wie ' +
+      'myslec mysli dawac daje mowic mowi widziec widzi slyszec slyszy czuc czuje ' +
+      'zyc zyje umierac umiera wierzyc wierzy kochac kocha modlic modli prosic prosi ' +
+      'pytac pyta szukac szuka znalezc znajduje powiedziec powie ' +
+      'jest sa byl byla bylo beda byc miec ma maja moze musi mozna trzeba ' +
+      'to ten ta te co jak gdzie kiedy dlaczego czy ktory ktora ktore').split(' ')),
+    ageRe: /ile lat|w jakim wieku/i,
+    birthTerms: ['narodziny', 'urodzony'], birthTitleRe: /narodziny/i,
+    subjectRe: /^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+$/,
+    minLen: 3, distinctiveLen: 5, rareLen: 8, parenMinLen: 7,
+    bStart: '\\b', bCont: '\\w*', bEnd: '\\b', flags: 'gi', splitRe: /[^a-z0-9']+/,
   },
 }
 

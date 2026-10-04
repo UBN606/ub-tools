@@ -334,7 +334,6 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) stopR
 
 // ---------- ask ----------
 function runAsk(q, max = 5, lang = 'en') {
-  if (lang === 'pl') return runAskPolishFallback(q)
   if (lang !== 'en') return runAskI18n(q, max, lang)
   stopReading()
   const L = askLabels(lang)
@@ -350,17 +349,8 @@ const ASK_LOADING = {
   es: 'Cargando el texto en espa\u00f1ol\u2026',
   fr: 'Chargement du texte fran\u00e7ais\u2026',
   ko: '\ud55c\uad6d\uc5b4 \ud14d\uc2a4\ud2b8\ub97c \ubd88\ub7ec\uc624\ub294 \uc911\u2026',
+  pl: 'Wczytywanie polskiego tekstu\u2026',
 }
-// Polish is detected but the Polish text is not available yet: say so plainly
-// in Polish, and offer English or Spanish, instead of failing silently.
-function runAskPolishFallback(q) {
-  stopReading()
-  const box = $('results')
-  box.innerHTML = `<div class="summary"><h2>Po polsku — wkrótce</h2>
-    <p>Studio nie mówi jeszcze po polsku. Spróbuj zapytać po angielsku lub hiszpańsku.</p>
-    <p class="why">The Studio does not have the Polish text yet. Try asking in English or Spanish.</p></div>`
-}
-
 async function runAskI18n(q, max, lang) {
   stopReading()
   const L = askLabels(lang)
@@ -649,21 +639,22 @@ function renderList(items, { title, sub, empty, progressKey, read }) {
 }
 
 // ---------- the tablet ----------
-// The Read tablet can show the official Spanish translation (Derek, 2026-10-02):
+// The Read tablet can show official translations (Derek, 2026-10-02):
 // same refs, same prev/next, the browser downloads the text from urantia.org
 // on first use and caches it in IndexedDB. Nothing translated lives in the repo.
 let readLang = normalizeReadLang(store.get(READ_LANG_KEY, 'en'))
-let esByRef = null
-let esLoading = null
+const i18nByRef = { es: null, pl: null }
+const i18nLoading = { es: null, pl: null }
+const I18N_NAMES = { es: 'Spanish', pl: 'Polish' }
 let openRefSeq = 0
-async function ensureEs() {
-  if (esByRef) return esByRef
-  if (!esLoading) {
-    esLoading = loadTranslation('es', { authorProvider: englishAuthorFor })
-      .then((papers) => { esByRef = buildByRef(papers); return esByRef })
-      .catch((e) => { esLoading = null; throw e })
+async function ensureI18n(lang) {
+  if (i18nByRef[lang]) return i18nByRef[lang]
+  if (!i18nLoading[lang]) {
+    i18nLoading[lang] = loadTranslation(lang, { authorProvider: englishAuthorFor })
+      .then((papers) => { i18nByRef[lang] = buildByRef(papers); return i18nByRef[lang] })
+      .catch((e) => { i18nLoading[lang] = null; throw e })
   }
-  return esLoading
+  return i18nLoading[lang]
 }
 function paintLangRow() {
   document.querySelectorAll('#t-lang-row .lang-pick').forEach((b) => {
@@ -689,19 +680,19 @@ async function openRef(ref) {
   inner.style.animation = 'none'; void inner.offsetWidth; inner.style.animation = ''
   $('t-note').textContent = ''
   paintLangRow()
-  let resolved = resolveReadParagraph(ref, readLang, exact, esByRef)
-  if (readLang === 'es' && !esByRef) {
+  let resolved = resolveReadParagraph(ref, readLang, exact, i18nByRef[readLang])
+  if ((readLang === 'es' || readLang === 'pl') && !i18nByRef[readLang]) {
     $('t-ref').textContent = ref
     $('t-where').textContent = ''
-    $('t-text').textContent = 'Loading the Spanish text\u2026'
+    $('t-text').textContent = `Loading the ${I18N_NAMES[readLang]} text\u2026`
     try {
-      await ensureEs()
+      await ensureI18n(readLang)
     } catch (e) {
-      tNote("Couldn't load the Spanish text \u2014 check your connection and try again.")
+      tNote(`Couldn't load the ${I18N_NAMES[readLang]} text \u2014 check your connection and try again.`)
     }
     if (seq !== openRefSeq || current !== ref) return
-    resolved = resolveReadParagraph(ref, readLang, exact, esByRef)
-    if (resolved.fallback && !resolved.par.error) tNote('Spanish text not found for this paragraph \u2014 showing English.')
+    resolved = resolveReadParagraph(ref, readLang, exact, i18nByRef[readLang])
+    if (resolved.fallback && !resolved.par.error) tNote(`${I18N_NAMES[readLang]} text not found for this paragraph \u2014 showing English.`)
   }
   const par = resolved.par
   if (par.error) {

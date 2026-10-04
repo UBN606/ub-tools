@@ -202,13 +202,14 @@ test('official translation URLs point at urantia.org zips', () => {
   for (const [lang, url] of Object.entries(TRANSLATION_URLS)) {
     assert.match(url, /^https:\/\/(www\.)?urantia\.org\/.*-txt\.zip$/, `bad URL for ${lang}`)
   }
-  assert.equal(Object.keys(TRANSLATION_URLS).sort().join(','), 'es,fr,ko')
+  assert.equal(Object.keys(TRANSLATION_URLS).sort().join(','), 'es,fr,ko,pl')
 })
 
 test('toggleLangs skips the current language and names the rest plainly', () => {
-  // Spanish-only for now; FR/KO return after ranking review
-  assert.deepEqual(toggleLangs('es').map((t) => t.code), ['en'])
-  assert.deepEqual(toggleLangs('es').map((t) => t.label), ['English'])
-  assert.deepEqual(toggleLangs('en').map((t) => t.code), ['es'])
-  assert.deepEqual(toggleLangs('en').map((t) => t.label), ['Español'])
+  // ES and PL ship; FR/KO return after ranking review
+  assert.deepEqual(toggleLangs('es').map((t) => t.code), ['en', 'pl'])
+  assert.deepEqual(toggleLangs('es').map((t) => t.label), ['English', 'Polski'])
+  assert.deepEqual(toggleLangs('en').map((t) => t.code), ['es', 'pl'])
+  assert.deepEqual(toggleLangs('en').map((t) => t.label), ['Español', 'Polski'])
+  assert.deepEqual(toggleLangs('pl').map((t) => t.code), ['en', 'es'])
 })
