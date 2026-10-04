@@ -5,7 +5,7 @@
 // when the shell changes.
 'use strict'
 
-const VERSION = 'ub-tools-v18'
+const VERSION = 'ub-tools-v19'
 const SHELL_CACHE = VERSION + '-shell'
 const TEXT_CACHE = VERSION + '-text'
 const MAX_TEXT_ENTRIES = 250
@@ -16,7 +16,7 @@ const SHELL = [
   './quiz.js', './plans.js', './readalong.js', './deep-link.js', './a11y.js',
   './share.js', './topics.js', './ask.js', './ask-format.js', './embed-quote.js', './edge-voices.js',
   './lang-detect.js', './parse-i18n.js', './ask-i18n.js', './load-translation.js',
-  './read-lang.js',
+  './read-lang.js', './study-tracks.js',
   './plans-data.json', './quiz-bank.json', './pronounce.json', './ubn-articles.json',
   './icons/icon-192.png', './icons/icon-512.png',
 ]
