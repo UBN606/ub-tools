@@ -70,6 +70,9 @@ loadEngine((done, total, source) => {
   status.classList.add('ready')
   loadTopics().catch(() => {})
   renderReadAlong($('listen-slab'), E, { esc, store, startReading, setView })
+  // One voice at a time: when the read-along narration starts, stop any TTS
+  // voice (the reverse direction — TTS stopping narration — is in speech.stop()).
+  document.addEventListener('readalong:playing', () => speech.stopTTS())
   $('groove').classList.add('done')
   for (const el of [$('q'), $('draft'), $('go')]) el.disabled = false
   $('q').focus()

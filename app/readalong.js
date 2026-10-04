@@ -320,6 +320,12 @@ export function renderReadAlong(container, E, deps = {}) {
   const stopBtn = container.querySelector('#ra-stop')
   const rateSel = container.querySelector('#ra-rate')
   const ownBox = container.querySelector('.ra-own')
+  // One voice at a time: when the narration starts, tell the app to stop any
+  // TTS voice. (The app answers with speech.stopTTS(); the event pattern
+  // matches the existing 'readalong:tts-request' below.)
+  on(audio, 'play', () => {
+    container.dispatchEvent(new CustomEvent('readalong:playing', { bubbles: true }))
+  })
 
   // Point the player at the built-in narration for this paper. A custom file
   // belongs to one paper, so changing papers always returns to the stream.

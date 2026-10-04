@@ -319,13 +319,19 @@ export const speech = {
     if (this._edge) this._edge.play().catch(() => {})
     else if (this.ok) speechSynthesis.resume()
   },
-  stop() {
+  stopTTS() {
     if (this.ok) speechSynthesis.cancel()
     if (this._edge) {
       this._edge.pause()
       this._edge = null
     }
     if (this.speaking) { this.speaking = false; this.onchange?.(false) }
+  },
+  stop() {
+    this.stopTTS()
+    // The read-along's human narration is a separate <audio> element — one
+    // voice at a time, so stopping TTS also stops the narration.
+    document.getElementById('ra-audio')?.pause()
   },
   speaking: false,
   onchange: null,
