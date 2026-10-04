@@ -258,6 +258,9 @@ export function whenVoices(cb) {
 let chosen = null
 try { chosen = localStorage.getItem('voice') } catch {}
 export function chooseVoice(name) { chosen = name; try { localStorage.setItem('voice', name) } catch {} }
+// 0.1s of silence (8kHz 8-bit mono WAV) used to unlock audio inside the tap
+// gesture on iOS. See speech.say below.
+const SILENT_WAV = 'data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA=='
 export const speech = {
   ok: typeof speechSynthesis !== 'undefined',
   _edge: null, // the playing Edge-voice <audio>, if any
@@ -270,14 +273,25 @@ export const speech = {
       this.speaking = true
       this.onchange?.(true)
       const done = () => { this.speaking = false; this.onchange?.(false); onEnd?.() }
+      // iOS Safari only honors play() inside the tap gesture. Unlock audio with
+      // silence NOW; the fetched voice attaches when it arrives. Without this,
+      // play() after the async fetch is rejected on iPhone and every utterance
+      // silently falls back to the device voice.
+      const audio = new Audio()
+      audio.preload = 'auto'
+      audio.src = SILENT_WAV
+      try { const u = audio.play(); if (u && u.catch) u.catch(() => {}) } catch {}
+      this._edge = audio
+      let live = false
+      audio.onended = () => { if (!live) return; this._edge = null; done() }
+      audio.onerror = () => { if (!live) return; this._edge = null; this.sayLocal(text, onEnd) }
       edgeAudio(spoken(text), eid).then(
-        (audio) => {
-          this._edge = audio
-          audio.onended = () => { this._edge = null; done() }
-          audio.onerror = () => { this._edge = null; this.sayLocal(text, onEnd) }
+        (fetched) => {
+          live = true
+          audio.src = fetched.src
           audio.play().catch(() => { this._edge = null; this.sayLocal(text, onEnd) })
         },
-        () => this.sayLocal(text, onEnd),
+        () => { this._edge = null; this.sayLocal(text, onEnd) },
       )
       return
     }
