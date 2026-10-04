@@ -118,6 +118,101 @@ export const TRACKS = [
       },
     ],
   },
+{
+    id: "what-happens-when-we-die",
+    intro: "Death is the question readers ask about most. Here is what the book says happens after this life, in plain language, with the exact paragraphs each answer comes from.",
+    questions: [
+      {
+        answer: "You sleep, and then you wake up on the first mansion world. Your guardian angel brings your soul, your Thought Adjuster brings your memories, and when the two reunite, your personality is reassembled and you are conscious again. You resume your life right where death interrupted it, in a new body.",
+        q: "What happens right after we die?",
+        quotes: [
+          {
+            ref: "47:3.1",
+            text: "On the mansion worlds the resurrected mortal survivors resume their lives just where they left off when overtaken by death. When you go from Urantia to the first mansion world, you will notice considerable change, but if you had come from a more normal and progressive sphere of time, you would hardly notice the difference except for the fact that you were in possession of a different body; the tabernacle of flesh and blood has been left behind on the world of nativity."
+          },
+          {
+            ref: "47:3.3",
+            text: "The mortal-mind transcripts and the active creature-memory patterns as transformed from the material levels to the spiritual are the individual possession of the detached Thought Adjusters; these spiritized factors of mind, memory, and creature personality are forever a part of such Adjusters. The creature mind-matrix and the passive potentials of identity are present in the morontia soul intrusted to the keeping of the seraphic destiny guardians. And it is the reuniting of the morontia-soul trust of the seraphim and the spirit-mind trust of the Adjuster that reassembles creature personality and constitutes resurrection of a sleeping survivor."
+          }
+        ]
+      },
+      {
+        answer: "No. The book describes a long, gradual journey, and death is only the doorway into its first stage: seven mansion worlds of training and growth. Reaching God comes much later, after a vast adventure through many worlds. Think of death as the first day of school, not graduation.",
+        q: "Do we go straight to heaven?",
+        quotes: [
+          {
+            ref: "47:10.7",
+            text: "Mortal death is a technique of escape from the material life in the flesh; and the mansonia experience of progressive life through seven worlds of corrective training and cultural education represents the introduction of mortal survivors to the morontia career, the transition life which intervenes between the evolutionary material existence and the higher spirit attainment of the ascenders of time who are destined to achieve the portals of eternity."
+          },
+          {
+            ref: "47:10.5",
+            text: "Seven times do those mortals who pass through the entire mansonia career experience the adjustment sleep and the resurrection awakening. But the last resurrection hall, the final awakening chamber, was left behind on the seventh mansion world. No more will a form-change necessitate the lapse of consciousness or a break in the continuity of personal memory."
+          }
+        ]
+      },
+      {
+        answer: "Yes. When you wake up on the first mansion world, you get ten days of personal freedom, and the book says you can spend that time looking up loved ones and earth friends who arrived before you. Friendly companions are also assigned to welcome every new arrival and stay with them on the journey.",
+        q: "Will I see my loved ones again?",
+        quotes: [
+          {
+            ref: "47:3.6",
+            text: "From the resurrection halls you proceed to the Melchizedek sector, where you are assigned permanent residence. Then you enter upon ten days of personal liberty. You are free to explore the immediate vicinity of your new home and to familiarize yourself with the program which lies immediately ahead. You also have time to gratify your desire to consult the registry and call upon your loved ones and other earth friends who may have preceded you to these worlds. At the end of your ten-day period of leisure you begin the second step in the Paradise journey, for the mansion worlds are actual training spheres, not merely detention planets."
+          },
+          {
+            ref: "48:3.8",
+            text: "2. *Pilgrim Receivers and Free Associators.* These are the social companions of the new arrivals on the mansion worlds. One of them will certainly be on hand to welcome you when you awaken on the initial mansion world from the first transit sleep of time, when you experience the resurrection from the death of the flesh into the morontia life. And from the time you are thus formally welcomed on awakening to that day when you leave the local universe as a first-stage spirit, these Morontia Companions are ever with you."
+          }
+        ]
+      },
+      {
+        answer: "Your soul is the part of you that grows during this life out of your choices, your character, and your reaching for God. When you die, your body returns to dust, but two nonmaterial things survive: your Thought Adjuster carries the record of your mind and memories, and your guardian angel keeps your soul. Their reunion on the mansion worlds is what wakes you up.",
+        q: "What is the soul, and what part of me survives?",
+        quotes: [
+          {
+            ref: "111:0.1",
+            text: "THE presence of the divine Adjuster in the human mind makes it forever impossible for either science or philosophy to attain a satisfactory comprehension of the evolving soul of the human personality. The morontia soul is the child of the universe and may be really known only through cosmic insight and spiritual discovery."
+          },
+          {
+            ref: "112:3.5",
+            text: "After death the material body returns to the elemental world from which it was derived, but two nonmaterial factors of surviving personality persist: The pre-existent Thought Adjuster, with the memory transcription of the mortal career, proceeds to Divinington; and there also remains, in the custody of the destiny guardian, the immortal morontia soul of the deceased human. These phases and forms of soul, these once kinetic but now static formulas of identity, are essential to repersonalization on the morontia worlds; and it is the reunion of the Adjuster and the soul that reassembles the surviving personality, that reconsciousizes you at the time of the morontia awakening."
+          },
+          {
+            ref: "111:3.7",
+            text: "In so far as man’s evolving morontia soul becomes permeated by truth, beauty, and goodness as the value-realization of God-consciousness, such a resultant being becomes indestructible. If there is no survival of eternal values in the evolving soul of man, then mortal existence is without meaning, and life itself is a tragic illusion. But it is forever true: What you begin in time you will assuredly finish in eternity—if it is worth finishing."
+          }
+        ]
+      },
+      {
+        answer: "Yes. Your Thought Adjuster keeps a complete transcript of your mind, so nothing you were is lost. The book says your personality remains intact from the moment you arrive on the first mansion world, and though you receive a new body at each step forward, there is never a break in who you are.",
+        q: "Do I keep my memories and stay myself?",
+        quotes: [
+          {
+            ref: "47:4.4",
+            text: "A newly developed and suitably adjusted morontia body is acquired at the time of each advance from one mansion world to another. You go to sleep with the seraphic transport and awake with the new but undeveloped body in the resurrection halls, much as when you first arrived on mansion world number one except that the Thought Adjuster does not leave you during these transit sleeps between the mansion worlds. Your personality remains intact after you once pass from the evolutionary worlds to the initial mansion world."
+          },
+          {
+            ref: "47:10.5",
+            text: "Seven times do those mortals who pass through the entire mansonia career experience the adjustment sleep and the resurrection awakening. But the last resurrection hall, the final awakening chamber, was left behind on the seventh mansion world. No more will a form-change necessitate the lapse of consciousness or a break in the continuity of personal memory."
+          }
+        ]
+      },
+      {
+        answer: "They are real, active training worlds, not clouds or waiting rooms. Each of the seven teaches you something new, corrects what this life left unfinished, and gives you a finer body as you grow. Finishing all seven is such a triumph that the whole capital world gathers to celebrate each graduating class.",
+        q: "What are the mansion worlds like?",
+        quotes: [
+          {
+            ref: "47:10.7",
+            text: "Mortal death is a technique of escape from the material life in the flesh; and the mansonia experience of progressive life through seven worlds of corrective training and cultural education represents the introduction of mortal survivors to the morontia career, the transition life which intervenes between the evolutionary material existence and the higher spirit attainment of the ascenders of time who are destined to achieve the portals of eternity."
+          },
+          {
+            ref: "47:10.1",
+            text: "The reception of a new class of mansion world graduates is the signal for all Jerusem to assemble as a committee of welcome. Even the spornagia enjoy the arrival of these triumphant ascenders of evolutionary origin, those who have run the planetary race and finished the mansion world progression. Only the physical controllers and Morontia Power Supervisors are absent from these occasions of rejoicing."
+          }
+        ]
+      }
+    ],
+    title: "What happens when we die?"
+  },
 ]
 
 export function trackById(id) {

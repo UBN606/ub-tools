@@ -28,9 +28,9 @@ for (const f of files) {
 const byRef = new Map(order.map((ref, i) => [ref, i]));
 const byId = new Map(DATA.plans.map((p) => [p.id, p]));
 
-test('plans-data.json holds exactly the 3 plans', () => {
-  assert.equal(DATA.plans.length, 3);
-  assert.deepEqual(DATA.plans.map((p) => p.id), ['year', 'jesus', 'central']);
+test('plans-data.json holds exactly the 4 plans', () => {
+  assert.equal(DATA.plans.length, 4);
+  assert.deepEqual(DATA.plans.map((p) => p.id), ['meet-jesus', 'year', 'jesus', 'central']);
 });
 
 test('day counts are exactly 365 / 90 / 30', () => {
@@ -63,6 +63,7 @@ test('every startRef and endRef resolves against the real book data', () => {
 
 test('days are contiguous and non-overlapping within each plan', () => {
   for (const plan of DATA.plans) {
+    if (plan.highlights) continue; // highlight paths jump between papers by design
     let prevEnd = byRef.get(plan.days[0].startRef) - 1; // plans need not start at the book's first paragraph
     for (const d of plan.days) {
       const si = byRef.get(d.startRef);
@@ -126,6 +127,12 @@ test('day titles name the papers the refs belong to', () => {
   for (const plan of DATA.plans) {
     for (const d of plan.days) {
       const a = paperOf.get(d.startRef), b = paperOf.get(d.endRef);
+      if (plan.highlights) {
+        // Highlight plans use descriptive titles; just check the paper number is named
+        const expected = a === b ? `Paper ${a}` : `Papers ${a}`;
+        assert.ok(d.title.includes(expected), `${plan.id} day ${d.n} title names ${expected}`);
+        continue;
+      }
       if (a === b && a !== 0) assert.ok(d.title.startsWith(`Paper ${a}: `), `${plan.id} day ${d.n} title`);
       if (a === b && a === 0) assert.equal(d.title, 'Foreword', `${plan.id} day ${d.n} title`);
       if (a !== b && a !== 0) assert.equal(d.title, `Papers ${a}\u2013${b}`, `${plan.id} day ${d.n} title`);

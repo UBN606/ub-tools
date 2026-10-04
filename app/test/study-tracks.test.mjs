@@ -10,7 +10,7 @@ const REF_RE = /^\d{1,3}:\d{1,2}\.\d{1,2}$/
 
 test('TRACKS has the newcomer and love-one-another tracks', () => {
   const ids = TRACKS.map((t) => t.id).sort()
-  assert.deepEqual(ids, ['love-one-another', 'newcomer-start'])
+  assert.deepEqual(ids, ['love-one-another', 'newcomer-start', 'what-happens-when-we-die'])
 })
 
 test('trackById finds tracks and misses cleanly', () => {

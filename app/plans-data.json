@@ -1,6 +1,112 @@
 {
   "plans": [
     {
+      "id": "meet-jesus",
+      "title": "Meet Jesus in 14 Days",
+      "blurb": "New to the book? Start here. Fourteen short readings from the life of Jesus, from his birth to his resurrection. About 20 minutes a day.",
+      "days": [
+        {
+          "n": 1,
+          "title": "Paper 122: The birth of Jesus",
+          "startRef": "122:0.1",
+          "endRef": "122:8.7",
+          "paragraphs": 51
+        },
+        {
+          "n": 2,
+          "title": "Paper 125: Boy Jesus at the temple",
+          "startRef": "125:0.1",
+          "endRef": "125:6.13",
+          "paragraphs": 53
+        },
+        {
+          "n": 3,
+          "title": "Paper 136: The baptism",
+          "startRef": "136:0.1",
+          "endRef": "136:4.14",
+          "paragraphs": 37
+        },
+        {
+          "n": 4,
+          "title": "Papers 138-139: Choosing the twelve",
+          "startRef": "138:0.1",
+          "endRef": "139:11.11",
+          "paragraphs": 191
+        },
+        {
+          "n": 5,
+          "title": "Paper 140: The ordination sermon",
+          "startRef": "140:0.1",
+          "endRef": "140:5.24",
+          "paragraphs": 69
+        },
+        {
+          "n": 6,
+          "title": "Paper 151: Teaching by the seaside",
+          "startRef": "151:0.1",
+          "endRef": "151:6.8",
+          "paragraphs": 53
+        },
+        {
+          "n": 7,
+          "title": "Paper 170: The kingdom of heaven",
+          "startRef": "170:0.1",
+          "endRef": "170:5.21",
+          "paragraphs": 92
+        },
+        {
+          "n": 8,
+          "title": "Paper 179: The last supper",
+          "startRef": "179:0.1",
+          "endRef": "179:5.10",
+          "paragraphs": 44
+        },
+        {
+          "n": 9,
+          "title": "Paper 182: In Gethsemane",
+          "startRef": "182:0.1",
+          "endRef": "182:3.11",
+          "paragraphs": 52
+        },
+        {
+          "n": 10,
+          "title": "Paper 184: Before the Sanhedrin",
+          "startRef": "184:0.1",
+          "endRef": "184:5.11",
+          "paragraphs": 61
+        },
+        {
+          "n": 11,
+          "title": "Paper 185: The trial before Pilate",
+          "startRef": "185:0.1",
+          "endRef": "185:8.2",
+          "paragraphs": 68
+        },
+        {
+          "n": 12,
+          "title": "Paper 187: The crucifixion",
+          "startRef": "187:0.1",
+          "endRef": "187:6.3",
+          "paragraphs": 49
+        },
+        {
+          "n": 13,
+          "title": "Paper 189: The resurrection",
+          "startRef": "189:0.1",
+          "endRef": "189:5.5",
+          "paragraphs": 49
+        },
+        {
+          "n": 14,
+          "title": "Paper 196: The faith of Jesus",
+          "startRef": "196:0.1",
+          "endRef": "196:3.35",
+          "paragraphs": 73
+        }
+      ],
+      "highlights": true
+    },
+    {
       "id": "year",
       "title": "The Whole Book in a Year",
       "blurb": "The Foreword and all 196 papers, in 365 daily portions.",
