@@ -597,6 +597,9 @@ html[data-theme="dark"] .stop-bar,html[data-theme="dark"] .p-stop,html[data-them
 .x-details { margin-top: 12px; }
 .x-details summary { list-style: none; display: inline-flex; }
 .x-details summary::-webkit-details-marker { display: none; }
+.track { display: grid; gap: 2px; margin-top: 6px; }
+.t-quote { margin: 10px 0; padding-left: 12px; border-left: 3px solid var(--lapis); font: 400 15px/1.55 var(--serif); }
+.t-ref { display: block; margin-top: 8px; }
 .x-steps { margin: 10px 0 0; padding-left: 22px; font-size: 14px; color: var(--ink); display: grid; gap: 8px; }
 .x-steps code { font-size: 13px; }
 .foot-dev { font-size: 12px; opacity: .7; }

@@ -18,7 +18,7 @@ export const BOOK_TERMS = {
   worship: ['worship'], faith: ['faith'], believe: ['faith'], sin: ['sin'], evil: ['evil'], devil: ['Lucifer', 'Caligastia'],
   satan: ['Satan', 'Lucifer'], forgive: ['forgiveness'], forgiveness: ['forgiveness'], suffering: ['suffering', 'adversity'],
   pain: ['suffering'], grief: ['sorrow'], love: ['love'], marriage: ['marriage'], children: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], kids: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], family: ['family'],
-  reincarnation: ['reincarnation'], animals: ['animals'], pets: ['animals'], adam: ['Adam and Eve'], eve: ['Adam and Eve'],
+  reincarnation: ['reincarnation'], reincarnate: ['reincarnation'], reincarnated: ['reincarnation'], animals: ['animals'], pets: ['animals'], adam: ['Adam and Eve'], eve: ['Adam and Eve'],
   abortion: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], embryo: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], conception: ['Adjusterless children', 'first moral decision'], unborn: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'],
   fetus: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], unborn: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], miscarriage: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], baby: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], babies: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], infant: ['Adjusterless children', 'infant-receiving schools'], infants: ['Adjusterless children', 'infant-receiving schools'], child: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], adjusterless: ['Adjusterless children', 'probationary nursery', 'infant-receiving schools'], 'thought adjuster': ['Thought Adjuster'], adjuster: ['Thought Adjuster'],
   universe: ['universe'], purpose: ['purpose of life', 'perfection'], meaning: ['meaning of life', 'values'], happiness: ['happiness', 'joy'],
@@ -231,6 +231,18 @@ export function answer(E, question, { max = 5 } = {}) {
     if (r.total <= 3) quiet.push({ word: w, total: r.total, refs: r.results.map((x) => x.ref) })
   }
   return { refs: all.slice(0, max), more: all.slice(max, max + 10), why, words, mapped, quiet }
+}
+
+// Voice-garble guard: did the question likely come through garbled (dictation
+// noise, a fragment) rather than as a clear question the book couldn't answer?
+// Pure logic, so it can be tested. The renderer shows "try asking another way"
+// for garble instead of the generic "not found" miss message.
+export function looksGarbled(question, r) {
+  if ((r.refs || []).length > 0) return false  // found passages, so it understood enough
+  const words = String(question || '').trim().split(/\s+/).filter(Boolean)
+  if (words.length <= 2) return true  // "Rugged", "bigfoot", "one another?"
+  if ((r.mapped || []).length === 0 && words.length <= 5) return true  // short, nothing recognized
+  return false
 }
 
 // ---------- reading aloud (the browser's own voice; free) ----------

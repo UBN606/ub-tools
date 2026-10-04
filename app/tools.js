@@ -8,7 +8,21 @@
 
 const PAGES = 'https://ubn606.github.io/ub-tools'
 
+import { trackById } from './study-tracks.js'
+
 export const TOOLS = [
+  {
+    id: 'newcomer-start',
+    title: 'New here? Start here',
+    blurb: 'First time with The Urantia Book? These are the questions everyone asks first — answered in plain language, with the exact paragraphs.',
+    action: { kind: 'track', track: 'newcomer-start' },
+  },
+  {
+    id: 'love-one-another',
+    title: 'Love one another',
+    blurb: 'What the book teaches about loving each other — and about learning from one another\u2019s religion.',
+    action: { kind: 'track', track: 'love-one-another' },
+  },
   {
     id: 'parallel',
     title: 'Bible comparisons',
@@ -99,6 +113,26 @@ function entityCard(t, esc) {
   </div>`
 }
 
+function trackCard(t, esc) {
+  const track = trackById(t.action.track)
+  if (!track || !track.questions.length) return ''
+  return `<div class="x-card">
+    <strong>${esc(t.title)}</strong>
+    <span>${esc(t.blurb)}</span>
+    <div class="track">
+      ${track.questions.map((q, i) => `
+      <details class="x-details"${i === 0 ? ' open' : ''}>
+        <summary>${esc(q.q)}</summary>
+        <p>${esc(q.answer)}</p>
+        ${q.quotes.map((qt) => `
+        <blockquote class="t-quote">${esc(qt.text)}
+          <span class="t-ref"><button type="button" class="soft" data-ref="${esc(qt.ref)}">Read ${esc(qt.ref)}</button></span>
+        </blockquote>`).join('')}
+      </details>`).join('')}
+    </div>
+  </div>`
+}
+
 function extensionCard(t, esc) {
   return `<div class="x-card">
     <strong>${esc(t.title)}</strong>
@@ -127,6 +161,7 @@ export async function renderToolsView(box, { esc, setView, openRef }) {
     const a = t.action
     if (a.kind === 'entities') return entityCard(t, esc)
     if (a.kind === 'extension') return extensionCard(t, esc)
+    if (a.kind === 'track') return trackCard(t, esc)
     const btn = a.kind === 'view'
       ? `<button type="button" class="soft" data-view="${esc(a.view)}">${esc(a.label)}</button>`
       : `<a class="soft" href="${esc(urls[i])}" target="_blank" rel="noopener">${esc(a.label)} →</a>`
@@ -140,6 +175,10 @@ export async function renderToolsView(box, { esc, setView, openRef }) {
 
   grid.querySelectorAll('[data-view]').forEach((b) =>
     b.addEventListener('click', () => setView(b.dataset.view)))
+
+  // --- study-track "Read <ref>" buttons: jump to the paragraph in the reader ---
+  grid.querySelectorAll('.track [data-ref]').forEach((b) =>
+    b.addEventListener('click', () => { setView('read'); openRef(b.dataset.ref) }))
 
   // --- who's-who search ---
   const input = grid.querySelector('#e-q')

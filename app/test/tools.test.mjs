@@ -9,7 +9,7 @@ const BANNED = ['github', 'JSON', 'repo', 'npm', 'server', 'API']
 
 test('TOOLS covers the kit in plain language', () => {
   const ids = TOOLS.map((t) => t.id).sort()
-  assert.deepEqual(ids, ['api', 'audio', 'entities', 'extension', 'parallel', 'quote-cards', 'visuals'])
+  assert.deepEqual(ids, ['api', 'audio', 'entities', 'extension', 'love-one-another', 'newcomer-start', 'parallel', 'quote-cards', 'visuals'])
 })
 
 test('every tool has a plain title and blurb', () => {
@@ -32,9 +32,10 @@ test('no tool shows a code-hosting site to the reader', () => {
 test('every action is a known kind with what it needs', () => {
   for (const t of TOOLS) {
     const a = t.action
-    assert.ok(['page', 'view', 'entities', 'extension'].includes(a.kind), `${t.id} has unknown action kind`)
+    assert.ok(['page', 'view', 'entities', 'extension', 'track'].includes(a.kind), `${t.id} has unknown action kind`)
     if (a.kind === 'page') assert.ok(a.local && a.remote && a.label, `${t.id} page action incomplete`)
     if (a.kind === 'view') assert.ok(a.view && a.label, `${t.id} view action incomplete`)
+    if (a.kind === 'track') assert.ok(a.track, `${t.id} track action incomplete`)
   }
 })
 

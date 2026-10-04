@@ -5,7 +5,7 @@ import { parseRefParam, expandRange, isValidRef, refLink } from './deep-link.js'
 import { renderReadAlong } from './readalong.js'
 import { loadTopics, findTopics } from './topics.js'
 import { THEME_KEY, SIZE_KEY, SIZE_DEFAULT, resolveTheme, oppositeTheme, parseStoredTheme, parseStoredSize, stepSize, applyTheme, applySize, migrateLegacyBig, themeToggleState } from './a11y.js'
-import { answer, speech, listener, englishVoices, whenVoices, chooseVoice } from './ask.js'
+import { answer, looksGarbled, speech, listener, englishVoices, whenVoices, chooseVoice } from './ask.js'
 import { EDGE_VOICES, EDGE_DEFAULT, edgeOptionValue, edgeAvailable } from './edge-voices.js'
 import { askLabels, forwardText, toggleLangs } from './ask-format.js'
 import { detectLang } from './lang-detect.js'
@@ -334,6 +334,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) stopR
 
 // ---------- ask ----------
 function runAsk(q, max = 5, lang = 'en') {
+  if (lang === 'pl') return runAskPolishFallback(q)
   if (lang !== 'en') return runAskI18n(q, max, lang)
   stopReading()
   const L = askLabels(lang)
@@ -350,6 +351,16 @@ const ASK_LOADING = {
   fr: 'Chargement du texte fran\u00e7ais\u2026',
   ko: '\ud55c\uad6d\uc5b4 \ud14d\uc2a4\ud2b8\ub97c \ubd88\ub7ec\uc624\ub294 \uc911\u2026',
 }
+// Polish is detected but the Polish text is not available yet: say so plainly
+// in Polish, and offer English or Spanish, instead of failing silently.
+function runAskPolishFallback(q) {
+  stopReading()
+  const box = $('results')
+  box.innerHTML = `<div class="summary"><h2>Po polsku — wkrótce</h2>
+    <p>Studio nie mówi jeszcze po polsku. Spróbuj zapytać po angielsku lub hiszpańsku.</p>
+    <p class="why">The Studio does not have the Polish text yet. Try asking in English or Spanish.</p></div>`
+}
+
 async function runAskI18n(q, max, lang) {
   stopReading()
   const L = askLabels(lang)
@@ -400,7 +411,10 @@ function renderAnswer({ q, max, lang, L, r, getPars, showTopics, showSilence, sh
     : `<p>Didn't find what you were looking for?</p>`
   const missedBtn = FEEDBACK_ENDPOINT ? 'Add detail by email' : (FEEDBACK_EMAIL ? 'Tell us your question' : 'Copy your question to send us')
   const missed = `<div class="missed">${missedNote}<button type="button" class="soft" id="missed">${missedBtn}</button></div>`
-  if (!r.refs.length) { box.innerHTML = `<p class="empty">${esc(L.empty)}</p>${missed}`; wireMissed(q); return }
+  if (!r.refs.length) {
+    const note = looksGarbled(q, r) ? L.garbled : L.empty
+    box.innerHTML = `<p class="empty">${esc(note)}</p>${missed}`; wireMissed(q); return
+  }
   const pars = getPars(r.refs).filter((p) => !p.error)
   if (!pars.length) { box.innerHTML = `<p class="empty">${esc(L.empty)}</p>${missed}`; wireMissed(q); return }
   const silence = showSilence && r.quiet.length ? `<div class="silence"><strong>The book says little about this directly.</strong> ${r.quiet.map((x) => x.total === 0 ? `It never uses the word "${esc(x.word)}".` : `It uses the word "${esc(x.word)}" only ${x.total === 1 ? 'once' : `${x.total} times`}: ${x.refs.map((ref) => `<button type="button" class="linkish" data-open="${esc(ref)}">${esc(ref)}</button>`).join(', ')}.`).join(' ')} Below are the passages closest to your question. They may not answer it.</div>` : ''

@@ -43,3 +43,15 @@ test('empty question defaults to English', () => {
   assert.equal(detectLang(''), 'en')
   assert.equal(detectLang(null), 'en')
 })
+
+// Polish -> 'pl' (graceful fallback, text not shipped yet)
+for (const [q, want] of [
+  ['Co się dzieje po śmierci', 'pl'],
+  ['Syn Stwórca', 'pl'],
+  ['Co to jest osobowość', 'pl'],
+  ['Kim był Jezus?', 'pl'],
+]) {
+  test(`detectLang(${JSON.stringify(q)}) === ${want}`, () => {
+    assert.equal(detectLang(q), want)
+  })
+}

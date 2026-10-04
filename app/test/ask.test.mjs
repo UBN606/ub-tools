@@ -162,3 +162,10 @@ test('generic "how old was X?" no longer leads with birth-word noise', () => {
     assert.ok(!r.refs.slice(0, 3).includes('103:2.1'), `for ${q}: top 3 were ${r.refs.slice(0, 3).join(',')}`)
   }
 })
+
+test('"Do humans reincarnate" maps the verb to the book\'s noun and leads with 86:4.6', () => {
+  const { mapped } = toBookTerms('Do humans reincarnate')
+  assert.ok(mapped.includes('reincarnation'), `mapped were: ${mapped.join(',')}`)
+  const r = answer(E, 'Do humans reincarnate')
+  assert.equal(r.refs[0], '86:4.6', `top 5 were ${r.refs.slice(0, 5).join(',')}`)
+})
