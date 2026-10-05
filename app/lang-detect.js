@@ -69,6 +69,13 @@ function detectLangFull(question) {
   const q = String(question || '')
   if (/[\uAC00-\uD7AF]/.test(q)) return 'ko'
   const words = wordSet(q)
+  // If it reads like an English question, it is one. Check this FIRST,
+  // before glue-word counting, so a common word like "to" (also Polish)
+  // doesn't misfire on "What does it mean to be spiritual?"
+  const EN = new Set(('what who whom whose when where why how which is are was were be been '
+    + 'do does did the and or of to in on it its this that these those tell about').split(' '))
+  let enHits = 0
+  for (const w of words) if (EN.has(w)) enHits++
   let es = 0, fr = 0, pl = 0
   for (const w of words) {
     if (ES_SET.has(w)) es++
@@ -80,17 +87,15 @@ function detectLangFull(question) {
   if (/[çœ]/.test(q.toLowerCase())) fr += 2
   // Polish diacritics are a strong signal (ą ć ę ł ń ś ź ż).
   if (/[ąćęłńśźż]/.test(q.toLowerCase())) pl += 3
-  // Clear winner by glue words takes it.
+  // Clear winner by glue words takes it, unless English hits are stronger.
+  // A single Polish glue word like "to" should not beat multiple English words.
   const top = Math.max(es, fr, pl)
-  if (top > 0) {
+  if (top > 0 && top > enHits) {
     const winners = [es === top && 'es', fr === top && 'fr', pl === top && 'pl'].filter(Boolean)
     if (winners.length === 1) return winners[0]
   }
-  // Tie: if it reads like an English question, it is one ('jesus' alone is not
-  // enough to call it Spanish — the folded content check below would say so).
-  const EN = new Set(('what who whom whose when where why how which is are was were be been '
-    + 'do does did the and or of to in on it its this that these those tell about').split(' '))
-  for (const w of words) if (EN.has(w)) return 'en'
+  // English question words win ties and weak matches.
+  if (enHits > 0) return 'en'
   // No glue words told them apart: ask the content words (folded like Ask folds them).
   const folded = q.toLowerCase()
     .replace(/[áàäâ]/g, 'a').replace(/[éèëê]/g, 'e').replace(/[íìïî]/g, 'i')

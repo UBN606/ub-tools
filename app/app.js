@@ -334,6 +334,21 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) stopR
 
 // ---------- ask ----------
 function runAsk(q, max = 5, lang = 'en') {
+  // Polish is detected but translations haven't shipped yet.
+  // Show a graceful note and fall back to English instead of erroring.
+  if (lang === 'pl') {
+    stopReading()
+    const box = $('results')
+    const L = askLabels('en')
+    const r = answer(E, q, { max })
+    // Prepend a friendly notice about Polish not being available yet
+    renderAnswer({ q, max, lang: 'en', L, r, getPars: (refs) => E.search.getParagraphs(refs), showTopics: true, showSilence: true, showDeeper: true })
+    const notice = document.createElement('p')
+    notice.className = 'lang-notice'
+    notice.textContent = 'Polish translation isn\u2019t available yet \u2014 showing the English answer below.'
+    box.prepend(notice)
+    return
+  }
   if (lang !== 'en') return runAskI18n(q, max, lang)
   stopReading()
   const L = askLabels(lang)
