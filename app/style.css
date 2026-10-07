@@ -681,7 +681,7 @@ html[data-theme="dark"] .pwa-banner {
 .pwa-banner-text { margin: 0; font-size: 14px; line-height: 1.45; color: var(--ink); flex: 1; }
 .pwa-banner-actions { display: flex; gap: 8px; flex-shrink: 0; }
 .pwa-btn {
-  border: 0; cursor: pointer; font: 600 13.5px/1 var(--sans); color: var(--ink);
+  border: 0; cursor: pointer; font: 600 13.5px/1 var(--sans); color: #2A2C32;
   padding: 11px 14px; border-radius: 12px; white-space: nowrap;
   background: linear-gradient(160deg, #F9F8F6, #ECEAE6);
   box-shadow: 3px 4px 8px var(--lift-dark), -2px -2px 6px var(--lift-light);
