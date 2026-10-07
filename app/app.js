@@ -4,7 +4,7 @@ import { citeLine, copyText, shareQuote, quotePicture, shareRowHTML, shareTo } f
 import { parseRefParam, expandRange, isValidRef, refLink } from './deep-link.js'
 import { renderReadAlong } from './readalong.js'
 import { loadTopics, findTopics } from './topics.js'
-import { THEME_KEY, SIZE_KEY, SIZE_DEFAULT, resolveTheme, oppositeTheme, parseStoredTheme, parseStoredSize, stepSize, applyTheme, applySize, migrateLegacyBig, themeToggleState } from './a11y.js'
+import { THEME_KEY, SIZE_KEY, SIZE_DEFAULT, SIZE_MAX, resolveTheme, oppositeTheme, parseStoredTheme, parseStoredSize, applyTheme, applySize, migrateLegacyBig, themeToggleState } from './a11y.js'
 import { answer, looksGarbled, speech, listener, englishVoices, whenVoices, chooseVoice } from './ask.js'
 import { EDGE_VOICES, EDGE_DEFAULT, edgeOptionValue, edgeAvailable } from './edge-voices.js'
 import { askLabels, forwardText, toggleLangs } from './ask-format.js'
@@ -230,22 +230,20 @@ let theme = resolveTheme(store.get(THEME_KEY, null), mqDark.matches)
 let size = parseStoredSize(store.get(SIZE_KEY, null))
 if (size == null) size = migrateLegacyBig(store.get('big', true)) // old single toggle
 const themeBtn = $('theme-toggle')
-const sizeDec = $('size-dec'), sizeReset = $('size-reset'), sizeInc = $('size-inc')
+const sizeCycle = $('size-cycle')
+const SIZE_LABELS = ['A−', 'A', 'A+', 'A++']
 const applyDisplay = () => {
   applyTheme(document, theme); applySize(document, size)
   const st = themeToggleState(theme)
   themeBtn.setAttribute('aria-pressed', String(st.pressed))
   themeBtn.setAttribute('aria-label', st.label)
   themeBtn.innerHTML = st.shortLabel
-  sizeDec.disabled = size <= 0
-  sizeInc.disabled = size >= 3
-  sizeReset.setAttribute('aria-pressed', String(size === SIZE_DEFAULT))
+  sizeCycle.textContent = SIZE_LABELS[size]
+  sizeCycle.setAttribute('aria-label', `Text size: ${['compact', 'default', 'large', 'extra large'][size]}. Tap to change.`)
   placeThumb()
 }
 themeBtn.addEventListener('click', () => { theme = oppositeTheme(theme); store.set(THEME_KEY, theme); applyDisplay() })
-sizeDec.addEventListener('click', () => { size = stepSize(size, -1); store.set(SIZE_KEY, size); applyDisplay() })
-sizeInc.addEventListener('click', () => { size = stepSize(size, 1); store.set(SIZE_KEY, size); applyDisplay() })
-sizeReset.addEventListener('click', () => { size = SIZE_DEFAULT; store.set(SIZE_KEY, size); applyDisplay() })
+sizeCycle.addEventListener('click', () => { size = size >= SIZE_MAX ? SIZE_MIN : size + 1; store.set(SIZE_KEY, size); applyDisplay() })
 // follow the device until the user picks a theme explicitly
 mqDark.addEventListener?.('change', (e) => {
   if (parseStoredTheme(store.get(THEME_KEY, null)) == null) { theme = e.matches ? 'dark' : 'light'; applyDisplay() }

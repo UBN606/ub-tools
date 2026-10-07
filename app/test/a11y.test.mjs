@@ -215,13 +215,13 @@ test('Studio interactive controls are at least 44px tall', (t) => {
 
 test('index.html carries the display controls and pre-paint script', () => {
   const html = readFileSync(join(root, 'index.html'), 'utf8')
-  for (const id of ['theme-toggle', 'size-dec', 'size-reset', 'size-inc']) {
+  for (const id of ['theme-toggle', 'size-cycle']) {
     assert.ok(html.includes(`id="${id}"`), `button #${id} exists`)
   }
   assert.ok(!html.includes('id="bigger"'), 'old single toggle is gone')
   assert.ok(html.includes("localStorage.getItem('ub-tools-theme')"), 'pre-paint theme script present')
   assert.ok(html.includes("localStorage.getItem('ub-tools-text-size')"), 'pre-paint size script present')
-  assert.ok(html.includes('A− A A+'), 'help text documents the new controls')
+  assert.ok(html.includes('cycles through text sizes'), 'help text documents the size button')
 })
 
 // ---------- visuals pages ----------

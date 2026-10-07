@@ -289,12 +289,9 @@ mark { background: linear-gradient(transparent 55%, rgba(70, 97, 138, .2) 55%); 
 .lang-row .lang-pick { padding: 8px 12px; }
 .answer-loading { margin: 24px 6px; font: 500 16px/1.5 var(--sans); color: var(--graphite); }
 .answer-head h2 { margin: 0; font: 600 22px/1.3 var(--sans); }
-html.big body { font-size: 19px; }
-html.big .well input { font-size: 30px; }
-html.big .answer .a-text { font-size: 25px; }
+html.big .answer .a-text { font-size: 24px; }
 html.big .answer .a-ref { font-size: 28px; }
 html.big .hint, html.big .answer .a-where { font-size: 17px; }
-html.big .modes button, html.big .go, html.big .soft { font-size: 17px; }
 @media (max-width: 560px) {
   .bar { flex-wrap: wrap; }
   .bar-right { flex-wrap: wrap; gap: 8px; }
@@ -305,7 +302,7 @@ html.big .modes button, html.big .go, html.big .soft { font-size: 17px; }
 }
 .voice-pick select { font: 500 14px/1 var(--sans); color: var(--ink); border: 0; padding: 10px 12px; border-radius: 12px; max-width: 220px; cursor: pointer;
   background: linear-gradient(160deg, #F9F8F6, #ECEAE6); box-shadow: 4px 5px 10px var(--lift-dark), -3px -3px 8px var(--lift-light); }
-html.big .voice-pick select { font-size: 17px; }
+
 @media (max-width: 560px) { .voice-pick select { max-width: 150px; } }
 
 /* the phone sheet must stay gone while hidden (display:flex above would override [hidden]) */
@@ -315,7 +312,7 @@ html.big .voice-pick select { font-size: 17px; }
   border: 0; cursor: pointer; padding: 18px 30px; border-radius: 999px; font: 600 19px/1 var(--sans); color: #fff;
   background: radial-gradient(circle at 35% 30%, #B8864A, var(--fix)); box-shadow: 8px 10px 22px rgba(120, 80, 30, .4), -4px -4px 10px var(--lift-light); }
 .stop-bar svg { width: 22px; height: 22px; }
-html.big .stop-bar { font-size: 22px; padding: 20px 34px; }
+
 .soft.reading { color: var(--fix); font-weight: 700; box-shadow: inset 2px 2px 5px var(--press-dark), inset -2px -2px 5px var(--press-light); }
 /* ---------- the reading player ---------- */
 .stop-bar { display: none; }
@@ -331,7 +328,7 @@ html.big .stop-bar { font-size: 22px; padding: 20px 34px; }
 .p-controls button:disabled { opacity: .4; cursor: default; }
 .p-controls .p-stop { color: #fff; background: radial-gradient(circle at 35% 30%, #B8864A, var(--fix)); }
 .answer li.now-reading { outline: 4px solid var(--fix); outline-offset: 4px; background: #FBF7F0; }
-html.big .p-controls button { font-size: 20px; padding: 16px 18px; }
+
 body:has(.player:not([hidden])) main { padding-bottom: 150px; }
 @media (max-width: 560px) { .player { padding: 12px; } .p-controls { width: 100%; } .p-controls button { flex: 1; min-width: 0; padding: 14px 6px; } }
 /* ---------- copy, share, print ---------- */
@@ -374,7 +371,7 @@ a.soft { text-decoration: none; display: inline-flex; align-items: center; }
 .share-btn { border: 0; cursor: pointer; font: 600 15px/1 var(--sans); padding: 12px 15px; border-radius: 14px; color: #fff; box-shadow: 4px 5px 10px var(--lift-dark), -3px -3px 8px var(--lift-light); }
 .s-facebook { background: #3F63A8; } .s-email { background: #5B6B7D; } .s-text { background: #3E8A5B; } .s-whatsapp { background: #2E8F6A; }
 .s-instagram { background: linear-gradient(135deg, #8B4FB0, #C24A6A 55%, #D08A3E); } .s-print, .s-copy { background: linear-gradient(160deg, #F9F8F6, #ECEAE6); color: var(--ink); }
-html.big .share-btn { font-size: 18px; padding: 14px 17px; }
+
 .sel-bar { position: absolute; z-index: 50; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px; border-radius: 16px; background: #2B2E33; box-shadow: 0 10px 28px rgba(0,0,0,.28); max-width: calc(100vw - 16px); }
 .sel-bar button { border: 0; cursor: pointer; font: 600 15px/1 var(--sans); color: #fff; background: rgba(255,255,255,.12); padding: 11px 13px; border-radius: 11px; }
 .sel-note { color: #CFE0CF; font-size: 13px; padding: 0 6px; }
@@ -516,24 +513,27 @@ html.big .ra-select, html.big .ra-label { font-size: 18px; }
 html.big .quiz-quote { font-size: 25px !important; }
 @media print { .topnav { display: none !important; } }
 
-/* ---------- text size: compact (A−) and extra large (A+) ----------
-   Level 2 reuses the existing html.big rules; level 1 is the default. */
-html.compact body{font-size:15px}
-html.compact .answer .a-text{font-size:19px}
-html.compact .answer .a-ref{font-size:25px}
-html.compact .t-text{font-size:17px}
-html.compact .well input{font-size:26px}
-html.compact .ra-text-line{font-size:20px}
-html.bigger body{font-size:21px}
-html.bigger .well input{font-size:34px}
+/* ---------- text size: 4 distinct levels, reading content only ----------
+   Level 1 is the default. Sizes target reading text, not UI chrome,
+   so buttons and navigation stay put when the size changes. */
+html.compact .answer .a-text{font-size:18px}
+html.compact .answer .a-ref{font-size:22px}
+html.compact .t-text{font-size:16px}
+html.compact .well input{font-size:24px}
+html.compact .ra-text-line{font-size:18px}
+html.big .answer .a-text{font-size:24px}
+html.big .answer .a-ref{font-size:28px}
+html.big .t-text{font-size:20px}
+html.big .well input{font-size:30px}
+html.big .ra-text-line{font-size:24px}
 html.bigger .answer .a-text{font-size:28px}
-html.bigger .answer .a-ref{font-size:31px}
+html.bigger .answer .a-ref{font-size:32px}
 html.bigger .t-text{font-size:23px}
+html.bigger .well input{font-size:34px}
 html.bigger .ra-text-line{font-size:27px}
 html.bigger .quiz-quote{font-size:28px !important}
 html.bigger .help-steps{font-size:24px}
 html.bigger .help-steps li{padding-left:56px}
-html.bigger .modes button,html.bigger .topnav button{font-size:19px}
 
 /* ---------- dark mode (html[data-theme="dark"]) ---------- */
 html[data-theme="dark"]{color-scheme:dark;--ground:#24262B;--chalk:#2E3138;--basin:#2A2C32;--ink:#ECE9E2;--graphite:#B9B5AA;--faint:#94918A;--lapis:#9DB6DC;--lapis-soft:rgba(157,182,220,.18);--pass:#93B89E;--fix:#D9A55C;--lift-dark:rgba(0,0,0,.55);--lift-light:rgba(255,255,255,.07);--press-dark:rgba(0,0,0,.5);--press-light:rgba(255,255,255,.06)}
@@ -606,6 +606,45 @@ html[data-theme="dark"] .stop-bar,html[data-theme="dark"] .p-stop,html[data-them
 
 /* Theme toggle icons */
 .ticon { vertical-align: -1.5px; }
+
+/* ---------- polish pass: easier on the eyes, same design language ----------
+   Targeted refinements only. No layout changes, no new components. */
+
+/* Brand-tinted text selection, both themes */
+::selection { background: rgba(70, 97, 138, .28); }
+html[data-theme="dark"] ::selection { background: rgba(157, 182, 220, .32); }
+
+/* Gentle hover lift on raised controls: they feel alive, not flat.
+   Active (pressed-in) states already exist; this completes the pair. */
+.soft, .chip, .go, .share-btn, .x-card, .plan, .study-items li {
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.soft:hover, .chip:hover { transform: translateY(-1px); }
+.go:hover { transform: translateY(-1px);
+  box-shadow: 8px 10px 20px rgba(58, 78, 110, .42), -4px -4px 10px var(--lift-light), inset 1px 1px 0 rgba(255, 255, 255, .25); }
+.go:disabled:hover { transform: none; box-shadow: 4px 5px 10px var(--lift-dark), -3px -3px 7px var(--lift-light); }
+.x-card:hover, .plan:hover { transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) {
+  .soft:hover, .chip:hover, .go:hover, .x-card:hover, .plan:hover { transform: none; }
+}
+
+/* Older readers: the small helper lines get a touch more presence */
+.hint { font-size: 14px; }
+.foot { font-size: 13.5px; }
+
+/* Smooth anchor jumps, unless the reader asked for reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* Answer cards: a hair more air between the citation and the words */
+.answer .a-where { margin: 6px 0 16px; }
+
+/* The single size-cycle button reads as a control, not a label */
+#size-cycle { min-width: 52px; font-weight: 700; }
+
+/* Dead rule cleanup: the old three-button group used aria-pressed */
+.size[aria-pressed="true"] { color: inherit; font-weight: inherit; }
 
 /* Primary actions (Plans "Start", Listen fallback voice): filled, unmistakable */
 .soft.strong {
