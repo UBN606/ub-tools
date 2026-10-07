@@ -5,6 +5,7 @@ import { parseRefParam, expandRange, isValidRef, refLink } from './deep-link.js'
 import { renderReadAlong } from './readalong.js'
 import { loadTopics, findTopics } from './topics.js'
 import { THEME_KEY, SIZE_KEY, SIZE_DEFAULT, SIZE_MAX, resolveTheme, oppositeTheme, parseStoredTheme, parseStoredSize, applyTheme, applySize, migrateLegacyBig, themeToggleState } from './a11y.js'
+import { initPWA } from './pwa.js'
 import { answer, looksGarbled, speech, listener, englishVoices, whenVoices, chooseVoice } from './ask.js'
 import { EDGE_VOICES, EDGE_DEFAULT, edgeOptionValue, edgeAvailable } from './edge-voices.js'
 import { askLabels, forwardText, toggleLangs } from './ask-format.js'
@@ -78,6 +79,8 @@ loadEngine((done, total, source) => {
   $('q').focus()
   const u = new URL(location.href)
   if (u.searchParams.get('q')) { $('q').value = u.searchParams.get('q'); setMode(u.searchParams.get('mode') || 'ask'); submit() }
+  // Standalone ?mode= (PWA shortcuts, shared links): switch tabs without a query.
+  else if (u.searchParams.get('mode') && tabs.some((t) => t.dataset.mode === u.searchParams.get('mode'))) { setMode(u.searchParams.get('mode')) }
   else handleRefLink()
 }).catch((err) => {
   status.textContent = 'The book could not be loaded'
@@ -753,9 +756,6 @@ $('t-share').querySelectorAll('.share-btn').forEach((btn) => btn.addEventListene
 }))
 addEventListener('afterprint', () => document.body.classList.remove('print-one'))
 
-// PWA: installable + offline shell. Only on http(s); file:// has no SW.
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {})
-  })
-}
+// PWA: installable + offline shell + update banner + install nudge.
+// Only on http(s); file:// has no service worker. All logic in pwa.js.
+initPWA()
