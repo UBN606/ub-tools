@@ -22,7 +22,7 @@ These free tools let any AI, or any person, pull the book's exact wording and ch
 
 ## UB Tools Studio: the same tools in your browser
 
-`app/` is a web app over these tools: search the book, read every paragraph on a place, and check a draft's quotes, its claims about the book and what it left unread. It runs the same `ub-search.js`, `ub-verify.js`, `ub-recall.js` and `ub-claims.js` files, so it gives the same answers as the command line and the MCP server. Nothing you type leaves your computer.
+`app/` is a web app over these tools: search the book, read every paragraph on a place, and check a draft's quotes, its claims about the book and what it left unread. It runs the same `ub-search.js`, `ub-verify.js`, `ub-recall.js` and `ub-claims.js` files, so it gives the same answers as the command line and the MCP server. Searches run in your browser. Questions asked in Ask are logged (question text, page address and time only, no name or account) so the term mappings can be improved; see `app/feedback.js`.
 
 The Studio is organized in six views, switched from the tab bar at the top:
 

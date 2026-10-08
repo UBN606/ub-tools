@@ -14,6 +14,7 @@ import { answerIn, buildByRef } from './ask-i18n.js'
 import { loadTranslation } from './load-translation.js'
 import { READ_LANG_KEY, normalizeReadLang, resolveReadParagraph, whereLine } from './read-lang.js'
 import { sendMissed } from './feedback.js'
+import { chatIntent, trimChat, STARTERS } from './chat.js'
 
 const $ = (id) => document.getElementById(id)
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
@@ -181,10 +182,10 @@ function setMode(m) {
   const ask = m === 'ask'
   $('mic').hidden = !ask || !mic
   $('q-label').textContent = check ? 'Paste a draft' : ask ? 'Ask a question' : m === 'places' ? 'A place or people' : 'Search the book'
-  $('q').placeholder = ask ? 'Ask a question, like: What happens after we die?' : m === 'places' ? 'A place or people, like Maya, Peru or Easter Island' : 'Words, a phrase, or a reference like 180:2.1'
+  $('q').placeholder = ask ? 'Type a short question' : m === 'places' ? 'A place or people, like Maya, Peru or Easter Island' : 'Words, a phrase, or a reference like 180:2.1'
   $('go').textContent = check ? 'Check draft' : ask ? 'Ask the book' : m === 'places' ? 'Show every paragraph' : 'Search'
   $('hint').textContent = ask
-    ? 'The book answers in its own words, with where to find them. Tap the microphone to speak your question. Press Listen to hear the answer.'
+    ? 'This searches the book, it is not a chatbot. Short questions work best. You will see the book\'s own words, with where to find them. Tap a question below to try it.'
     : check
     ? 'Checks each quote against its citation, every claim credited to the book, and whether the draft left paragraphs on its subject unread.'
     : m === 'places'
@@ -261,6 +262,14 @@ placeTopThumb()
 
 function renderChips() {
   const box = $('chips')
+  if (mode === 'ask') {
+    box.innerHTML = STARTERS.map((q) => `<button type="button" class="chip">${esc(q)}</button>`).join('')
+    box.classList.add('wrap')
+    box.hidden = false
+    box.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => { $('q').value = c.textContent; submit() }))
+    return
+  }
+  box.classList.remove('wrap')
   if (mode !== 'places') { box.hidden = true; box.innerHTML = ''; return }
   const ids = ['mexico-central-america', 'south-america', 'pacific', 'japan', 'india', 'egypt', 'europe', 'orange-race', 'blue-race']
   box.innerHTML = ids.map((id) => `<button type="button" class="chip" data-id="${id}">${esc(LABELS[id])}</button>`).join('')
@@ -271,8 +280,25 @@ function renderChips() {
 // ---------- submit ----------
 $('ask').addEventListener('submit', (e) => { e.preventDefault(); submit() })
 $('draft').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); submit() } })
+// After a tap on Ask or Search, bring the results onto the screen: on a phone with large
+// text they start below the fold, and a screen that doesn't change reads as "it didn't work".
+let pendingScroll = false
+function revealResults() {
+  if (!pendingScroll) return
+  pendingScroll = false
+  const box = $('results')
+  if (!box.firstElementChild) return
+  // 'instant' overrides the stylesheet's smooth scrolling: a smooth scroll is cut short by
+  // a tap or another scroll while it runs, and then the answer still sits below the fold.
+  box.scrollIntoView({ behavior: 'instant', block: 'start' })
+}
 function submit() {
   if (!E) return
+  pendingScroll = true
+  dispatch()
+  revealResults()
+}
+function dispatch() {
   if (mode === 'check') return runCheck($('draft').value)
   const q = $('q').value.trim()
   if (!q) return
@@ -334,7 +360,7 @@ addEventListener('pagehide', stopReading)
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopReading() })
 
 // ---------- ask ----------
-function runAsk(q, max = 5, lang = 'en') {
+function runAsk(q, max = 5, lang = 'en', { exact = false } = {}) {
   // Polish is detected but translations haven't shipped yet.
   // Show a graceful note and fall back to English instead of erroring.
   if (lang === 'pl') {
@@ -353,8 +379,50 @@ function runAsk(q, max = 5, lang = 'en') {
   if (lang !== 'en') return runAskI18n(q, max, lang)
   stopReading()
   const L = askLabels(lang)
-  const r = answer(E, q, { max })
-  renderAnswer({ q, max, lang, L, r, getPars: (refs) => E.search.getParagraphs(refs), showTopics: true, showSilence: true, showDeeper: true })
+  if (!exact) {
+    const intent = chatIntent(q)
+    if (intent) return renderChat(intent, q)
+  }
+  // The search runs on the question inside a chatty message ("Hello, could you tell me
+  // what the book says about angels? Thank you" -> "what the book says about angels?").
+  const t = exact ? { question: q, trimmed: false } : trimChat(q)
+  const r = answer(E, t.question, { max })
+  renderAnswer({ q, max, lang, L, r, getPars: (refs) => E.search.getParagraphs(refs), showTopics: true, showSilence: true, showDeeper: true, searched: { ...t, exact } })
+  lastAsk = q
+}
+
+// Messages that aren't questions for the book get a kind, plain reply instead of
+// passages that only happen to share a word ("Thank you so much" used to show 167:5.1).
+let lastAsk = null
+const starterButtons = () => `<div class="chips chat-chips wrap">${STARTERS.map((s) => `<button type="button" class="chip" data-ask="${esc(s)}">${esc(s)}</button>`).join('')}</div>`
+const openButton = (ref, text) => `<button type="button" class="soft" data-open="${esc(ref)}">${esc(text)}</button>`
+function renderChat(intent, q) {
+  const box = $('results')
+  if (intent.kind === 'paper') {
+    const refs = E.order.filter((ref) => ref.startsWith(`${intent.paper}:`))
+    const first = refs.length ? E.byRef.get(refs[0]) : null
+    if (first) {
+      renderList(refs.map((ref) => ({ ref })), {
+        title: `Paper ${intent.paper}: ${esc(first.paperTitle)}`,
+        sub: 'Ask never writes about the book, so it can\'t summarize. Here is the paper itself, in the book\'s own words. Tap any paragraph to read it.',
+      })
+      revealResults()
+      return
+    }
+  }
+  const back = lastAsk && intent.kind === 'followup' ? `<button type="button" class="soft" data-ask="${esc(lastAsk)}">Back to your last answer</button>` : ''
+  const msg = {
+    greeting: `<p><strong>Hello!</strong> This is a search of The Urantia Book, not a person to chat with. Type a short question and it shows you the book's own words, with where to find them.</p><p>Try one of these:</p>${starterButtons()}`,
+    thanks: `<p><strong>You're welcome!</strong> Ask another question whenever you like, or try one of these:</p>${starterButtons()}`,
+    followup: `<p><strong>Ask doesn't remember your last question.</strong> It searches the book each time, so it needs the subject in the question, like <em>What happens after we die?</em></p><p>To read more about an answer, press <strong>See it in the book</strong> under any passage for the paragraphs around it, or <strong>Show more passages</strong> at the bottom of the answer.</p><div class="chat-actions">${back}</div>`,
+    author: `<p><strong>Ask can only show what the book says, in its own words.</strong> The papers are signed by those who presented them, for example at the end of Paper 2.</p><div class="chat-actions">${openButton('92:4.9', 'Where the book speaks of the papers (92:4.9)')}${openButton('2:7.13', 'A signature line (2:7.13)')}</div>`,
+    true: `<p><strong>Ask can show you what the book says, with where to find it, but it can't judge whether the book is true.</strong> That is for each reader to weigh.</p><div class="chat-actions">${openButton('92:4.9', 'Where the book speaks of the papers (92:4.9)')}</div><p>Or ask about a subject:</p>${starterButtons()}`,
+  }[intent.kind]
+  box.innerHTML = `<div class="empty chat-reply">${msg}<p class="chat-exact"><button type="button" class="linkish" data-exact>Search the book for my exact words instead</button></p></div>`
+  box.querySelectorAll('[data-ask]').forEach((b) => b.addEventListener('click', () => { $('q').value = b.dataset.ask; pendingScroll = true; runAsk(b.dataset.ask) }))
+  box.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openRef(b.dataset.open)))
+  box.querySelector('[data-exact]').addEventListener('click', () => { pendingScroll = true; runAsk(q, 5, 'en', { exact: true }) })
+  revealResults()
 }
 
 // A question asked in Spanish, French, or Korean gets an answer in that language.
@@ -409,7 +477,7 @@ function englishAuthorFor(pidx) {
 // One rendering path for every Ask language: the clearest passage featured as
 // the answer, supporting quotes below, every quote with its exact citation,
 // and a language toggle so the reader can switch.
-function renderAnswer({ q, max, lang, L, r, getPars, showTopics, showSilence, showDeeper }) {
+function renderAnswer({ q, max, lang, L, r, getPars, showTopics, showSilence, showDeeper, searched }) {
   const box = $('results')
   const plain = (t) => t.replace(/<[^>]+>/g, '')
   const missedNote = FEEDBACK_ENDPOINT
@@ -419,10 +487,13 @@ function renderAnswer({ q, max, lang, L, r, getPars, showTopics, showSilence, sh
   const missed = `<div class="missed">${missedNote}<button type="button" class="soft" id="missed">${missedBtn}</button></div>`
   if (!r.refs.length) {
     const note = looksGarbled(q, r) ? L.garbled : L.empty
-    box.innerHTML = `<p class="empty">${esc(note)}</p>${missed}`; wireMissed(q); return
+    box.innerHTML = `<p class="empty">${esc(note)}</p>${missed}`; wireMissed(q); revealResults(); return
   }
   const pars = getPars(r.refs).filter((p) => !p.error)
-  if (!pars.length) { box.innerHTML = `<p class="empty">${esc(L.empty)}</p>${missed}`; wireMissed(q); return }
+  if (!pars.length) { box.innerHTML = `<p class="empty">${esc(L.empty)}</p>${missed}`; wireMissed(q); revealResults(); return }
+  // Shows what the search actually used, so readers learn that short questions work,
+  // and can always run their own words instead.
+  const searchedLine = searched?.trimmed ? `<p class="searched">Searched the book for: <strong>${esc(searched.question)}</strong> <button type="button" class="linkish" id="search-exact">Use my exact words instead</button></p>` : ''
   const silence = showSilence && r.quiet.length ? `<div class="silence"><strong>The book says little about this directly.</strong> ${r.quiet.map((x) => x.total === 0 ? `It never uses the word "${esc(x.word)}".` : `It uses the word "${esc(x.word)}" only ${x.total === 1 ? 'once' : `${x.total} times`}: ${x.refs.map((ref) => `<button type="button" class="linkish" data-open="${esc(ref)}">${esc(ref)}</button>`).join(', ')}.`).join(' ')} Below are the passages closest to your question. They may not answer it.</div>` : ''
   const topicsFound = showTopics ? findTopics(r.words, r.mapped) : []
   const index = topicsFound.length ? `<div class="index-hint">${topicsFound.map((t, k) => `<button type="button" class="soft" data-topic="${k}">The book's index: ${esc(t.label)} (${t.refs.length} passages)</button>`).join('')}</div>` : ''
@@ -434,14 +505,15 @@ function renderAnswer({ q, max, lang, L, r, getPars, showTopics, showSilence, sh
   const langRow = `<div class="lang-row"><span class="lang-label">${esc(L.alsoIn)}</span>${toggleLangs(lang).map((t) => `<button type="button" class="soft lang-pick" data-lang="${t.code}">${esc(t.label)}</button>`).join('')}</div>`
   box.innerHTML = `<div class="answer-head"><h2>${esc(L.head)}</h2><div class="head-actions">${speech.ok ? '<button type="button" class="soft strong" id="read-all">Listen to the answer</button>' : ''}<button type="button" class="soft" id="print">Print the answer</button><button type="button" class="soft" id="copy-all">${esc(L.copyAnswer)}</button></div></div>
 ${langRow}
-<p class="print-question">Question: ${esc(q)}</p>${silence}${index}
+<p class="print-question">Question: ${esc(q)}</p>${searchedLine}${silence}${index}
 <ol class="answer">${featuredCard(pars[0])}</ol>
 ${pars.length > 1 ? `<h3 class="more-head">${esc(L.more)}</h3><ol class="answer supporting">${pars.slice(1).map((p, k) => supportingCard(p, k + 1)).join('')}</ol>` : ''}
 ${r.more.length ? `<button type="button" class="soft more" id="more">Show more passages</button>` : ''}
 ${showDeeper ? goDeeper(pars.map((p) => p.ref)) : ''}
 ${missed}
 <p class="print-foot">From ${esc(L.book)}, as found by UB Tools Studio: https://ubn606.github.io/ub-tools/app/ . URANTIA BOOK NETWORK, urantiabooknetwork.com</p>`
-  $('more')?.addEventListener('click', () => { runAsk(q, max + 10, lang); $('results').querySelectorAll('.answer li')[max]?.scrollIntoView({ block: 'start' }) })
+  $('search-exact')?.addEventListener('click', () => { pendingScroll = true; runAsk(q, max, lang, { exact: true }) })
+  $('more')?.addEventListener('click', () => { runAsk(q, max + 10, lang, { exact: !!searched?.exact }); $('results').querySelectorAll('.answer li')[max]?.scrollIntoView({ block: 'start' }) })
   box.querySelectorAll('.lang-pick').forEach((b) => b.addEventListener('click', () => runAsk(q, max, b.dataset.lang)))
   box.querySelectorAll('[data-topic]').forEach((b) => b.addEventListener('click', () => { const t = topicsFound[Number(b.dataset.topic)]; renderList(t.refs.map((ref) => ({ ref })), { title: `The book's index: ${esc(t.label)}`, sub: `${t.refs.length} passages the index lists. Tap one to read it.` }) }))
   wireMissed(q)
@@ -462,6 +534,7 @@ ${missed}
   }))
   $('print').addEventListener('click', () => { stopReading(); print() })
   $('copy-all').addEventListener('click', async (e) => { const btn = e.currentTarget; const ok = await copyText(forwardText(lang, q, quotes)); btn.textContent = ok ? L.copied : 'Copy blocked'; setTimeout(() => { $('copy-all') && ($('copy-all').textContent = L.copyAnswer) }, 2500) })
+  revealResults()
 }
 
 function showShareMenu(card, m) {
