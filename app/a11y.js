@@ -97,3 +97,38 @@ export function themeToggleState(theme) {
     shortLabel: dark ? `${ICON_SUN} Light` : `${ICON_MOON} Dark`,
   }
 }
+
+// ---------- look: Classic (calm, the default) or Cosmic (bold, for younger seekers) ----------
+export const STYLE_KEY = 'ub-tools-style'
+export const STYLES = ['classic', 'cosmic']
+
+export function parseStoredStyle(raw) {
+  if (raw == null) return 'classic'
+  let v = raw
+  try { v = JSON.parse(raw) } catch { /* keep raw */ }
+  return STYLES.includes(v) ? v : 'classic'
+}
+
+export function otherStyle(style) {
+  return style === 'cosmic' ? 'classic' : 'cosmic'
+}
+
+export function applyStyle(doc, style) {
+  const el = doc.documentElement
+  if (style === 'cosmic') el.dataset.style = 'cosmic'
+  else delete el.dataset.style
+  return style
+}
+
+const ICON_SPARK = '<svg class="ticon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z"/></svg>'
+const ICON_LEAF = '<svg class="ticon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/></svg>'
+
+// The button names the look it switches TO, like the Dark/Light button does.
+export function lookToggleState(style) {
+  const cosmic = style === 'cosmic'
+  return {
+    pressed: cosmic,
+    label: cosmic ? 'Switch to the Classic look' : 'Switch to the Cosmic look',
+    shortLabel: cosmic ? `${ICON_LEAF}Classic` : `${ICON_SPARK}Cosmic`,
+  }
+}

@@ -732,3 +732,133 @@ html.bigger .searched, html.bigger .chat-reply { font-size: 20px; }
 /* Starter questions wrap instead of scrolling sideways: a cut-off row hides that more exist */
 .chips.wrap { flex-wrap: wrap; overflow-x: visible; -webkit-mask-image: none; mask-image: none; }
 .chips.wrap .chip { flex: 0 1 auto; white-space: normal; text-align: left; }
+
+/* =====================================================================
+   COSMIC: the second look, for younger seekers. Chosen with the Look button
+   in the header (a11y.js STYLE_KEY); Classic above stays the default.
+   Deep space in dark mode, aurora dawn in light mode: glass panels with
+   hairline edges, pill controls, a drifting nebula behind everything.
+   Same layout, same 44px targets, same contrast floors (a11y.test.mjs).
+   The book's words stay in Newsreader; the interface switches to Space Grotesk.
+   ===================================================================== */
+html[data-style="cosmic"]{color-scheme:light;
+  --ground:#F7F5FF;--chalk:#FFFFFF;--basin:#EFEBFC;--paper:#FFFFFF;
+  --ink:#1B1530;--graphite:#4A4466;--faint:#5A5478;
+  --lapis:#5536D6;--lapis-soft:rgba(85,54,214,.16);--pass:#1F7A55;--fix:#8A5A1F;
+  --lift-dark:rgba(60,40,140,.10);--lift-light:rgba(255,255,255,0);--press-dark:rgba(60,40,140,.08);--press-light:rgba(255,255,255,0);
+  --glass:rgba(255,255,255,.72);--glass-strong:rgba(255,255,255,.9);--hair:rgba(85,54,214,.16);--hair-strong:rgba(85,54,214,.32);
+  --glow:0 18px 50px -18px rgba(85,54,214,.35);
+  --orb-a:rgba(124,92,255,.30);--orb-b:rgba(43,184,230,.24);--orb-c:rgba(245,196,81,.22);
+  --spring:cubic-bezier(.32,.72,0,1);
+  --sans:"Space Grotesk","Hanken Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --r-slab:32px;--r-well:24px;--r-control:999px}
+html[data-style="cosmic"][data-theme="dark"]{color-scheme:dark;
+  --ground:#07060F;--chalk:#14112A;--basin:#0E0C1E;--paper:#14112A;
+  --ink:#F3F1FF;--graphite:#BDB8DC;--faint:#A19CC4;
+  --lapis:#A99BFF;--lapis-soft:rgba(169,155,255,.2);--pass:#5EE6B0;--fix:#F5C451;
+  --lift-dark:rgba(0,0,0,.5);--press-dark:rgba(0,0,0,.4);
+  --glass:rgba(20,17,42,.66);--glass-strong:rgba(24,20,50,.92);--hair:rgba(255,255,255,.09);--hair-strong:rgba(169,155,255,.4);
+  --glow:0 24px 70px -24px rgba(124,92,255,.55);
+  --orb-a:rgba(124,92,255,.38);--orb-b:rgba(43,184,230,.22);--orb-c:rgba(245,196,81,.14)}
+
+/* the sky: three slow orbs on a fixed layer behind the page (transform-only motion) */
+html[data-style="cosmic"] body{background:var(--ground);position:relative}
+html[data-style="cosmic"] body::before{content:"";position:fixed;inset:-20vmax;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(38vmax 38vmax at 18% 12%,var(--orb-a),transparent 62%),
+    radial-gradient(34vmax 34vmax at 86% 30%,var(--orb-b),transparent 60%),
+    radial-gradient(30vmax 30vmax at 50% 92%,var(--orb-c),transparent 60%);
+  animation:cosmic-drift 38s var(--spring) infinite alternate}
+html[data-style="cosmic"][data-theme="dark"] body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55;
+  background-image:radial-gradient(1px 1px at 12% 22%,#fff,transparent),radial-gradient(1px 1px at 72% 14%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 38% 66%,#fff,transparent),radial-gradient(1px 1px at 86% 78%,#fff,transparent),
+    radial-gradient(1px 1px at 58% 40%,#fff,transparent),radial-gradient(1.5px 1.5px at 22% 86%,#fff,transparent),
+    radial-gradient(1px 1px at 92% 52%,#fff,transparent),radial-gradient(1px 1px at 6% 58%,#fff,transparent);
+  background-size:620px 620px}
+@keyframes cosmic-drift{to{transform:translate3d(4vmax,-3vmax,0) rotate(8deg)}}
+
+/* type */
+html[data-style="cosmic"] .brand{font-weight:700;letter-spacing:-.02em}
+html[data-style="cosmic"] .brand span{background:linear-gradient(90deg,var(--ink),var(--lapis));-webkit-background-clip:text;background-clip:text;color:transparent}
+html[data-style="cosmic"] .answer-head h2,html[data-style="cosmic"] .help h2{letter-spacing:-.02em;font-weight:700}
+
+/* glass panels with a hairline edge, replacing the clay shadows */
+html[data-style="cosmic"] .slab,html[data-style="cosmic"] .tablet-inner,html[data-style="cosmic"] .tablet .tablet-inner,
+html[data-style="cosmic"] .answer li,html[data-style="cosmic"] .help,html[data-style="cosmic"] .player{
+  background:var(--glass);border:1px solid var(--hair);box-shadow:var(--glow),inset 0 1px 0 rgba(255,255,255,.12)}
+html[data-style="cosmic"] .slab{animation:cosmic-rise .9s var(--spring) both}
+html[data-style="cosmic"] .help{background:var(--glass-strong)}
+html[data-style="cosmic"] .help::backdrop{background:rgba(7,6,15,.55);backdrop-filter:blur(10px)}
+
+/* segmented controls: pressed track becomes a hairline capsule, the thumb a lit pill */
+html[data-style="cosmic"] .modes,html[data-style="cosmic"] .topnav{background:var(--basin);border:1px solid var(--hair);box-shadow:none;border-radius:22px}
+html[data-style="cosmic"] .modes-thumb,html[data-style="cosmic"] .topnav-thumb{border-radius:16px;
+  background:linear-gradient(135deg,rgba(124,92,255,.22),rgba(43,184,230,.16));border:1px solid var(--hair-strong);box-shadow:0 6px 20px -8px rgba(124,92,255,.6)}
+html[data-style="cosmic"] .topnav button[aria-current="true"],html[data-style="cosmic"] .modes button[aria-selected="true"]{color:var(--ink);font-weight:600}
+
+/* the well: a glowing input capsule */
+html[data-style="cosmic"] .well{background:var(--basin);border:1px solid var(--hair);box-shadow:none;transition:border-color .5s var(--spring),box-shadow .5s var(--spring)}
+html[data-style="cosmic"] .well:focus-within{border-color:var(--hair-strong);box-shadow:0 0 0 4px var(--lapis-soft),0 18px 50px -20px rgba(124,92,255,.7)}
+
+/* the primary action: a gradient pill that presses like a key (white text >= 4.6:1 across the gradient) */
+html[data-style="cosmic"] .go,html[data-style="cosmic"][data-theme="dark"] .go{border-radius:999px;color:#fff;
+  background:linear-gradient(120deg,#5B3FE0 0%,#4A56E6 50%,#3A6FE0 100%);
+  box-shadow:0 12px 30px -10px rgba(91,63,224,.75),inset 0 1px 0 rgba(255,255,255,.28);
+  transition:transform .5s var(--spring),box-shadow .5s var(--spring)}
+html[data-style="cosmic"] .go:hover{transform:translateY(-2px);box-shadow:0 18px 40px -12px rgba(91,63,224,.9),inset 0 1px 0 rgba(255,255,255,.3)}
+html[data-style="cosmic"] .go:active{transform:scale(.98)}
+html[data-style="cosmic"] .go:disabled{background:var(--basin);color:var(--faint);box-shadow:none}
+
+/* secondary controls: quiet glass pills */
+html[data-style="cosmic"] .soft,html[data-style="cosmic"] .chip,html[data-style="cosmic"] .close,html[data-style="cosmic"] .mic,
+html[data-style="cosmic"] .p-controls button,html[data-style="cosmic"] .voice-pick select,html[data-style="cosmic"] .ra-select,
+html[data-style="cosmic"] .e-az-name,html[data-style="cosmic"] .status{
+  background:var(--glass);border:1px solid var(--hair);box-shadow:none;color:var(--ink);
+  transition:transform .45s var(--spring),border-color .45s var(--spring),background-color .45s var(--spring)}
+html[data-style="cosmic"] .soft,html[data-style="cosmic"] .chip{border-radius:999px}
+html[data-style="cosmic"] .soft:hover,html[data-style="cosmic"] .chip:hover{border-color:var(--hair-strong);transform:translateY(-1px)}
+html[data-style="cosmic"] .soft:active,html[data-style="cosmic"] .chip:active{transform:scale(.98)}
+html[data-style="cosmic"] .soft.strong{color:#fff;border-color:transparent;background:linear-gradient(120deg,#5B3FE0,#3A6FE0)}
+html[data-style="cosmic"] .help-btn{color:var(--lapis)}
+html[data-style="cosmic"] .groove{background:var(--basin);box-shadow:none;border:1px solid var(--hair)}
+html[data-style="cosmic"] .groove span{background:linear-gradient(90deg,#7C5CFF,#2BB8E6,#F5C451)}
+
+/* answers: the featured passage gets a lit gold edge; cards rise in one after another */
+html[data-style="cosmic"] .answer li{border-radius:28px;animation:cosmic-rise .8s var(--spring) both}
+html[data-style="cosmic"] .answer li:nth-child(2){animation-delay:.08s}
+html[data-style="cosmic"] .answer li:nth-child(3){animation-delay:.16s}
+html[data-style="cosmic"] .answer li:nth-child(n+4){animation-delay:.24s}
+html[data-style="cosmic"] .answer li.featured{border:1px solid transparent;
+  background:linear-gradient(var(--glass-strong),var(--glass-strong)) padding-box,
+    linear-gradient(120deg,#F5C451,#7C5CFF 45%,#2BB8E6) border-box;
+  box-shadow:0 30px 80px -30px rgba(245,196,81,.45),var(--glow)}
+html[data-style="cosmic"] .a-eyebrow{color:var(--fix);letter-spacing:.22em}
+html[data-style="cosmic"] .cite-chip{background:var(--fix);color:#fff;box-shadow:0 6px 18px -8px rgba(245,196,81,.8)}
+html[data-style="cosmic"][data-theme="dark"] .cite-chip{color:#1A1300}
+html[data-style="cosmic"] .answer .a-ref{color:var(--lapis)}
+html[data-style="cosmic"] .answer li.now-reading{outline-color:var(--fix);background:var(--glass-strong)}
+html[data-style="cosmic"] .silence{background:rgba(245,196,81,.12);color:var(--ink);border:1px solid rgba(245,196,81,.35);box-shadow:none}
+html[data-style="cosmic"] .empty{background:var(--glass);border:1px solid var(--hair);box-shadow:none}
+html[data-style="cosmic"] mark{background:linear-gradient(transparent 55%,rgba(124,92,255,.28) 55%)}
+html[data-style="cosmic"][data-theme="dark"] .verdict .seal{color:#07060F}
+html[data-style="cosmic"][data-theme="dark"] .stop-bar,html[data-style="cosmic"][data-theme="dark"] .p-stop,
+html[data-style="cosmic"][data-theme="dark"] .mic.listening{color:#1A1300}
+
+@keyframes cosmic-rise{from{opacity:0;transform:translate3d(0,22px,0)}}
+@media (prefers-reduced-motion: reduce){
+  html[data-style="cosmic"] body::before,html[data-style="cosmic"] .slab,html[data-style="cosmic"] .answer li{animation:none}
+  html[data-style="cosmic"] .go,html[data-style="cosmic"] .soft,html[data-style="cosmic"] .chip{transition:none}
+}
+
+/* the Look button: a small sparkle pill */
+.look-btn svg{vertical-align:-2px;margin-right:6px}
+html[data-style="cosmic"] .look-btn{border-color:var(--hair-strong);background:linear-gradient(120deg,rgba(124,92,255,.2),rgba(43,184,230,.14))}
+/* phones: the Read-view modes become .soft pills; give the selected one the lit look */
+@media (max-width:680px){
+  html[data-style="cosmic"] .modes .soft[aria-selected="true"],html[data-style="cosmic"][data-theme="dark"] .modes .soft[aria-selected="true"],
+  html[data-style="cosmic"] .modes button[aria-selected="true"],html[data-style="cosmic"][data-theme="dark"] .modes button[aria-selected="true"]{
+    background:linear-gradient(135deg,rgba(124,92,255,.22),rgba(43,184,230,.16));border-color:var(--hair-strong);color:var(--ink);box-shadow:0 6px 20px -8px rgba(124,92,255,.6)}
+}
+.look-btn{white-space:nowrap}
+html[data-style="cosmic"] .well input{letter-spacing:-.04em}
+@media (max-width:420px){html.bigger .well input{font-size:30px}} /* A++ on phones: the whole placeholder fits (34px cut it off) */
