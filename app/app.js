@@ -13,7 +13,7 @@ import { detectLang } from './lang-detect.js'
 import { answerIn, buildByRef } from './ask-i18n.js'
 import { loadTranslation } from './load-translation.js'
 import { READ_LANG_KEY, normalizeReadLang, resolveReadParagraph, whereLine } from './read-lang.js'
-import { sendMissed } from './feedback.js'
+import { sendMissed, shouldLogMiss } from './feedback.js'
 import { chatIntent, trimChat, STARTERS } from './chat.js'
 
 const $ = (id) => document.getElementById(id)
@@ -480,17 +480,18 @@ function englishAuthorFor(pidx) {
 function renderAnswer({ q, max, lang, L, r, getPars, showTopics, showSilence, showDeeper, searched }) {
   const box = $('results')
   const plain = (t) => t.replace(/<[^>]+>/g, '')
-  const missedNote = FEEDBACK_ENDPOINT
-    ? `<p>Didn't find what you were looking for? Your question was saved so we can improve the search.</p>`
+  const logged = FEEDBACK_ENDPOINT && shouldLogMiss(r)
+  const missedNote = logged
+    ? `<p>The book may not speak to this directly. Your question was saved so we can improve the search.</p>`
     : `<p>Didn't find what you were looking for?</p>`
-  const missedBtn = FEEDBACK_ENDPOINT ? 'Add detail by email' : (FEEDBACK_EMAIL ? 'Tell us your question' : 'Copy your question to send us')
+  const missedBtn = logged ? 'Add detail by email' : (FEEDBACK_EMAIL ? 'Tell us your question' : 'Copy your question to send us')
   const missed = `<div class="missed">${missedNote}<button type="button" class="soft" id="missed">${missedBtn}</button></div>`
   if (!r.refs.length) {
     const note = looksGarbled(q, r) ? L.garbled : L.empty
-    box.innerHTML = `<p class="empty">${esc(note)}</p>${missed}`; wireMissed(q); revealResults(); return
+    box.innerHTML = `<p class="empty">${esc(note)}</p>${missed}`; wireMissed(q, logged); revealResults(); return
   }
   const pars = getPars(r.refs).filter((p) => !p.error)
-  if (!pars.length) { box.innerHTML = `<p class="empty">${esc(L.empty)}</p>${missed}`; wireMissed(q); revealResults(); return }
+  if (!pars.length) { box.innerHTML = `<p class="empty">${esc(L.empty)}</p>${missed}`; wireMissed(q, !!FEEDBACK_ENDPOINT); revealResults(); return }
   // Shows what the search actually used, so readers learn that short questions work,
   // and can always run their own words instead.
   const searchedLine = searched?.trimmed ? `<p class="searched">Searched the book for: <strong>${esc(searched.question)}</strong> <button type="button" class="linkish" id="search-exact">Use my exact words instead</button></p>` : ''
@@ -516,7 +517,7 @@ ${missed}
   $('more')?.addEventListener('click', () => { runAsk(q, max + 10, lang, { exact: !!searched?.exact }); $('results').querySelectorAll('.answer li')[max]?.scrollIntoView({ block: 'start' }) })
   box.querySelectorAll('.lang-pick').forEach((b) => b.addEventListener('click', () => runAsk(q, max, b.dataset.lang)))
   box.querySelectorAll('[data-topic]').forEach((b) => b.addEventListener('click', () => { const t = topicsFound[Number(b.dataset.topic)]; renderList(t.refs.map((ref) => ({ ref })), { title: `The book's index: ${esc(t.label)}`, sub: `${t.refs.length} passages the index lists. Tap one to read it.` }) }))
-  wireMissed(q)
+  wireMissed(q, logged)
   const cards = [...box.querySelectorAll('.answer li')]
   const items = pars.map((p, i) => ({ ref: p.ref, el: cards[i], text: `${plain(p.text)} Paper ${p.ref.replace(':', ', section ').replace('.', ', paragraph ')}.` }))
   box.querySelectorAll('[data-say]').forEach((b) => b.addEventListener('click', () => { const i = Number(b.dataset.say); startReading([items[i]]) }))
@@ -591,8 +592,8 @@ $('help-listen').addEventListener('click', () => speech.say([...document.querySe
 try { if (!localStorage.getItem('seen-help')) { localStorage.setItem('seen-help', '1'); addEventListener('load', () => openHelp()) } } catch {}
 
 // ---------- didn't find it ----------
-function wireMissed(q) {
-  if (FEEDBACK_ENDPOINT) sendMissed(FEEDBACK_ENDPOINT, q) // automatic; never blocks the UI
+function wireMissed(q, log) {
+  if (log) sendMissed(FEEDBACK_ENDPOINT, q) // automatic, only for real gaps (shouldLogMiss); never blocks the UI
   $('missed')?.addEventListener('click', async (e) => {
     const btn = e.currentTarget
     const body = `My question: ${q}\n\nWhat I hoped to find:\n`

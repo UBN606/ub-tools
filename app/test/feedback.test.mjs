@@ -2,7 +2,7 @@
 // Tests the missed-question feedback payload and sender (pure, no DOM).
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { missedPayload, sendMissed } from '../feedback.js'
+import { missedPayload, sendMissed, shouldLogMiss } from '../feedback.js'
 
 test('missedPayload carries the question, page and timestamp', () => {
   const p = missedPayload('What happens after we die?')
@@ -38,4 +38,12 @@ test('sendMissed never throws on network failure', async () => {
   const bad = () => Promise.reject(new Error('offline'))
   const r = await sendMissed('https://example.invalid/log', 'q?', bad)
   assert.equal(r, false)
+})
+
+test('shouldLogMiss sends only real gaps, not answered questions', () => {
+  assert.equal(shouldLogMiss({ refs: [], quiet: [] }), true, 'no passage found')
+  assert.equal(shouldLogMiss(null), true)
+  assert.equal(shouldLogMiss({ refs: ['47:4.4'], quiet: [] }), false, 'answered')
+  assert.equal(shouldLogMiss({ refs: ['47:4.4'], quiet: [{ word: 'simpler', total: 1 }] }), false, 'a rare word is still answered')
+  assert.equal(shouldLogMiss({ refs: ['160:1.13'], quiet: [{ word: 'narcissism', total: 0 }] }), true, 'a word the book never uses')
 })

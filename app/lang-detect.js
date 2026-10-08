@@ -25,7 +25,7 @@ const ES_WORDS = new Set(('morir muerte muerto muere mueren morimos murio murier
   + 'infierno dios padre creador alma espiritu conciencia orar oracion rezar rezo '
   + 'adoracion fe creer pecado mal diablo satanas perdon perdonar sufrimiento dolor amor '
   + 'matrimonio proposito felicidad miedo curacion milagro tierra filosofia universo vida '
-  + 'nacimiento').split(' '))
+  + 'nacimiento libro libros').split(' '))
 const FR_WORDS = new Set(('mourir mort meurt decede ange anges ciel enfer dieu pere createur ame esprit '
   + 'conscience prier priere culte adoration foi croire peche mal diable satan pardon '
   + 'pardonner souffrance douleur amour mariage famille univers bonheur peur guerison miracle '
@@ -40,11 +40,17 @@ const PL = ('się jest są był była było będą mieć ma mają nie co jak gdz
   + 'który która które jestem jesteś jesteśmy jesteście bardzo też również ale oraz lub albo ponieważ '
   + 'dlatego więc już jeszcze tylko także może musi można proszę dziękuję pana pani').split(' ')
 const PL_SET = new Set(PL)
+// Polish glue words that are also everyday English (or English name) words: "Ten
+// commandments", "co-creator", "Ma". They count only beside an unambiguous Polish signal,
+// or a single one of them turns an English question Polish.
+const PL_AMBIGUOUS = new Set('to ten ta te co ma ale pani pana jak'.split(' '))
 // Polish content words the Ask answerer knows (folded the way Ask folds them).
 const PL_WORDS = new Set(('bog boga bogiem ojciec ojca stworca dusza duch sumienie aniol aniolowie niebo '
   + 'pieklo piekle milosc kochac modlitwa modlic wiara wierzyc grzech zlo diabel szatan '
   + 'przebaczenie przebaczyc cierpienie bol smierc umrzec umiera zycie narodziny wszechswiat '
-  + 'urantia ksiega osobowosc syn jezus chrystus prawda dobro piekno').split(' '))
+  + 'ksiega osobowosc syn jezus chrystus prawda dobro piekno').split(' '))
+// ("urantia" is not here: it is the same word in every language, so it says nothing about
+// which one the question is in. It used to send "Urantia history" to Polish.)
 const stripKo = (w) => {
   let prev = ''
   while (w.length > 2 && w !== prev) {
@@ -76,17 +82,20 @@ function detectLangFull(question) {
     + 'do does did the and or of to in on it its this that these those tell about').split(' '))
   let enHits = 0
   for (const w of words) if (EN.has(w)) enHits++
-  let es = 0, fr = 0, pl = 0
+  let es = 0, fr = 0, pl = 0, plSure = 0
   for (const w of words) {
     if (ES_SET.has(w)) es++
     if (FR_SET.has(w)) fr++
-    if (PL_SET.has(w)) pl++
+    if (PL_SET.has(w)) { pl++; if (!PL_AMBIGUOUS.has(w)) plSure++ }
   }
-  if (/[¿¡]/.test(q)) es += 2
+  // Inverted marks are only ever Spanish: they outweigh English glue in a mixed question
+  // ("¿Qué dice the book about angels?").
+  if (/[¿¡]/.test(q)) es += 3
   if (/\w*ñ\w*/.test(q.toLowerCase())) es += 2
   if (/[çœ]/.test(q.toLowerCase())) fr += 2
   // Polish diacritics are a strong signal (ą ć ę ł ń ś ź ż).
-  if (/[ąćęłńśźż]/.test(q.toLowerCase())) pl += 3
+  if (/[ąćęłńśźż]/.test(q.toLowerCase())) { pl += 3; plSure++ }
+  if (!plSure) pl = 0
   // Clear winner by glue words takes it, unless English hits are stronger.
   // A single Polish glue word like "to" should not beat multiple English words.
   const top = Math.max(es, fr, pl)

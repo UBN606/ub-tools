@@ -12,6 +12,7 @@ const cases = [
   ['¿Qué pasa cuando morimos?', 'es'],
   ['que es la filosofia para el libro de urantia', 'es'], // no accents
   ['filosofia', 'es'], // one word, no glue
+  ['el libro de Urantia', 'es'], // "libro" is Spanish; "Urantia" is every language's
   ['¿Cómo era el cabello de Adán y Eva?', 'es'],
   ['¿Quién fue Jesús?', 'es'],
   ['¿Qué enseña el libro sobre la oración?', 'es'],
@@ -50,6 +51,25 @@ for (const [q, want] of [
   ['Syn Stwórca', 'pl'],
   ['Co to jest osobowość', 'pl'],
   ['Kim był Jezus?', 'pl'],
+  ['Co to jest dusza', 'pl'], // no diacritics: "jest" is unambiguous, so "co" and "to" count
+  ['Kim jest Jezus', 'pl'],
+]) {
+  test(`detectLang(${JSON.stringify(q)}) === ${want}`, () => {
+    assert.equal(detectLang(q), want)
+  })
+}
+
+// English questions that used to get Polish answers: "Urantia" (the same word in every
+// language) and English words that are also Polish glue ("ten", "co", "ma", "te").
+for (const q of ['Urantia', 'Urantia book', 'Urantia history', 'Urantia Foundation', 'urantia papers',
+  'Ten commandments', 'Ten lepers', 'ten apostles', 'Ten thousand years', 'co-creator', 'Co op', 'Ma', 'Te Deum']) {
+  test(`detectLang(${JSON.stringify(q)}) === en`, () => {
+    assert.equal(detectLang(q), 'en')
+  })
+}
+
+for (const [q, want] of [
+  ['Urantia nie', 'pl'], // a sure Polish word still wins
 ]) {
   test(`detectLang(${JSON.stringify(q)}) === ${want}`, () => {
     assert.equal(detectLang(q), want)
