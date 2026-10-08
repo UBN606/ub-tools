@@ -30,6 +30,13 @@ export const BOOK_TERMS = {
   wisest: ['all-wisdom'],
   'morontia nursery': ['probation nursery'],
   filosofia: ['philosophy'], metronita: ['morontia'],
+  // Reader-email misses (2026-10): the book never uses "narcissism", so these are its nearest
+  // words; the answer's "says little about this directly" note still says so.
+  narcissism: ['self-seeking', 'self-centered', 'selfishness'], narcissist: ['self-seeking', 'self-centered', 'selfishness'],
+  narcissistic: ['self-seeking', 'self-centered', 'selfishness'], selfish: ['selfishness'], ego: ['self-seeking', 'egotism'],
+  // "How do I become more spiritual?": Paper 100 (religious growth, spiritual development).
+  'more spiritual': ['religious growth', 'spiritual development'], 'spiritual growth': ['religious growth', 'spiritual development'],
+  'grow spiritually': ['religious growth', 'spiritual development'], spirituality: ['spirituality', 'spiritual development'],
 }
 const QUESTION_WORDS = new Set('what whats who whom whose when where why how which does do did is are was were will would can could should shall may might the a an of to in on for from with about into and or but if then than that this these those it its be been being have has had i me my we our you your they them their he him his she her there here say says said tell define defined definition book urantia ub please'.split(' '))
 
@@ -108,7 +115,7 @@ export function answer(E, question, { max = 5 } = {}) {
     queries.push({ q: 'eternity-infinity', weight: 2.5, label: 'eternity-infinity' })
   // Specific subjects outrank general ones: a question about a child who dies is about the
   // probationary nursery first, the mansion worlds second.
-  const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools'])
+  const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools', 'religious growth', 'spiritual development'])
   // A parenthetical clarification names the term the reader means ("What are Spoor Nega?
   // (means Spornagia)"): long parenthetical words get their own high-weight query so the
   // misspelled words outside the parens can't drown them out.

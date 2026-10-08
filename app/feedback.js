@@ -8,6 +8,15 @@
 // Pure functions are unit-tested in test/feedback.test.mjs. The fetch is
 // injectable so tests never touch the network.
 
+// Which answers are worth an email. The logger sends one email per question (and Gmail
+// caps a free account at about 100 a day), so only real gaps are sent: no passage found,
+// or a word of the question the book never uses ("narcissism"), where the passages shown
+// are only the closest the book comes. Answered questions are not sent.
+export function shouldLogMiss(r) {
+  if (!r || !(r.refs || []).length) return true
+  return (r.quiet || []).some((x) => x.total === 0)
+}
+
 export function missedPayload(q) {
   return {
     question: String(q).slice(0, 500),

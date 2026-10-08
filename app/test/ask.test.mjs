@@ -6,6 +6,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 import { answer, toBookTerms } from '../ask.js'
+import { shouldLogMiss } from '../feedback.js'
 
 const require = createRequire(import.meta.url)
 const search = require('../../ub-search.js')
@@ -168,4 +169,25 @@ test('"Do humans reincarnate" maps the verb to the book\'s noun and leads with 8
   assert.ok(mapped.includes('reincarnation'), `mapped were: ${mapped.join(',')}`)
   const r = answer(E, 'Do humans reincarnate')
   assert.equal(r.refs[0], '86:4.6', `top 5 were ${r.refs.slice(0, 5).join(',')}`)
+})
+
+// Reader-email misses (2026-10): each was emailed as unanswered.
+test('narcissism finds the book\'s nearest words, and is still logged as a gap', () => {
+  const r = answer(E, 'What is narcissism?')
+  assert.ok(r.refs.length, 'no passages')
+  assert.match(byRef.get(r.refs[0]).text, /self-seeking|self-centered|selfishness/i)
+  assert.ok(r.quiet.some((x) => x.word === 'narcissism' && x.total === 0), 'the never-used note must still show')
+  assert.equal(shouldLogMiss(r), true)
+})
+
+test('becoming more spiritual leads with religious growth and spiritual development', () => {
+  for (const q of ['How do I become more spiritual?', 'How can I grow spiritually?', 'What is spirituality?']) {
+    const top3 = answer(E, q).refs.slice(0, 3).map((ref) => byRef.get(ref).text)
+    assert.ok(top3.some((t) => /spiritual growth|religious growth|spiritual development|Spirituality becomes/i.test(t)), q)
+  }
+})
+
+test('answered questions are not emailed as misses', () => {
+  for (const q of ['How old was Jesus when he died?', 'How old is Jesus when he died?', 'What happens after we die?', 'Why is there evil?'])
+    assert.equal(shouldLogMiss(answer(E, q)), false, q)
 })
