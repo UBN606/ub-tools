@@ -574,6 +574,11 @@ html[data-theme="dark"] .stop-bar,html[data-theme="dark"] .p-stop,html[data-them
 .soft:disabled{opacity:.45;cursor:default}
 .a11y-btns{display:flex;gap:8px;align-items:center}
 .size-group{display:flex;gap:6px;align-items:center}
+@media (max-width: 560px) {
+  .bar-right{display:flex;flex-wrap:wrap;gap:8px}
+  .bar-right .soft,.bar-right .voice-pick{flex:1 1 30%;min-width:0;text-align:center}
+  .bar-right .voice-pick select{width:100%}
+}
 
 /* Tools view: who's-who search, install steps, quiet footer */
 .e-search { margin-top: 12px; }
