@@ -33,7 +33,7 @@ The Studio is organized in six views, switched from the tab bar at the top:
 - **Explore** — the imagery: the `visuals/` cosmos map, Jesus timeline, Palestine map and genealogy trees, plus a gallery of the 34 verified `quote-cards/`, each opening its paragraph in the book.
 - **Tools** — the front door to everything else in the kit: the quote-verifier browser extension, UB Parallel, the entity index, the quote cards, the UB API, the visuals, and the read-along audio data. Each card says what the tool does and how to open it; local copies are preferred when the Studio is served from this repo.
 
-Display settings in the header, shared across the Studio and all four visuals pages: **dark mode** (follows your device until you pick one) and **text size A− A A+** (four levels, remembered). Contrast ratios are asserted by `app/test/a11y.test.mjs` — real math, not inversion — and touch targets are 44px.
+Display settings in the header, shared across the Studio and all four visuals pages: **dark mode** (follows your device until you pick one) and **text size A− A A+** (four levels, remembered). The Studio also has two **looks**: **Classic** (calm stone, the default) and **Cosmic** (deep space in dark mode, aurora dawn in light mode, for younger seekers), switched from the header and remembered; both are held to the same contrast floors. Contrast ratios are asserted by `app/test/a11y.test.mjs` — real math, not inversion — and touch targets are 44px.
 
 `app/embed-quote.js` is a separate drop-in widget any website can use: one script tag shows a verified quote-of-the-day (deterministic by date, 60 machine-sliced and `ub-verify.js`-checked quotes, no network needed). See `app/embed.md`.
 

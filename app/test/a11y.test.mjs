@@ -12,6 +12,7 @@ import {
   parseStoredTheme, resolveTheme, oppositeTheme,
   parseStoredSize, clampSize, stepSize, sizeClass, sizePercent,
   migrateLegacyBig, applyTheme, applySize, themeToggleState,
+  STYLE_KEY, parseStoredStyle, otherStyle, applyStyle, lookToggleState,
 } from '../a11y.js'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -175,6 +176,77 @@ test('Studio dark theme meets contrast targets (no inversion)', (t) => {
   // white text would fail on the lightened greens/ambers, so dark mode uses dark text there
   check(t, '#23262B', v.pass, 4.5, 'seal text on PASS green')
   check(t, '#2A2013', v.fix, 4.5, 'stop-button text on FIX amber')
+})
+
+// The Cosmic look sets its own palette; Classic's tokens must not leak into it.
+const COSMIC = 'html[data-style="cosmic"]'
+const COSMIC_DARK = 'html[data-style="cosmic"][data-theme="dark"]'
+
+test('Cosmic light (aurora dawn) meets contrast targets', (t) => {
+  const v = { ...varsOf(css, ':root'), ...varsOf(css, COSMIC) }
+  assert.ok(v.ground !== '#E7E5E1', 'cosmic overrides the palette')
+  check(t, v.ink, v.ground, 7, 'body text')
+  check(t, v.ink, v.chalk, 7, 'panel text')
+  check(t, v.ink, v.basin, 7, 'well text')
+  check(t, v.graphite, v.ground, 4.5, 'secondary text')
+  check(t, v.faint, v.ground, 4.5, 'faint metadata text')
+  check(t, v.faint, v.chalk, 4.5, 'faint text on panels')
+  check(t, v.lapis, v.ground, 4.5, 'accent text')
+  check(t, v.fix, v.chalk, 4.5, 'gold eyebrow on panels')
+  check(t, '#ffffff', v.fix, 4.5, 'white cite chip on gold')
+  check(t, '#ffffff', v.pass, 4.5, 'white on PASS')
+})
+
+test('Cosmic dark (deep space) meets contrast targets', (t) => {
+  const v = { ...varsOf(css, ':root'), ...varsOf(css, COSMIC), ...varsOf(css, COSMIC_DARK) }
+  assert.ok(v.ground !== '#F7F5FF', 'cosmic dark overrides cosmic light')
+  check(t, v.ink, v.ground, 7, 'body text')
+  check(t, v.ink, v.chalk, 7, 'panel text')
+  check(t, v.ink, v.basin, 7, 'well text')
+  check(t, v.graphite, v.ground, 4.5, 'secondary text')
+  check(t, v.faint, v.ground, 4.5, 'faint metadata text')
+  check(t, v.faint, v.chalk, 4.5, 'faint text on panels')
+  check(t, v.lapis, v.chalk, 4.5, 'accent text on panels')
+  check(t, v.fix, v.chalk, 4.5, 'gold eyebrow on panels')
+  check(t, '#1A1300', v.fix, 4.5, 'dark cite chip text on gold')
+  check(t, '#07060F', v.pass, 4.5, 'seal text on PASS')
+})
+
+test('Cosmic primary button keeps white text readable across its gradient', (t) => {
+  for (const stop of ['#5B3FE0', '#4A56E6', '#3A6FE0']) check(t, '#ffffff', stop, 4.5, `go button at ${stop}`)
+  assert.ok(css.includes('linear-gradient(120deg,#5B3FE0 0%,#4A56E6 50%,#3A6FE0 100%)'), 'gradient stops match the test')
+})
+
+test('Cosmic motion stops under prefers-reduced-motion', () => {
+  const m = css.match(/@media \(prefers-reduced-motion: reduce\)\{\s*html\[data-style="cosmic"\][^@]*/)
+  assert.ok(m && /animation:none/.test(m[0]) && /transition:none/.test(m[0]), 'reduced-motion block for cosmic')
+})
+
+test('Look setting: Classic by default, Cosmic only when chosen', () => {
+  assert.equal(STYLE_KEY, 'ub-tools-style')
+  assert.equal(parseStoredStyle(null), 'classic')
+  assert.equal(parseStoredStyle('"cosmic"'), 'cosmic')
+  assert.equal(parseStoredStyle('cosmic'), 'cosmic')
+  assert.equal(parseStoredStyle('"neon"'), 'classic')
+  assert.equal(otherStyle('classic'), 'cosmic')
+  assert.equal(otherStyle('cosmic'), 'classic')
+  const d = { documentElement: { dataset: {} } }
+  applyStyle(d, 'cosmic'); assert.equal(d.documentElement.dataset.style, 'cosmic')
+  applyStyle(d, 'classic'); assert.equal(d.documentElement.dataset.style, undefined)
+  const c = lookToggleState('classic'), k = lookToggleState('cosmic')
+  assert.equal(c.pressed, false); assert.match(c.shortLabel, /Cosmic/); assert.match(c.shortLabel, /<svg/)
+  assert.equal(k.pressed, true); assert.match(k.shortLabel, /Classic/)
+})
+
+test('app.js imports every a11y constant it uses', () => {
+  // SIZE_MIN was used but never imported, so the text-size button threw at A++ and
+  // readers could never make the text smaller again.
+  const app = readFileSync(join(root, 'app.js'), 'utf8')
+  const imp = app.match(/import \{([^}]*)\} from '\.\/a11y\.js'/)[1].split(',').map((x) => x.trim())
+  const local = new Set([...app.matchAll(/\b(?:const|let|var)\s+([A-Z_]+)\b/g)].map((m) => m[1]))
+  for (const name of new Set(app.match(/\b(SIZE_[A-Z]+|THEME_KEY|STYLE_KEY)\b/g))) {
+    if (!local.has(name)) assert.ok(imp.includes(name), `${name} is used in app.js but not imported`)
+  }
 })
 
 test('extra size levels have real CSS rules', () => {
