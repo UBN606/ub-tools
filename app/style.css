@@ -716,3 +716,19 @@ html[data-theme="dark"] .pwa-online-badge {
   background: linear-gradient(160deg, #35383F, #2F3239 60%, #2B2E35);
 }
 .pwa-online-badge.is-back { color: var(--pass); }
+
+/* Ask: what the search used, and kind replies to messages that aren't questions (chat.js) */
+.searched { margin: 0 6px 16px; color: var(--graphite); font-size: 16px; line-height: 1.5; }
+.searched strong { color: var(--ink); font-weight: 600; }
+.searched .linkish { margin-left: 6px; }
+.chat-reply p { margin: 0 0 12px; line-height: 1.55; }
+.chat-reply p:last-child { margin-bottom: 0; }
+.chat-reply .chat-chips { margin: 4px 0 14px; }
+.chat-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 4px 0 14px; }
+.chat-actions:empty { display: none; }
+.chat-exact { font-size: 15px; }
+html.big .searched, html.big .chat-reply { font-size: 18px; }
+html.bigger .searched, html.bigger .chat-reply { font-size: 20px; }
+/* Starter questions wrap instead of scrolling sideways: a cut-off row hides that more exist */
+.chips.wrap { flex-wrap: wrap; overflow-x: visible; -webkit-mask-image: none; mask-image: none; }
+.chips.wrap .chip { flex: 0 1 auto; white-space: normal; text-align: left; }
