@@ -74,7 +74,7 @@ test('update check picks the newest published desktop release and its .dmg', () 
     { tag_name: 'desktop-v1.3.0-beta', html_url: 'u1' },
     { tag_name: 'desktop-v1.1.0', prerelease: true, html_url: 'u2' },
     { tag_name: 'v9.9.9', html_url: 'u3' },
-    { tag_name: 'desktop-v1.0.2', html_url: 'u4', assets: [{ name: 'UB-Tools-1.0.2-mac.dmg.blockmap', browser_download_url: 'b' }, { name: 'UB-Tools-1.0.2-mac.dmg', browser_download_url: 'd' }] },
+    { tag_name: 'desktop-v1.0.2', html_url: 'u4', assets: [{ name: 'UBN-Tools-mac.dmg.blockmap', browser_download_url: 'b' }, { name: 'UBN-Tools-mac.dmg', browser_download_url: 'd' }] },
     { tag_name: 'desktop-v1.0.1', html_url: 'u5' },
   ]
   assert.deepEqual(site.latestDesktopRelease(list), { version: [1, 0, 2], tag: 'desktop-v1.0.2', url: 'u4', dmg: 'd' })

@@ -1,4 +1,4 @@
-# Builds UB Tools for Mac (desktop/) on a real Mac, launches it to check it works,
+# Builds UBN Tools for Mac (desktop/) on a real Mac, launches it to check it works,
 # and, for a desktop-vX.Y.Z tag or a release run, publishes the .dmg as a GitHub release.
 #
 # Release:  bump "version" in desktop/package.json and merge it to main, then either
@@ -118,20 +118,20 @@ jobs:
 
       - name: Check the signature
         run: |
-          app="dist/mac-universal/UB Tools.app"
+          app="dist/mac-universal/UBN Tools.app"
           codesign --verify --deep --strict --verbose=2 "$app"
-          lipo -archs "$app/Contents/MacOS/UB Tools"
+          lipo -archs "$app/Contents/MacOS/UBN Tools"
           if [ "$SIGNED" = "1" ]; then
             spctl --assess --type execute --verbose=2 "$app"
             xcrun stapler validate "$app"
           fi
 
       - name: Launch the app and check it works
-        run: node scripts/smoke.mjs "dist/mac-universal/UB Tools.app/Contents/MacOS/UB Tools"
+        run: node scripts/smoke.mjs "dist/mac-universal/UBN Tools.app/Contents/MacOS/UBN Tools"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: UB-Tools-mac
+          name: UBN-Tools-mac
           path: desktop/dist/*.dmg
           if-no-files-found: error
 
@@ -142,22 +142,22 @@ jobs:
         run: |
           version="${RELEASE_TAG#desktop-v}"
           {
-            echo "UB Tools for Mac, version $version. Works on Apple silicon and Intel Macs running macOS 13 Ventura or newer."
+            echo "UBN Tools for Mac, version $version. Works on Apple silicon and Intel Macs running macOS 13 Ventura or newer."
             echo
-            echo "**To install:** download **UB-Tools-$version-mac.dmg** below, open it, and drag **UB Tools** into **Applications**."
+            echo "**To install:** download **UBN-Tools-mac.dmg** below, open it, and drag **UBN Tools** into **Applications**."
             if [ "$SIGNED" != "1" ]; then
               echo
               echo "**The first time you open it**, your Mac will say it can't check the app for malicious software. That's expected for now; to open it:"
               echo
               echo "1. Click **Done** on that message."
-              echo "2. Open **System Settings**, then **Privacy & Security**, scroll down, and click **Open Anyway** next to UB Tools."
+              echo "2. Open **System Settings**, then **Privacy & Security**, scroll down, and click **Open Anyway** next to UBN Tools."
               echo "3. Enter your Mac password and click **Open**. You only do this once."
               echo
-              echo "On macOS 13 or 14 you can instead hold **Control**, click UB Tools in Applications, choose **Open**, then **Open** again."
+              echo "On macOS 13 or 14 you can instead hold **Control**, click UBN Tools in Applications, choose **Open**, then **Open** again."
             fi
             echo
             echo "Everything works offline after the first launch, which downloads the book text once from Urantiapedia (CC BY-SA 4.0)."
           } > release-notes.md
           # Creates the tag on this commit when it doesn't exist yet (the Run workflow path).
           gh release create "$RELEASE_TAG" dist/*.dmg --target "$GITHUB_SHA" \
-            --title "UB Tools for Mac $version" --notes-file release-notes.md
+            --title "UBN Tools for Mac $version" --notes-file release-notes.md

@@ -1,4 +1,4 @@
-// UB Tools for Mac — the main process.
+// UBN Tools for Mac — the main process.
 //
 // One window showing UB Tools Studio. The Studio's files ship inside the app
 // (Contents/Resources/site) and are served at the Studio's own web address, so
@@ -19,6 +19,25 @@ const SITE_DIR = process.env.UB_SITE_DIR
   : app.isPackaged ? path.join(process.resourcesPath, 'site') : path.resolve(__dirname, '..')
 // Tests run with a throwaway profile so they never touch a reader's data.
 if (process.env.UB_USER_DATA) app.setPath('userData', path.resolve(process.env.UB_USER_DATA))
+else moveDataFromOldName()
+
+// Version 1.0.0 was called "UB Tools", so its data (reading plans, the saved book
+// text) lives in Application Support/UB Tools. Carry it over to the new name once.
+// Electron creates the new folder (for its crash reporter) before this code runs, so
+// the test is whether it holds any page data yet, not whether it exists.
+function moveDataFromOldName() {
+  try {
+    const now = app.getPath('userData')
+    const before = path.join(path.dirname(now), 'UB Tools')
+    if (before === now || !fs.existsSync(before) || fs.existsSync(path.join(now, 'Local Storage'))) return
+    fs.mkdirSync(now, { recursive: true })
+    for (const name of fs.readdirSync(before)) {
+      const to = path.join(now, name)
+      if (!fs.existsSync(to)) fs.renameSync(path.join(before, name), to)
+    }
+    fs.rmSync(before, { recursive: true, force: true })
+  } catch { /* nothing to move, or no permission: start fresh */ }
+}
 const STATE_FILE = () => path.join(app.getPath('userData'), 'window-state.json')
 const UPDATE_EVERY_MS = 24 * 60 * 60 * 1000
 
@@ -79,7 +98,7 @@ function createWindow() {
     ...site.restoreBounds(state.bounds, displays),
     minWidth: 420,
     minHeight: 480,
-    title: 'UB Tools',
+    title: 'UBN Tools',
     show: false,
     // The Studio's own page colors, so there is no white flash before it paints.
     backgroundColor: nativeTheme.shouldUseDarkColors ? '#1d1a13' : '#faf7ef',
@@ -194,7 +213,7 @@ function buildMenu() {
       role: 'help',
       submenu: [
         { label: 'Urantia Book Network', click: () => openExternal('https://urantiabooknetwork.com') },
-        { label: 'Open UB Tools in Your Browser', click: () => openExternal(site.START_URL) },
+        { label: 'Open UBN Tools in Your Browser', click: () => openExternal(site.START_URL) },
       ],
     },
   ]
@@ -218,7 +237,7 @@ async function checkForUpdates({ manual = false } = {}) {
     if (manual) {
       await ask({
         type: 'info',
-        message: latest ? 'UB Tools is up to date.' : 'Couldn’t check for updates.',
+        message: latest ? 'UBN Tools is up to date.' : 'Couldn’t check for updates.',
         detail: latest ? `You have version ${current}, the newest one.` : 'Check your internet connection and try again.',
         buttons: ['OK'],
       })
@@ -229,8 +248,8 @@ async function checkForUpdates({ manual = false } = {}) {
   if (!manual && readState().skipVersion === newest) return
   const { response } = await ask({
     type: 'info',
-    message: `A new version of UB Tools is ready: ${newest}`,
-    detail: `You have version ${current}. Download the new one, open it, and drag UB Tools into your Applications folder to replace this copy. Your reading plans and saved book text are kept.`,
+    message: `A new version of UBN Tools is ready: ${newest}`,
+    detail: `You have version ${current}. Download the new one, open it, and drag UBN Tools into your Applications folder to replace this copy. Your reading plans and saved book text are kept.`,
     buttons: ['Download', 'Later', 'Skip This Version'],
     defaultId: 0,
     cancelId: 1,
@@ -251,7 +270,7 @@ if (!app.requestSingleInstanceLock()) {
   })
 
   app.setAboutPanelOptions({
-    applicationName: 'UB Tools',
+    applicationName: 'UBN Tools',
     applicationVersion: app.getVersion(),
     copyright: 'Made by the Urantia Book Network.',
     credits: 'Book text and topic index from Urantiapedia (urantiapedia.org), CC BY-SA 4.0, downloaded once and kept on this Mac.',

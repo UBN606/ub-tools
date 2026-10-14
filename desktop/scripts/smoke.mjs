@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// desktop/scripts/smoke.mjs — launch a built UB Tools app and check it really works.
-//   node scripts/smoke.mjs "dist/mac-universal/UB Tools.app/Contents/MacOS/UB Tools" [extra args...]
+// desktop/scripts/smoke.mjs — launch a built UBN Tools app and check it really works.
+//   node scripts/smoke.mjs "dist/mac-universal/UBN Tools.app/Contents/MacOS/UBN Tools" [extra args...]
 // Checks, through Chrome DevTools: the Studio opens from the bundled files at its web
 // address, the page knows it is in the Mac app, no service worker registers, the page
 // has no Node.js access, and (needs internet) the whole book loads.
