@@ -19,12 +19,14 @@ const stamp = now.toISOString().replace(/[-:]/g, '').replace(/\..+$/, '')
 const version = `ub-tools-${stamp}`
 
 let sw = readFileSync(swPath, 'utf8')
-const before = sw
-sw = sw.replace(/const VERSION = 'ub-tools-[^']*'/, `const VERSION = '${version}'`)
-if (sw === before) {
+const VERSION_LINE = /const VERSION = 'ub-tools-[^']*'/
+// Check for the line itself: two bumps in the same second leave the file unchanged,
+// which is fine, not a missing line.
+if (!VERSION_LINE.test(sw)) {
   console.error('bump-sw: VERSION line not found in app/sw.js — is the format still "const VERSION = \'ub-tools-...\'"?')
   process.exit(1)
 }
+sw = sw.replace(VERSION_LINE, `const VERSION = '${version}'`)
 writeFileSync(swPath, sw)
 console.log(`bump-sw: app/sw.js VERSION -> ${version}`)
 console.log('Next: git add app/sw.js && git commit -m "..." && git push')

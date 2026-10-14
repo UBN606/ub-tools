@@ -57,19 +57,31 @@ export function isDesktopApp(win) {
   return Boolean(win && win.ubDesktop)
 }
 
-export function isIOS(userAgent) {
+// maxTouchPoints: since iPadOS 13, Safari on an iPad reports a Mac user agent;
+// a touch screen is how to tell it apart (no Mac has one).
+export function isIOS(userAgent, maxTouchPoints = 0) {
   const ua = String(userAgent || '')
-  return /iPad|iPhone|iPod/.test(ua) && !/MSStream/.test(ua)
+  if (/iPad|iPhone|iPod/.test(ua) && !/MSStream/.test(ua)) return true
+  return /Macintosh/.test(ua) && maxTouchPoints > 1
+}
+
+// Safari on a Mac. From macOS 14 Sonoma it can keep a site in the Dock as its own
+// app (File > Add to Dock), but it never offers that itself (no beforeinstallprompt),
+// so the nudge shows the menu steps. Other Mac browsers say so in their user agent.
+export function isMacSafari(userAgent, maxTouchPoints = 0) {
+  const ua = String(userAgent || '')
+  if (!/Macintosh/.test(ua) || maxTouchPoints > 1) return false
+  return /Version\/[\d.]+.*Safari\//.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/.test(ua)
 }
 
 // Gate for the install nudge. hasPrompt is whether we hold a
-// beforeinstallprompt event (Android/Chrome); iOS never has one and gets
-// manual instructions instead, so it doesn't need it.
-export function shouldShowInstallPrompt({ visits, dismissedUntilRaw, nowMs, standalone, hasPrompt, ios }) {
+// beforeinstallprompt event (Android/Chrome); iOS and Mac Safari never have
+// one and get manual instructions instead, so they don't need it.
+export function shouldShowInstallPrompt({ visits, dismissedUntilRaw, nowMs, standalone, hasPrompt, ios, macSafari = false }) {
   if (standalone) return false
   if (isSnoozed(dismissedUntilRaw, nowMs)) return false
   if (visits < INSTALL_MIN_VISITS) return false
-  if (!ios && !hasPrompt) return false
+  if (!ios && !macSafari && !hasPrompt) return false
   return true
 }
 
@@ -110,16 +122,19 @@ export function buildUpdateBanner(doc, { onUpdate, onLater }) {
   return bar
 }
 
-// ios=true -> Share-menu instructions instead of the native prompt button.
-export function buildInstallBanner(doc, { ios, onInstall, onDismiss }) {
+// ios=true -> Share-menu instructions; macSafari=true -> File-menu (Add to Dock)
+// instructions; otherwise the native prompt button.
+export function buildInstallBanner(doc, { ios, macSafari = false, onInstall, onDismiss }) {
   const bar = makeEl(doc, 'div', 'pwa-banner')
   bar.setAttribute('role', 'status')
   const text = ios
     ? 'Add UBN Tools to your Home Screen for quick access: tap Share, then “Add to Home Screen.”'
-    : 'Add UBN Tools to your Home Screen for quick access.'
+    : macSafari
+      ? 'Keep UBN Tools in your Dock as its own app: in Safari, choose File, then “Add to Dock” (macOS 14 or newer).'
+      : 'Add UBN Tools to your Home Screen for quick access.'
   bar.appendChild(makeEl(doc, 'p', 'pwa-banner-text', text))
   const actions = makeEl(doc, 'div', 'pwa-banner-actions')
-  const go = makeEl(doc, 'button', 'pwa-btn pwa-btn-primary', ios ? 'Got it' : 'Add to Home Screen')
+  const go = makeEl(doc, 'button', 'pwa-btn pwa-btn-primary', ios || macSafari ? 'Got it' : 'Add to Home Screen')
   go.type = 'button'
   go.addEventListener('click', onInstall)
   const no = makeEl(doc, 'button', 'pwa-btn', 'Not now')
@@ -167,7 +182,8 @@ function initWebOnly(window, document, nav, store) {
     matchMediaStandalone: Boolean(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches),
     navigatorStandalone: nav.standalone === true,
   })
-  const ios = isIOS(nav.userAgent || '')
+  const ios = isIOS(nav.userAgent || '', nav.maxTouchPoints || 0)
+  const macSafari = isMacSafari(nav.userAgent || '', nav.maxTouchPoints || 0)
 
   // ---- service worker registration + update checks ----
   // updateViaCache: 'none' is the important bit: without it the browser may
@@ -217,13 +233,15 @@ function initWebOnly(window, document, nav, store) {
       standalone,
       hasPrompt: Boolean(deferredPrompt),
       ios,
+      macSafari,
     })
     if (!ok) return
     installShown = true
     const bar = buildInstallBanner(document, {
       ios,
+      macSafari,
       onInstall: () => {
-        // Native prompt where we have one; iOS "Got it" just acknowledges.
+        // Native prompt where we have one; "Got it" (iOS, Mac Safari) just acknowledges.
         if (deferredPrompt) {
           try { deferredPrompt.prompt() } catch { /* ignore */ }
           deferredPrompt = null
@@ -239,7 +257,7 @@ function initWebOnly(window, document, nav, store) {
     deferredPrompt = e
     maybeShowInstall()
   })
-  // iOS never fires beforeinstallprompt; check on load instead.
+  // iOS and Mac Safari never fire beforeinstallprompt; check on load instead.
   maybeShowInstall()
 }
 

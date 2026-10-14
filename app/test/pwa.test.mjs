@@ -99,7 +99,7 @@ function repoRoot() {
 
 import {
   isSnoozed, updateSnoozeUntil, installDismissUntil,
-  nextVisitCount, isStandaloneDisplay, isIOS, isDesktopApp, shouldShowInstallPrompt,
+  nextVisitCount, isStandaloneDisplay, isIOS, isMacSafari, isDesktopApp, shouldShowInstallPrompt,
   buildUpdateBanner, buildInstallBanner, buildOnlineBadge,
   UPDATE_SNOOZE_HOURS, INSTALL_MIN_VISITS, INSTALL_SNOOZE_DAYS,
 } from '../pwa.js'
@@ -149,6 +149,40 @@ test('standalone + iOS detection', () => {
   assert.equal(isIOS('Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X)'), true)
   assert.equal(isIOS('Mozilla/5.0 (Linux; Android 14)'), false)
   assert.equal(isIOS('Mozilla/5.0 (Windows NT 10.0)'), false)
+})
+
+// Real user agents. iPadOS Safari reports a Mac; only the touch screen tells it apart.
+const UA_MAC_SAFARI = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15'
+const UA_MAC_CHROME = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
+const UA_MAC_EDGE = UA_MAC_CHROME + ' Edg/129.0.0.0'
+const UA_MAC_FIREFOX = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:131.0) Gecko/20100101 Firefox/131.0'
+
+test('Mac Safari gets the Add to Dock nudge; iPads, other browsers and the Mac app do not', () => {
+  assert.equal(isMacSafari(UA_MAC_SAFARI, 0), true)
+  assert.equal(isMacSafari(UA_MAC_SAFARI, 5), false, 'an iPad in desktop mode is not a Mac')
+  assert.equal(isIOS(UA_MAC_SAFARI, 5), true, 'an iPad in desktop mode gets the Home Screen steps')
+  assert.equal(isIOS(UA_MAC_SAFARI, 0), false)
+  assert.equal(isMacSafari(UA_MAC_CHROME, 0), false, 'Chrome has its own install prompt')
+  assert.equal(isMacSafari(UA_MAC_EDGE, 0), false)
+  assert.equal(isMacSafari(UA_MAC_FIREFOX, 0), false)
+  assert.equal(isMacSafari('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1', 5), false)
+  const base = { visits: 9, dismissedUntilRaw: null, nowMs: 1_000_000, standalone: false, hasPrompt: false, ios: false }
+  assert.equal(shouldShowInstallPrompt({ ...base, macSafari: true }), true, 'Mac Safari path')
+  assert.equal(shouldShowInstallPrompt({ ...base, macSafari: true, standalone: true }), false, 'already in the Dock')
+})
+
+test('install banner: Add to Dock steps for Mac Safari', () => {
+  let installed = 0
+  const bar = buildInstallBanner(fakeDoc(), { ios: false, macSafari: true, onInstall: () => installed++, onDismiss: () => {} })
+  const text = bar.query('pwa-banner-text').textContent
+  assert.match(text, /UBN Tools/)
+  assert.match(text, /File/)
+  assert.match(text, /Add to Dock/)
+  assert.match(text, /macOS 14/)
+  const primary = bar.query('pwa-btn-primary')
+  assert.equal(primary.textContent, 'Got it')
+  primary.click()
+  assert.equal(installed, 1)
 })
 
 test('Mac app detection: window.ubDesktop skips the service worker and install nudge', () => {
