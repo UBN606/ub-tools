@@ -17,10 +17,16 @@
 //   would strand them on the old version forever.
 'use strict'
 
-const VERSION = 'ub-tools-20261014T093450'
+const VERSION = 'ub-tools-20261014T094001'
 const SHELL_CACHE = VERSION + '-shell'
 const TEXT_CACHE = VERSION + '-text'
 const MAX_TEXT_ENTRIES = 250
+// Caches an update keeps: this version's own, plus the book text (engine.js,
+// 'ub-tools-book-v1') and the book's topical index (topics.js, 'ub-tools-index-v1').
+// Neither changes between app versions; deleting them made every update re-download
+// the whole book and broke offline reading until it had.
+const BOOK_CACHE_PREFIXES = ['ub-tools-book-', 'ub-tools-index-']
+const keepOnActivate = (key) => key.startsWith(VERSION) || BOOK_CACHE_PREFIXES.some((p) => key.startsWith(p))
 
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
@@ -44,7 +50,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => !k.startsWith(VERSION)).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => !keepOnActivate(k)).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   )
 })

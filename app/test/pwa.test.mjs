@@ -68,6 +68,20 @@ test('sw.js is versioned, skippable, and caches pwa.js', () => {
   assert.ok(sw.includes("'./pwa.js'"), 'pwa.js not in the shell cache list')
 })
 
+test('an update keeps the stored book and index, and drops only old app caches', async () => {
+  const { runInNewContext } = await import('node:vm')
+  const code = readFileSync(join(appDir, 'sw.js'), 'utf8')
+  const sw = runInNewContext(code + '\n;({ VERSION, keepOnActivate })', { self: { addEventListener() {} } })
+  const bookCache = readFileSync(join(appDir, 'engine.js'), 'utf8').match(/const CACHE = '([^']+)'/)[1]
+  const indexCache = readFileSync(join(appDir, 'topics.js'), 'utf8').match(/caches\.open\('([^']+)'\)/)[1]
+  assert.ok(sw.keepOnActivate(bookCache), `${bookCache} (engine.js) must survive an update`)
+  assert.ok(sw.keepOnActivate(indexCache), `${indexCache} (topics.js) must survive an update`)
+  assert.ok(sw.keepOnActivate(sw.VERSION + '-shell'))
+  assert.ok(sw.keepOnActivate(sw.VERSION + '-text'))
+  assert.equal(sw.keepOnActivate('ub-tools-20200101T000000-shell'), false, 'old app shell should be dropped')
+  assert.equal(sw.keepOnActivate('ub-tools-20200101T000000-text'), false, 'old text cache should be dropped')
+})
+
 test('bump-sw.mjs stamps a fresh version', async () => {
   const { execFileSync } = await import('node:child_process')
   const before = readFileSync(join(appDir, 'sw.js'), 'utf8')
