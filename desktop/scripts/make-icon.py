@@ -9,10 +9,10 @@ on Apple's icon grid: a 824 px rounded-square body in the brand navy inside a
 transparent 1024 px canvas, a soft shadow, and a faint blue glow behind the
 emblem. Output: desktop/build/icon-mac.png (electron-builder makes the .icns).
 
-The emblem source is 360 px, so it is enlarged about 2x for the 1024 px master;
-it stays sharp at Dock and Finder sizes. Do not AI-upscale it (the brand kit
-records an AI upscaler corrupting UBN artwork); swap in a larger original if one
-turns up.
+The emblem comes from build/src/ubn-emblem-1440.png (make-emblem.py): the
+original with its clipped ring redrawn as a full circle and the artwork enlarged
+4x by Real-ESRGAN, checked against the original. It is downsized here, so the
+1024 px master is sharp.
 
     python3 desktop/scripts/make-icon.py
 """
@@ -22,7 +22,8 @@ import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[2]
-EMBLEM = Path(__file__).resolve().parents[1] / 'build' / 'src' / 'ubn-emblem.png'
+# The touched-up, enlarged emblem (perfect gold ring); see make-emblem.py.
+EMBLEM = Path(__file__).resolve().parents[1] / 'build' / 'src' / 'ubn-emblem-1440.png'
 OUT = Path(__file__).resolve().parents[1] / 'build' / 'icon-mac.png'
 
 N = 1024
@@ -68,7 +69,7 @@ def main():
     emblem = Image.open(EMBLEM).convert('RGBA')
     w = int(BODY * 0.86)
     h = round(emblem.height * w / emblem.width)
-    emblem = emblem.resize((w, h), Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=2, percent=60, threshold=2))
+    emblem = emblem.resize((w, h), Image.LANCZOS)
     ex, ey = (BODY - w) // 2, (BODY - h) // 2
     glow = Image.new('L', (BODY, BODY), 0)
     glow.paste(emblem.getchannel('A'), (ex, ey))
