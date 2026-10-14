@@ -85,7 +85,7 @@ function repoRoot() {
 
 import {
   isSnoozed, updateSnoozeUntil, installDismissUntil,
-  nextVisitCount, isStandaloneDisplay, isIOS, shouldShowInstallPrompt,
+  nextVisitCount, isStandaloneDisplay, isIOS, isDesktopApp, shouldShowInstallPrompt,
   buildUpdateBanner, buildInstallBanner, buildOnlineBadge,
   UPDATE_SNOOZE_HOURS, INSTALL_MIN_VISITS, INSTALL_SNOOZE_DAYS,
 } from '../pwa.js'
@@ -135,6 +135,12 @@ test('standalone + iOS detection', () => {
   assert.equal(isIOS('Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X)'), true)
   assert.equal(isIOS('Mozilla/5.0 (Linux; Android 14)'), false)
   assert.equal(isIOS('Mozilla/5.0 (Windows NT 10.0)'), false)
+})
+
+test('Mac app detection: window.ubDesktop skips the service worker and install nudge', () => {
+  assert.equal(isDesktopApp({ ubDesktop: { platform: 'darwin', version: '1.0.0' } }), true)
+  assert.equal(isDesktopApp({}), false)
+  assert.equal(isDesktopApp(undefined), false)
 })
 
 // ---------- pwa.js DOM builders (fake document) ----------

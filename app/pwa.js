@@ -50,6 +50,13 @@ export function isStandaloneDisplay({ matchMediaStandalone = false, navigatorSta
   return Boolean(matchMediaStandalone || navigatorStandalone)
 }
 
+// The Mac app (desktop/) sets window.ubDesktop. It ships the Studio's files
+// itself and has its own update notice, so the service worker and the
+// "Add to Home Screen" nudge are skipped there; the offline badge stays.
+export function isDesktopApp(win) {
+  return Boolean(win && win.ubDesktop)
+}
+
 export function isIOS(userAgent) {
   const ua = String(userAgent || '')
   return /iPad|iPhone|iPod/.test(ua) && !/MSStream/.test(ua)
@@ -143,7 +150,12 @@ export function initPWA() {
   const store = window.localStorage
   if (!('serviceWorker' in nav)) return
   if (!window.location.protocol.startsWith('http')) return // no SW on file://
+  if (!isDesktopApp(window)) initWebOnly(window, document, nav, store)
+  initOfflineBadge(window, document, nav)
+}
 
+// Service worker, update banner and install nudge: the website only.
+function initWebOnly(window, document, nav, store) {
   const nowMs = () => Date.now()
   const hadController = Boolean(nav.serviceWorker.controller)
 
@@ -229,8 +241,9 @@ export function initPWA() {
   })
   // iOS never fires beforeinstallprompt; check on load instead.
   maybeShowInstall()
+}
 
-  // ---- offline badge ----
+function initOfflineBadge(window, document, nav) {
   let badge = null
   let badgeTimer = 0
   const clearBadge = () => {

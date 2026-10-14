@@ -35,6 +35,8 @@ The Studio is organized in six views, switched from the tab bar at the top:
 
 Display settings in the header, shared across the Studio and all four visuals pages: **dark mode** (follows your device until you pick one) and **text size A− A A+** (four levels, remembered). The Studio also has two **looks**: **Classic** (calm stone, the default) and **Cosmic** (deep space in dark mode, aurora dawn in light mode, for younger seekers), switched from the header and remembered; both are held to the same contrast floors. Contrast ratios are asserted by `app/test/a11y.test.mjs` — real math, not inversion — and touch targets are 44px.
 
+**UB Tools for Mac.** `desktop/` packages the Studio as a Mac app (Apple silicon and Intel, macOS 13 or newer) with its own window, Dock icon and Mac menus. The Studio's files are bundled, so the app works offline from the first launch. Download the `.dmg` from the latest *UB Tools for Mac* release; `.github/workflows/mac-app.yml` builds and tests it on a real Mac. See `desktop/README.md`.
+
 `app/embed-quote.js` is a separate drop-in widget any website can use: one script tag shows a verified quote-of-the-day (deterministic by date, 60 machine-sliced and `ub-verify.js`-checked quotes, no network needed). See `app/embed.md`.
 
 ## Browser extension: verify a quote on any webpage

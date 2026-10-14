@@ -1,0 +1,58 @@
+{
+  "name": "ub-tools-desktop",
+  "productName": "UB Tools",
+  "version": "1.0.0",
+  "description": "UB Tools Studio as a Mac app: read, listen to, search and study The Urantia Book, offline.",
+  "author": "Urantia Book Network",
+  "homepage": "https://urantiabooknetwork.com",
+  "license": "SEE LICENSE IN ../LICENSE",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.mjs",
+    "stage": "node scripts/stage.mjs",
+    "dist:mac": "node scripts/stage.mjs && electron-builder --mac --universal --publish never",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "devDependencies": {
+    "electron": "44.4.5",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.urantiabooknetwork.ubtools",
+    "productName": "UB Tools",
+    "copyright": "Urantia Book Network",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "lib/**",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "site",
+        "to": "site"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.reference",
+      "icon": "build/icon.png",
+      "target": [
+        "dmg"
+      ],
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "artifactName": "UB-Tools-${version}-mac.${ext}"
+    },
+    "dmg": {
+      "title": "UB Tools ${version}",
+      "artifactName": "UB-Tools-${version}-mac.${ext}"
+    }
+  }
+}
