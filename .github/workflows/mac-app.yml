@@ -41,9 +41,9 @@ jobs:
       run:
         working-directory: desktop
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -77,15 +77,18 @@ jobs:
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          if [ -n "$CSC_LINK" ]; then
+          # Pull requests always build ad-hoc: electron-builder refuses real certificates there.
+          if [ -n "$CSC_LINK" ] && [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
             echo "Signing with Developer ID and notarizing."
             echo "SIGNED=1" >> "$GITHUB_ENV"
             npx electron-builder --mac --universal --publish never
           else
-            echo "::warning::No Apple certificate secrets: building ad-hoc signed. Readers will need to approve the app once in System Settings."
+            echo "::warning::Building ad-hoc signed (no Apple certificate secrets, or a pull request). Readers would need to approve this build once in System Settings."
             echo "SIGNED=0" >> "$GITHUB_ENV"
             unset CSC_LINK CSC_KEY_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID
-            CSC_IDENTITY_AUTO_DISCOVERY=false npx electron-builder --mac --universal --publish never \
+            # CSC_FOR_PULL_REQUEST: without it electron-builder skips even ad-hoc signing on
+            # pull requests, and an unsigned app won't open on Apple silicon. No secrets are involved.
+            CSC_FOR_PULL_REQUEST=true CSC_IDENTITY_AUTO_DISCOVERY=false npx electron-builder --mac --universal --publish never \
               -c.mac.identity=- -c.mac.hardenedRuntime=false
           fi
 
