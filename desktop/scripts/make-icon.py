@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
-"""desktop/scripts/make-icon.py: build the Mac app icon from the Studio's mark.
+"""desktop/scripts/make-icon.py: build the Mac app icon from the UBN emblem.
 
-The Studio's icon (app/icons/icon-1024.png) is a full-bleed square with white
-corners, which looks wrong in the Dock. This keeps the gold mark exactly and
-re-frames it on Apple's icon grid: a 824 px rounded-square body inside a
-transparent 1024 px canvas, a navy gradient, a soft drop shadow and a gentle
-gold sheen. Output: desktop/build/icon-mac.png (electron-builder makes the .icns).
+The emblem (gold ring, blue circuit triangle) is the brand's own mark: the
+website's favicon and every profile picture use it (ub-iq growth/brand-kit/
+DESIGN.md, section 4). build/src/ubn-emblem.png is that emblem, cut from the
+website's public/images/ubn-logo-mark.png without the wordmark. This places it
+on Apple's icon grid: a 824 px rounded-square body in the brand navy inside a
+transparent 1024 px canvas, a soft shadow, and a faint blue glow behind the
+emblem. Output: desktop/build/icon-mac.png (electron-builder makes the .icns).
+
+The emblem source is 360 px, so it is enlarged about 2x for the 1024 px master;
+it stays sharp at Dock and Finder sizes. Do not AI-upscale it (the brand kit
+records an AI upscaler corrupting UBN artwork); swap in a larger original if one
+turns up.
 
     python3 desktop/scripts/make-icon.py
 """
@@ -15,29 +22,13 @@ import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[2]
-SRC = ROOT / 'app' / 'icons' / 'icon-1024.png'
+EMBLEM = Path(__file__).resolve().parents[1] / 'build' / 'src' / 'ubn-emblem.png'
 OUT = Path(__file__).resolve().parents[1] / 'build' / 'icon-mac.png'
 
 N = 1024
 BODY = 824            # Apple's macOS icon grid: 824 px body, 100 px margin
 OFF = (N - BODY) // 2
 SS = 4                # supersampling for smooth edges
-
-NAVY = np.array([24, 31, 45.])
-GOLD = np.array([197, 159, 74.])
-
-
-def mark_alpha():
-    """The gold mark as an alpha mask, anti-aliasing kept, cropped to its bounds."""
-    im = np.array(Image.open(SRC).convert('RGB')).astype(float)
-    d = GOLD - NAVY
-    t = np.clip(((im - NAVY) @ d) / (d @ d), 0, 1)
-    off_line = np.linalg.norm(im - (NAVY + t[..., None] * d), axis=2) > 18
-    t[off_line] = 0  # the white corners and their edge pixels are not the mark
-    a = Image.fromarray((t * 255).astype('uint8'), 'L')
-    # Bounds from clearly-gold pixels only; a few faint strays would off-centre it.
-    return a.crop(a.point(lambda v: 255 if v > 96 else 0).getbbox())
-
 
 def squircle(size):
     """Superellipse (n=5) mask, close to Apple's continuous-corner shape."""
@@ -66,32 +57,30 @@ def main():
     shadow = shadow.filter(ImageFilter.GaussianBlur(18)).point(lambda v: int(v * 0.42))
     canvas.paste(Image.new('RGBA', (N, N), (0, 0, 0, 255)), (0, 0), shadow)
 
-    # Body: navy, a touch lighter at the top, with a soft light from above.
-    body = vertical_gradient(BODY, BODY, (36, 46, 68), (15, 20, 31)).convert('RGBA')
+    # Body: the brand navy (navy-light #141b2d down to navy #0a0e1a), lit softly from above.
+    body = vertical_gradient(BODY, BODY, (26, 35, 58), (10, 14, 26)).convert('RGBA')
     hl = Image.new('L', (BODY, BODY), 0)
-    ImageDraw.Draw(hl).ellipse((-BODY * 0.1, -BODY * 0.75, BODY * 1.1, BODY * 0.35), fill=22)
+    ImageDraw.Draw(hl).ellipse((-BODY * 0.1, -BODY * 0.75, BODY * 1.1, BODY * 0.35), fill=18)
     hl = ImageChops.multiply(hl.filter(ImageFilter.GaussianBlur(120)), body_mask)
     body = Image.composite(Image.new('RGBA', (BODY, BODY), (255, 255, 255, 255)), body, hl)
 
-    # The mark, 70% of the body wide, with a gold sheen from light to deep.
-    mark = mark_alpha()
-    w = int(BODY * 0.70)
-    h = round(mark.height * w / mark.width)
-    mark = mark.resize((w, h), Image.LANCZOS)
-    gold = vertical_gradient(w, h, (240, 206, 112), (190, 146, 56)).convert('RGBA')
+    # The UBN emblem, 86% of the body, with a faint blue glow from its circuit triangle.
+    emblem = Image.open(EMBLEM).convert('RGBA')
+    w = int(BODY * 0.86)
+    h = round(emblem.height * w / emblem.width)
+    emblem = emblem.resize((w, h), Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=2, percent=60, threshold=2))
+    ex, ey = (BODY - w) // 2, (BODY - h) // 2
     glow = Image.new('L', (BODY, BODY), 0)
-    # Optical centre: a downward chevron reads high, so sit it a little low.
-    mx, my = (BODY - w) // 2, (BODY - h) // 2 + 14
-    glow.paste(mark, (mx, my))
-    glow = glow.filter(ImageFilter.GaussianBlur(22)).point(lambda v: int(v * 0.28))
-    body = Image.composite(Image.new('RGBA', (BODY, BODY), (232, 197, 71, 255)), body, glow)
-    body.paste(gold, (mx, my), mark)
+    glow.paste(emblem.getchannel('A'), (ex, ey))
+    glow = glow.filter(ImageFilter.GaussianBlur(28)).point(lambda v: int(v * 0.35))
+    body = Image.composite(Image.new('RGBA', (BODY, BODY), (33, 150, 243, 255)), body, glow)
+    body.alpha_composite(emblem, (ex, ey))
 
-    body.putalpha(body_mask)
+    body.putalpha(ImageChops.multiply(body.getchannel('A'), body_mask))
     canvas.alpha_composite(body, (OFF, OFF))
     OUT.parent.mkdir(parents=True, exist_ok=True)
     canvas.save(OUT)
-    print(f'make-icon: {OUT.relative_to(ROOT)} ({N}x{N}, mark {w}x{h})')
+    print(f'make-icon: {OUT.relative_to(ROOT)} ({N}x{N}, emblem {w}x{h})')
 
 
 if __name__ == '__main__':
