@@ -54,6 +54,13 @@ async function run() {
     ws.send(JSON.stringify({ id: my, method: 'Runtime.evaluate', params: { expression, awaitPromise: true, returnByValue: true } }))
   })
 
+  // The page's title appears as soon as <head> is parsed; wait for the whole page and its scripts.
+  let ready = false
+  for (let i = 0; i < 30 && !ready; i++) {
+    ready = (await evaluate("document.readyState === 'complete' && Boolean(document.getElementById('mic'))")) === true
+    if (!ready) await sleep(1000)
+  }
+  check('page finishes loading', ready)
   check('served at the Studio address', page.url === 'https://ubn606.github.io/ub-tools/app/', page.url)
   const desktop = await evaluate('JSON.stringify(window.ubDesktop || null)')
   check('page knows it is the Mac app', /"platform":"darwin"/.test(String(desktop)) || process.platform !== 'darwin', String(desktop))
@@ -70,6 +77,9 @@ async function run() {
 }
 
 try { await run() } catch (e) { check('smoke test ran', false, e.message) }
+// Let the app finish writing its profile before removing it.
+const exited = new Promise((r) => child.once('exit', r))
 child.kill()
-fs.rmSync(profile, { recursive: true, force: true })
+await Promise.race([exited, sleep(10000)])
+try { fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 500 }) } catch { /* temp dir: the OS cleans it */ }
 process.exit(failed ? 1 : 0)
