@@ -1,14 +1,14 @@
-# UB Tools for Mac
+# UBN Tools for Mac
 
-UB Tools Studio as a Mac app: Read, Listen, Plans, Quiz, Explore and Tools in their own window, with a Dock icon and the usual Mac menus. It works on Apple silicon and Intel Macs running macOS 13 Ventura or newer.
+UBN Tools is UB Tools Studio as a Mac app: Read, Listen, Plans, Quiz, Explore and Tools in their own window, with a Dock icon and the usual Mac menus. It works on Apple silicon and Intel Macs running macOS 13 Ventura or newer.
 
 ## For readers
 
-1. Download **UB-Tools-…-mac.dmg** from the latest *UB Tools for Mac* release.
-2. Open it and drag **UB Tools** into **Applications**.
-3. Open UB Tools. The first launch downloads the book's text once from [Urantiapedia](https://urantiapedia.org) (CC BY-SA 4.0). After that, everything works offline.
+1. Download **UBN-Tools-mac.dmg** from the latest *UBN Tools for Mac* release (always at `https://github.com/UBN606/ub-tools/releases/latest/download/UBN-Tools-mac.dmg`).
+2. Open it and drag **UBN Tools** into **Applications**.
+3. Open UBN Tools. The first launch downloads the book's text once from [Urantiapedia](https://urantiapedia.org) (CC BY-SA 4.0). After that, everything works offline.
 
-Until the app is signed with an Apple Developer ID, your Mac will warn the first time that it can't check the app. Click **Done**, open **System Settings → Privacy & Security**, click **Open Anyway** next to UB Tools, and enter your password. You only do this once. (On macOS 13 or 14 you can instead Control-click the app, choose **Open**, then **Open** again.)
+Until the app is signed with an Apple Developer ID, your Mac will warn the first time that it can't check the app. Click **Done**, open **System Settings → Privacy & Security**, click **Open Anyway** next to UBN Tools, and enter your password. You only do this once. (On macOS 13 or 14 you can instead Control-click the app, choose **Open**, then **Open** again.)
 
 When a new version is published, the app says so once and offers the download; it never updates itself without asking. Your reading plans, study list and saved book text are kept when you replace the app.
 
@@ -29,8 +29,10 @@ cd desktop
 npm install
 npm start          # runs the app on the repository's own files
 npm test           # unit tests, no Electron needed
-npm run dist:mac   # on a Mac: stage the files and build dist/UB-Tools-<version>-mac.dmg
+npm run dist:mac   # on a Mac: stage the files and build dist/UBN-Tools-mac.dmg
 ```
+
+The artwork is generated, then committed: `python3 scripts/make-icon.py` re-frames the Studio's gold mark on Apple's icon grid as `build/icon-mac.png`, and `python3 scripts/make-dmg-background.py` draws the install window (`build/dmg-background.png` and `@2x`). Once the app is signed with a Developer ID, drop the "Open Anyway" hint line from that script and run it again.
 
 `scripts/stage.mjs` copies the files git tracks (except development-only ones) into `desktop/site/`. `scripts/smoke.mjs <path to the app binary>` launches a built app and checks that the Studio opens from the bundle, that the page has no Node.js, that no service worker registers and that the book loads.
 

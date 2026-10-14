@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // desktop/scripts/stage.mjs — copy the Studio's files into desktop/site/ for the
-// Mac app to bundle, and the 1024px app icon into desktop/build/icon.png.
+// Mac app to bundle, and (on a Mac) build the install window's background.
 //
 // Only files tracked by git are copied, so nothing local leaks into a build:
 // never source-texts/ (Urantiapedia's text is downloaded by each reader, as on
@@ -48,9 +48,14 @@ function main() {
     fs.copyFileSync(from, to)
     bytes += fs.statSync(to).size
   }
-  fs.mkdirSync(path.join(DESKTOP, 'build'), { recursive: true })
-  fs.copyFileSync(path.join(ROOT, 'app', 'icons', 'icon-1024.png'), path.join(DESKTOP, 'build', 'icon.png'))
   console.log(`stage: ${files.length} files, ${(bytes / 1e6).toFixed(1)} MB -> desktop/site/`)
+  // The install window's background: 1x and 2x joined into one TIFF so it is sharp on
+  // Retina screens. tiffutil only exists on macOS, which is the only place a .dmg is built.
+  if (process.platform === 'darwin') {
+    const b = (f) => path.join(DESKTOP, 'build', f)
+    execFileSync('tiffutil', ['-cathidpicheck', b('dmg-background.png'), b('dmg-background@2x.png'), '-out', b('background.tiff')])
+    console.log('stage: build/background.tiff')
+  }
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) main()

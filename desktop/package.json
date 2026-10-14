@@ -1,8 +1,8 @@
 {
   "name": "ub-tools-desktop",
-  "productName": "UB Tools",
-  "version": "1.0.0",
-  "description": "UB Tools Studio as a Mac app: read, listen to, search and study The Urantia Book, offline.",
+  "productName": "UBN Tools",
+  "version": "1.0.1",
+  "description": "UBN Tools (UB Tools Studio) as a Mac app: read, listen to, search and study The Urantia Book, offline.",
   "author": "Urantia Book Network",
   "homepage": "https://urantiabooknetwork.com",
   "license": "SEE LICENSE IN ../LICENSE",
@@ -21,7 +21,7 @@
   },
   "build": {
     "appId": "com.urantiabooknetwork.ubtools",
-    "productName": "UB Tools",
+    "productName": "UBN Tools",
     "copyright": "Urantia Book Network",
     "directories": {
       "output": "dist",
@@ -41,18 +41,37 @@
     ],
     "mac": {
       "category": "public.app-category.reference",
-      "icon": "build/icon.png",
+      "icon": "build/icon-mac.png",
       "target": [
         "dmg"
       ],
       "hardenedRuntime": true,
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
-      "artifactName": "UB-Tools-${version}-mac.${ext}"
+      "artifactName": "UBN-Tools-mac.${ext}"
     },
     "dmg": {
-      "title": "UB Tools ${version}",
-      "artifactName": "UB-Tools-${version}-mac.${ext}"
+      "title": "UBN Tools ${version}",
+      "artifactName": "UBN-Tools-mac.${ext}",
+      "background": "build/background.tiff",
+      "iconSize": 128,
+      "window": {
+        "width": 660,
+        "height": 400
+      },
+      "contents": [
+        {
+          "x": 180,
+          "y": 200,
+          "type": "file"
+        },
+        {
+          "x": 480,
+          "y": 200,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
     }
   }
 }
