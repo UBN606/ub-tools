@@ -12,7 +12,7 @@ import {
   parseStoredTheme, resolveTheme, oppositeTheme,
   parseStoredSize, clampSize, stepSize, sizeClass, sizePercent,
   migrateLegacyBig, applyTheme, applySize, themeToggleState,
-  STYLE_KEY, parseStoredStyle, otherStyle, applyStyle, lookToggleState,
+  STYLE_KEY, STYLES, parseStoredStyle, nextStyle, otherStyle, applyStyle, lookToggleState,
 } from '../a11y.js'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -229,13 +229,75 @@ test('Look setting: Classic by default, Cosmic only when chosen', () => {
   assert.equal(parseStoredStyle('cosmic'), 'cosmic')
   assert.equal(parseStoredStyle('"neon"'), 'classic')
   assert.equal(otherStyle('classic'), 'cosmic')
-  assert.equal(otherStyle('cosmic'), 'classic')
   const d = { documentElement: { dataset: {} } }
   applyStyle(d, 'cosmic'); assert.equal(d.documentElement.dataset.style, 'cosmic')
   applyStyle(d, 'classic'); assert.equal(d.documentElement.dataset.style, undefined)
   const c = lookToggleState('classic'), k = lookToggleState('cosmic')
   assert.equal(c.pressed, false); assert.match(c.shortLabel, /Cosmic/); assert.match(c.shortLabel, /<svg/)
-  assert.equal(k.pressed, true); assert.match(k.shortLabel, /Classic/)
+  assert.equal(k.pressed, true); assert.match(k.shortLabel, /Galaxy/)
+})
+
+test('Look button cycles Classic, Cosmic, Galaxy; Galaxy builds on Cosmic', () => {
+  assert.deepEqual(STYLES, ['classic', 'cosmic', 'galaxy'])
+  assert.equal(nextStyle('classic'), 'cosmic')
+  assert.equal(nextStyle('cosmic'), 'galaxy')
+  assert.equal(nextStyle('galaxy'), 'classic')
+  assert.equal(nextStyle('neon'), 'cosmic')
+  assert.equal(parseStoredStyle('"galaxy"'), 'galaxy')
+  const d = { documentElement: { dataset: {} } }
+  applyStyle(d, 'galaxy')
+  assert.equal(d.documentElement.dataset.style, 'cosmic', 'Galaxy reuses the Cosmic panels')
+  assert.equal(d.documentElement.dataset.look, 'galaxy')
+  applyStyle(d, 'cosmic'); assert.equal(d.documentElement.dataset.look, undefined)
+  applyStyle(d, 'classic'); assert.equal(d.documentElement.dataset.style, undefined); assert.equal(d.documentElement.dataset.look, undefined)
+  const g = lookToggleState('galaxy')
+  assert.equal(g.pressed, true); assert.match(g.shortLabel, /Classic/); assert.equal(g.label, 'Switch to the Classic look')
+  // the pre-paint script in index.html must know Galaxy too, or it flashes Classic first
+  const html = readFileSync(join(root, 'index.html'), 'utf8')
+  assert.match(html, /st === 'galaxy'\) document\.documentElement\.dataset\.look = 'galaxy'/)
+})
+
+const GALAXY = 'html[data-style="cosmic"][data-look="galaxy"]'
+const GALAXY_DARK = GALAXY + '[data-theme="dark"]'
+
+test('Galaxy light (observatory dawn) meets contrast targets', (t) => {
+  const v = { ...varsOf(css, ':root'), ...varsOf(css, COSMIC), ...varsOf(css, GALAXY) }
+  assert.ok(v.ground === '#F3F6FC', 'galaxy overrides the cosmic palette')
+  check(t, v.ink, v.ground, 7, 'body text')
+  check(t, v.ink, v.chalk, 7, 'panel text')
+  check(t, v.ink, v.basin, 7, 'well text')
+  check(t, v.graphite, v.ground, 4.5, 'secondary text')
+  check(t, v.faint, v.ground, 4.5, 'faint metadata text')
+  check(t, v.faint, v.chalk, 4.5, 'faint text on panels')
+  check(t, v.lapis, v.ground, 4.5, 'accent text')
+  check(t, v.fix, v.chalk, 4.5, 'gold eyebrow on panels')
+  check(t, '#ffffff', v.fix, 4.5, 'white cite chip on gold')
+  check(t, '#ffffff', v.pass, 4.5, 'white on PASS')
+})
+
+test('Galaxy dark (deep space) meets contrast targets', (t) => {
+  const v = { ...varsOf(css, ':root'), ...varsOf(css, COSMIC), ...varsOf(css, COSMIC_DARK), ...varsOf(css, GALAXY), ...varsOf(css, GALAXY_DARK) }
+  assert.ok(v.ground === '#04060E', 'galaxy dark overrides galaxy light')
+  check(t, v.ink, v.ground, 7, 'body text')
+  check(t, v.ink, v.chalk, 7, 'panel text')
+  check(t, v.ink, v.basin, 7, 'well text')
+  check(t, v.graphite, v.ground, 4.5, 'secondary text')
+  check(t, v.faint, v.ground, 4.5, 'faint metadata text')
+  check(t, v.faint, v.chalk, 4.5, 'faint text on panels')
+  check(t, v.lapis, v.chalk, 4.5, 'accent text on panels')
+  check(t, v.fix, v.chalk, 4.5, 'gold eyebrow on panels')
+  check(t, '#1A1300', v.fix, 4.5, 'dark cite chip text on gold')
+  check(t, '#07060F', v.pass, 4.5, 'seal text on PASS')
+})
+
+test('Galaxy gold button keeps its dark text readable across the gradient', (t) => {
+  for (const stop of ['#F0C560', '#E2B44E', '#D8A93F']) check(t, '#1A1300', stop, 4.5, `go button at ${stop}`)
+  assert.ok(css.includes('linear-gradient(120deg,#F0C560 0%,#E2B44E 50%,#D8A93F 100%)'), 'gradient stops match the test')
+})
+
+test('Galaxy star twinkle stops under prefers-reduced-motion', () => {
+  const m = css.match(/@media \(prefers-reduced-motion: reduce\)\{\s*html\[data-style="cosmic"\]\[data-look="galaxy"\]\[data-theme="dark"\] body::after\{animation:none\}/)
+  assert.ok(m, 'reduced-motion block for the galaxy stars')
 })
 
 test('app.js imports every a11y constant it uses', () => {

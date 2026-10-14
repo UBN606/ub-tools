@@ -23,7 +23,8 @@ try {
   var dark = t === 'dark' ? true : t === 'light' ? false : matchMedia('(prefers-color-scheme: dark)').matches;
   if (dark) document.documentElement.dataset.theme = 'dark';
   var st = null; try { st = JSON.parse(localStorage.getItem('ub-tools-style')); } catch (e) {}
-  if (st === 'cosmic') document.documentElement.dataset.style = 'cosmic';
+  if (st === 'cosmic' || st === 'galaxy') document.documentElement.dataset.style = 'cosmic';
+  if (st === 'galaxy') document.documentElement.dataset.look = 'galaxy';
   var s = null; try { s = JSON.parse(localStorage.getItem('ub-tools-text-size')); } catch (e) {}
   var n = (typeof s === 'number' && isFinite(s)) ? Math.max(0, Math.min(3, Math.floor(s))) : null;
   if (n == null) { var b = null; try { b = JSON.parse(localStorage.getItem('big')); } catch (e) {} n = (b === false) ? 1 : 2; }
