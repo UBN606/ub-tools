@@ -27,7 +27,8 @@ async function pageTarget() {
   for (let i = 0; i < 90; i++) {
     try {
       const list = await (await fetch(`http://127.0.0.1:${PORT}/json`)).json()
-      const page = list.find((t) => t.type === 'page' && t.title === 'UB Tools Studio')
+      // By address, not title: the title is branding and changes (it did, to UBN Tools).
+      const page = list.find((t) => t.type === 'page' && t.url.startsWith('https://ubn606.github.io/ub-tools/app/'))
       if (page) return page
     } catch { /* not up yet */ }
     await sleep(1000)
