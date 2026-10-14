@@ -96,7 +96,7 @@ function makeEl(doc, tag, cls, text) {
 export function buildUpdateBanner(doc, { onUpdate, onLater }) {
   const bar = makeEl(doc, 'div', 'pwa-banner')
   bar.setAttribute('role', 'status')
-  bar.appendChild(makeEl(doc, 'p', 'pwa-banner-text', 'A new version of UB Tools is ready.'))
+  bar.appendChild(makeEl(doc, 'p', 'pwa-banner-text', 'A new version of UBN Tools is ready.'))
   const actions = makeEl(doc, 'div', 'pwa-banner-actions')
   const update = makeEl(doc, 'button', 'pwa-btn pwa-btn-primary', 'Reload')
   update.type = 'button'
@@ -115,8 +115,8 @@ export function buildInstallBanner(doc, { ios, onInstall, onDismiss }) {
   const bar = makeEl(doc, 'div', 'pwa-banner')
   bar.setAttribute('role', 'status')
   const text = ios
-    ? 'Add UB Tools to your Home Screen for quick access: tap Share, then “Add to Home Screen.”'
-    : 'Add UB Tools to your Home Screen for quick access.'
+    ? 'Add UBN Tools to your Home Screen for quick access: tap Share, then “Add to Home Screen.”'
+    : 'Add UBN Tools to your Home Screen for quick access.'
   bar.appendChild(makeEl(doc, 'p', 'pwa-banner-text', text))
   const actions = makeEl(doc, 'div', 'pwa-banner-actions')
   const go = makeEl(doc, 'button', 'pwa-btn pwa-btn-primary', ios ? 'Got it' : 'Add to Home Screen')
