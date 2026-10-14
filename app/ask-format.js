@@ -18,7 +18,7 @@ export const ASK_LABELS = {
     empty: 'The book does not speak to that in these words. Try asking with other words.',
     garbled: "That didn't come through clearly. Try asking it another way.",
     foundWhy: 'Found because it speaks of:',
-    via: 'via UB Tools Studio',
+    via: 'via UBN Tools',
     alsoIn: 'Also in:',
   },
   es: {
@@ -31,7 +31,7 @@ export const ASK_LABELS = {
     empty: 'El libro no habla de eso con estas palabras. Prueba con otras palabras.',
     garbled: 'Eso no se entendió bien. Intenta preguntarlo de otra manera.',
     foundWhy: 'Encontrado porque habla de:',
-    via: 'vía UB Tools Studio',
+    via: 'vía UBN Tools',
     alsoIn: 'También en:',
   },
   fr: {
@@ -44,7 +44,7 @@ export const ASK_LABELS = {
     empty: "Le livre n'en parle pas en ces termes. Essayez avec d'autres mots.",
     garbled: "Cela n'est pas arrivé clairement. Essayez de le demander autrement.",
     foundWhy: 'Trouvé parce qu’il parle de :',
-    via: 'via UB Tools Studio',
+    via: 'via UBN Tools',
     alsoIn: 'Aussi en :',
   },
   ko: {
@@ -57,7 +57,7 @@ export const ASK_LABELS = {
     empty: '책은 그에 대해 이렇게 말하지 않습니다. 다른 말로 질문해 보세요.',
     garbled: '질문이 잘 전달되지 않았습니다. 다른 말로 질문해 보세요.',
     foundWhy: '관련 주제로 찾음:',
-    via: 'UB Tools Studio 제공',
+    via: 'UBN Tools 제공',
     alsoIn: '다른 언어로 보기:',
   },
   pl: {
@@ -70,7 +70,7 @@ export const ASK_LABELS = {
     empty: 'Książka nie mówi o tym w tych słowach. Spróbuj zapytać innymi słowami.',
     garbled: 'To nie brzmiało wyraźnie. Spróbuj zapytać inaczej.',
     foundWhy: 'Znaleziono, ponieważ mówi o:',
-    via: 'przez UB Tools Studio',
+    via: 'przez UBN Tools',
     alsoIn: 'Także w:',
   },
 }

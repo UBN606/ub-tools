@@ -50,7 +50,7 @@ a { color: var(--lapis); text-underline-offset: 3px; }
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); font-weight: 600; letter-spacing: -.01em; font-size: 17px; }
-.mark { width: 34px; height: 34px; filter: drop-shadow(3px 4px 5px var(--lift-dark)) drop-shadow(-2px -2px 3px var(--lift-light)); }
+.mark { width: 34px; height: 34px; flex: none; filter: drop-shadow(2px 3px 4px var(--lift-dark)); }
 .status {
   margin: 0; font-size: 13.5px; color: var(--graphite);
   padding: 7px 14px; border-radius: 999px; background: var(--basin);
@@ -862,3 +862,125 @@ html[data-style="cosmic"] .look-btn{border-color:var(--hair-strong);background:l
 .look-btn{white-space:nowrap}
 html[data-style="cosmic"] .well input{letter-spacing:-.04em}
 @media (max-width:420px){html.bigger .well input{font-size:30px}} /* A++ on phones: the whole placeholder fits (34px cut it off) */
+
+/* =====================================================================
+   GALAXY: the UBN look. Navy deep space with a Milky Way band and a real
+   star field, the brand gold for actions and the emblem's electric blue for
+   accents. Built on Cosmic's glass panels and pills (data-style="cosmic") with
+   its own palette and sky (data-look="galaxy"); contrast floors are asserted in
+   a11y.test.mjs like the other looks. Light mode is "observatory dawn".
+   ===================================================================== */
+html[data-style="cosmic"][data-look="galaxy"]{color-scheme:light;
+  --ground:#F3F6FC;--chalk:#FFFFFF;--basin:#E8EEF8;--paper:#FFFFFF;
+  --ink:#0A1326;--graphite:#3A4763;--faint:#4C5873;
+  --lapis:#1559B0;--lapis-soft:rgba(21,89,176,.16);--pass:#1F7A55;--fix:#8A5A1F;
+  --lift-dark:rgba(10,30,80,.10);--press-dark:rgba(10,30,80,.08);
+  --glass:rgba(255,255,255,.74);--glass-strong:rgba(255,255,255,.92);--hair:rgba(21,89,176,.16);--hair-strong:rgba(21,89,176,.34);
+  --glow:0 18px 50px -18px rgba(21,89,176,.32);
+  --orb-a:rgba(33,150,243,.20);--orb-b:rgba(216,169,63,.20);--orb-c:rgba(79,195,247,.16)}
+html[data-style="cosmic"][data-look="galaxy"][data-theme="dark"]{color-scheme:dark;
+  --ground:#04060E;--chalk:#0E1530;--basin:#091024;--paper:#0E1530;
+  --ink:#F2F5FC;--graphite:#B9C3DB;--faint:#9AA6C4;
+  --lapis:#6CC8FF;--lapis-soft:rgba(108,200,255,.2);--pass:#5EE6B0;--fix:#F0C560;
+  --lift-dark:rgba(0,0,0,.55);--press-dark:rgba(0,0,0,.45);
+  --glass:rgba(12,19,44,.62);--glass-strong:rgba(14,21,48,.93);--hair:rgba(255,255,255,.09);--hair-strong:rgba(108,200,255,.42);
+  --glow:0 24px 70px -24px rgba(33,150,243,.55);
+  --orb-a:rgba(33,150,243,.30);--orb-b:rgba(216,169,63,.16);--orb-c:rgba(120,90,255,.18)}
+
+/* the sky: a diagonal Milky Way band over three slow orbs (same drift as Cosmic) */
+html[data-style="cosmic"][data-look="galaxy"] body::before{background:
+    linear-gradient(118deg,transparent 30%,rgba(120,170,255,.10) 42%,rgba(240,205,140,.12) 50%,rgba(120,170,255,.10) 58%,transparent 70%),
+    radial-gradient(38vmax 38vmax at 16% 14%,var(--orb-a),transparent 62%),
+    radial-gradient(34vmax 34vmax at 84% 28%,var(--orb-b),transparent 60%),
+    radial-gradient(32vmax 32vmax at 52% 94%,var(--orb-c),transparent 60%)}
+html[data-style="cosmic"][data-look="galaxy"][data-theme="dark"] body::before{background:
+    linear-gradient(118deg,transparent 28%,rgba(110,160,255,.13) 40%,rgba(255,220,160,.16) 49%,rgba(200,170,255,.12) 53%,rgba(110,160,255,.13) 60%,transparent 72%),
+    radial-gradient(38vmax 38vmax at 16% 14%,var(--orb-a),transparent 62%),
+    radial-gradient(34vmax 34vmax at 84% 28%,var(--orb-b),transparent 60%),
+    radial-gradient(32vmax 32vmax at 52% 94%,var(--orb-c),transparent 60%)}
+/* the stars: three layers on different tiles so the field never visibly repeats */
+html[data-style="cosmic"][data-look="galaxy"][data-theme="dark"] body::after{opacity:.95;
+  background-image:
+    radial-gradient(1.2px 1.2px at 36.5% 43.6%,#fff,transparent),
+    radial-gradient(1px 1px at 45.5% 45.4%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 65.2% 2.9%,#fff,transparent),
+    radial-gradient(1px 1px at 34.1% 73.9%,#fff,transparent),
+    radial-gradient(1px 1px at 53.8% 74.7%,#fff,transparent),
+    radial-gradient(1px 1px at 50.5% 4.3%,#fff,transparent),
+    radial-gradient(1px 1px at 64.5% 42.8%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 73.0% 72.2%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 57.4% 8.3%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 97.7% 36.6%,#fff,transparent),
+    radial-gradient(1px 1px at 82.8% 78.2%,#fff,transparent),
+    radial-gradient(1px 1px at 92.5% 32.8%,#fff,transparent),
+    radial-gradient(1px 1px at 19.8% 10.3%,#fff,transparent),
+    radial-gradient(1px 1px at 81.0% 45.0%,#dce6ff,transparent),
+    radial-gradient(1px 1px at 6.5% 5.7%,#fff,transparent),
+    radial-gradient(1px 1px at 1.1% 6.7%,#dce6ff,transparent),
+    radial-gradient(1px 1px at 3.3% 92.7%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 14.6% 76.0%,#fff,transparent),
+    radial-gradient(1px 1px at 76.9% 79.5%,#fff,transparent),
+    radial-gradient(1px 1px at 98.8% 70.1%,#fff,transparent),
+    radial-gradient(1px 1px at 55.9% 37.8%,#fff,transparent),
+    radial-gradient(1px 1px at 52.7% 18.9%,#fff,transparent),
+    radial-gradient(1px 1px at 42.1% 90.3%,#dce6ff,transparent),
+    radial-gradient(1px 1px at 8.1% 36.0%,#dce6ff,transparent),
+    radial-gradient(1.2px 1.2px at 39.2% 68.5%,#dce6ff,transparent),
+    radial-gradient(1px 1px at 34.3% 97.4%,#dce6ff,transparent),
+    radial-gradient(1px 1px at 2.0% 3.8%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 7.3% 20.3%,#dce6ff,transparent),
+    radial-gradient(1px 1px at 46.3% 96.8%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 11.7% 61.9%,#dce6ff,transparent),
+    radial-gradient(1px 1px at 10.9% 54.1%,#fff,transparent),
+    radial-gradient(1px 1px at 79.4% 29.2%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 32.0% 43.2%,#dce6ff,transparent),
+    radial-gradient(1px 1px at 74.7% 75.5%,#dce6ff,transparent),
+    radial-gradient(1.5px 1.5px at 52.1% 84.2%,#ffe6a8,transparent),
+    radial-gradient(1.5px 1.5px at 72.2% 57.1%,#ffe6a8,transparent),
+    radial-gradient(1.5px 1.5px at 75.8% 50.9%,#bfe3ff,transparent),
+    radial-gradient(1.8px 1.8px at 50.0% 76.6%,#ffe6a8,transparent),
+    radial-gradient(1.5px 1.5px at 68.5% 29.4%,#ffe6a8,transparent),
+    radial-gradient(1.8px 1.8px at 37.5% 35.5%,#ffe6a8,transparent),
+    radial-gradient(1.8px 1.8px at 23.8% 9.5%,#ffe6a8,transparent),
+    radial-gradient(1.8px 1.8px at 78.9% 69.8%,#ffe6a8,transparent),
+    radial-gradient(1.8px 1.8px at 68.3% 4.1%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 14.3% 32.2%,#fff,transparent),
+    radial-gradient(1.8px 1.8px at 91.1% 13.9%,#ffe6a8,transparent),
+    radial-gradient(1.5px 1.5px at 10.0% 59.5%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 31.9% 21.0%,#fff,transparent),
+    radial-gradient(1.8px 1.8px at 55.9% 98.8%,#fff,transparent),
+    radial-gradient(2.4px 2.4px at 35.8% 56.2%,#9fd8ff,transparent),
+    radial-gradient(2.4px 2.4px at 52.6% 97.6%,#ffffff,transparent),
+    radial-gradient(2.8px 2.8px at 82.0% 47.2%,#9fd8ff,transparent),
+    radial-gradient(2.8px 2.8px at 48.1% 50.7%,#ffffff,transparent),
+    radial-gradient(2.4px 2.4px at 25.4% 50.0%,#ffffff,transparent),
+    radial-gradient(2.8px 2.8px at 43.4% 69.2%,#9fd8ff,transparent);
+  background-size:720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,720px 720px,1100px 1100px,1100px 1100px,1100px 1100px,1100px 1100px,1100px 1100px,1100px 1100px,1100px 1100px,1100px 1100px,1100px 1100px,1100px 1100px,1100px 1100px,1100px 1100px,1100px 1100px,1100px 1100px,1500px 1500px,1500px 1500px,1500px 1500px,1500px 1500px,1500px 1500px,1500px 1500px;
+  animation:galaxy-twinkle 7s ease-in-out infinite alternate}
+@keyframes galaxy-twinkle{from{opacity:.75}to{opacity:1}}
+
+/* brand accents: the name in gold, actions in gold, highlights in electric blue */
+html[data-style="cosmic"][data-look="galaxy"] .brand span{background:linear-gradient(90deg,var(--ink),var(--fix));-webkit-background-clip:text;background-clip:text}
+html[data-style="cosmic"][data-look="galaxy"] .go,html[data-style="cosmic"][data-look="galaxy"][data-theme="dark"] .go{color:#1A1300;
+  background:linear-gradient(120deg,#F0C560 0%,#E2B44E 50%,#D8A93F 100%);
+  box-shadow:0 12px 30px -10px rgba(216,169,63,.7),inset 0 1px 0 rgba(255,255,255,.4)}
+html[data-style="cosmic"][data-look="galaxy"] .go:hover{box-shadow:0 18px 40px -12px rgba(216,169,63,.85),inset 0 1px 0 rgba(255,255,255,.45)}
+html[data-style="cosmic"][data-look="galaxy"] .go:disabled{background:var(--basin);color:var(--faint);box-shadow:none}
+html[data-style="cosmic"][data-look="galaxy"] .soft.strong{color:#1A1300;background:linear-gradient(120deg,#F0C560,#D8A93F)}
+html[data-style="cosmic"][data-look="galaxy"] .well:focus-within{box-shadow:0 0 0 4px var(--lapis-soft),0 18px 50px -20px rgba(33,150,243,.65)}
+html[data-style="cosmic"][data-look="galaxy"] .modes-thumb,html[data-style="cosmic"][data-look="galaxy"] .topnav-thumb{background:linear-gradient(135deg,rgba(33,150,243,.22),rgba(216,169,63,.14));box-shadow:0 6px 20px -8px rgba(33,150,243,.55)}
+html[data-style="cosmic"][data-look="galaxy"] .groove span{background:linear-gradient(90deg,#2196F3,#6CC8FF,#F0C560)}
+html[data-style="cosmic"][data-look="galaxy"] .answer li.featured{background:linear-gradient(var(--glass-strong),var(--glass-strong)) padding-box,
+    linear-gradient(120deg,#F0C560,#2196F3 50%,#6CC8FF) border-box;
+  box-shadow:0 30px 80px -30px rgba(216,169,63,.4),var(--glow)}
+html[data-style="cosmic"][data-look="galaxy"] mark{background:linear-gradient(transparent 55%,rgba(33,150,243,.26) 55%)}
+html[data-style="cosmic"][data-look="galaxy"] .look-btn{background:linear-gradient(120deg,rgba(33,150,243,.2),rgba(216,169,63,.16))}
+html[data-style="cosmic"][data-look="galaxy"] .help::backdrop{background:rgba(4,6,14,.6)}
+@media (max-width:680px){
+  html[data-style="cosmic"][data-look="galaxy"] .modes .soft[aria-selected="true"],html[data-style="cosmic"][data-look="galaxy"][data-theme="dark"] .modes .soft[aria-selected="true"],
+  html[data-style="cosmic"][data-look="galaxy"] .modes button[aria-selected="true"],html[data-style="cosmic"][data-look="galaxy"][data-theme="dark"] .modes button[aria-selected="true"]{
+    background:linear-gradient(135deg,rgba(33,150,243,.22),rgba(216,169,63,.14));box-shadow:0 6px 20px -8px rgba(33,150,243,.55)}
+}
+@media (prefers-reduced-motion: reduce){
+  html[data-style="cosmic"][data-look="galaxy"][data-theme="dark"] body::after{animation:none}
+}

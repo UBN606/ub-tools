@@ -17,7 +17,7 @@
 //   would strand them on the old version forever.
 'use strict'
 
-const VERSION = 'ub-tools-20261014T054751'
+const VERSION = 'ub-tools-20261014T064940'
 const SHELL_CACHE = VERSION + '-shell'
 const TEXT_CACHE = VERSION + '-text'
 const MAX_TEXT_ENTRIES = 250
@@ -30,7 +30,7 @@ const SHELL = [
   './lang-detect.js', './parse-i18n.js', './ask-i18n.js', './load-translation.js',
   './read-lang.js', './study-tracks.js', './chat.js',
   './plans-data.json', './quiz-bank.json', './pronounce.json', './ubn-articles.json',
-  './icons/icon-192.png', './icons/icon-512.png',
+  './icons/icon-192.png', './icons/icon-512.png', './icons/ubn-emblem-102.png', './icons/favicon-64.png',
 ]
 
 self.addEventListener('install', (event) => {

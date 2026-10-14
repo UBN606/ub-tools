@@ -98,9 +98,12 @@ export function themeToggleState(theme) {
   }
 }
 
-// ---------- look: Classic (calm, the default) or Cosmic (bold, for younger seekers) ----------
+// ---------- look: Classic (calm, the default), Cosmic (bold, for younger seekers) or
+// Galaxy (the UBN brand: navy deep space, gold and the emblem's electric blue) ----------
+// Galaxy reuses Cosmic's glass panels and pills (data-style="cosmic") and adds its own
+// palette and sky on top (data-look="galaxy"), so the two never drift apart.
 export const STYLE_KEY = 'ub-tools-style'
-export const STYLES = ['classic', 'cosmic']
+export const STYLES = ['classic', 'cosmic', 'galaxy']
 
 export function parseStoredStyle(raw) {
   if (raw == null) return 'classic'
@@ -109,26 +112,35 @@ export function parseStoredStyle(raw) {
   return STYLES.includes(v) ? v : 'classic'
 }
 
-export function otherStyle(style) {
-  return style === 'cosmic' ? 'classic' : 'cosmic'
+// The Look button cycles Classic -> Cosmic -> Galaxy -> Classic.
+// An unknown value counts as Classic, as parseStoredStyle reads it.
+export function nextStyle(style) {
+  const i = Math.max(0, STYLES.indexOf(style))
+  return STYLES[(i + 1) % STYLES.length]
 }
+export const otherStyle = nextStyle // older name, kept for callers
 
 export function applyStyle(doc, style) {
   const el = doc.documentElement
-  if (style === 'cosmic') el.dataset.style = 'cosmic'
+  if (style === 'cosmic' || style === 'galaxy') el.dataset.style = 'cosmic'
   else delete el.dataset.style
+  if (style === 'galaxy') el.dataset.look = 'galaxy'
+  else delete el.dataset.look
   return style
 }
 
 const ICON_SPARK = '<svg class="ticon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z"/></svg>'
+const ICON_GALAXY = '<svg class="ticon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 12c0-2 2-3.5 4-3s3.5 3 2.5 5.5S14 19 11 18.5 5.5 15 6 11 10 4.5 14 5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>'
 const ICON_LEAF = '<svg class="ticon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/></svg>'
 
 // The button names the look it switches TO, like the Dark/Light button does.
 export function lookToggleState(style) {
-  const cosmic = style === 'cosmic'
+  const next = nextStyle(STYLES.includes(style) ? style : 'classic')
+  const icon = { classic: ICON_LEAF, cosmic: ICON_SPARK, galaxy: ICON_GALAXY }[next]
+  const name = next[0].toUpperCase() + next.slice(1)
   return {
-    pressed: cosmic,
-    label: cosmic ? 'Switch to the Classic look' : 'Switch to the Cosmic look',
-    shortLabel: cosmic ? `${ICON_LEAF}Classic` : `${ICON_SPARK}Cosmic`,
+    pressed: style === 'cosmic' || style === 'galaxy',
+    label: `Switch to the ${name} look`,
+    shortLabel: `${icon}${name}`,
   }
 }
