@@ -50,7 +50,7 @@ a { color: var(--lapis); text-underline-offset: 3px; }
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); font-weight: 600; letter-spacing: -.01em; font-size: 17px; }
-.mark { width: 34px; height: 34px; filter: drop-shadow(3px 4px 5px var(--lift-dark)) drop-shadow(-2px -2px 3px var(--lift-light)); }
+.mark { width: 34px; height: 34px; flex: none; filter: drop-shadow(2px 3px 4px var(--lift-dark)); }
 .status {
   margin: 0; font-size: 13.5px; color: var(--graphite);
   padding: 7px 14px; border-radius: 999px; background: var(--basin);

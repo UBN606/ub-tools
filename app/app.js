@@ -520,7 +520,7 @@ ${pars.length > 1 ? `<h3 class="more-head">${esc(L.more)}</h3><ol class="answer 
 ${r.more.length ? `<button type="button" class="soft more" id="more">Show more passages</button>` : ''}
 ${showDeeper ? goDeeper(pars.map((p) => p.ref)) : ''}
 ${missed}
-<p class="print-foot">From ${esc(L.book)}, as found by UB Tools Studio: https://ubn606.github.io/ub-tools/app/ . URANTIA BOOK NETWORK, urantiabooknetwork.com</p>`
+<p class="print-foot">From ${esc(L.book)}, as found by UBN Tools: https://ubn606.github.io/ub-tools/app/ . URANTIA BOOK NETWORK, urantiabooknetwork.com</p>`
   $('search-exact')?.addEventListener('click', () => { pendingScroll = true; runAsk(q, max, lang, { exact: true }) })
   $('more')?.addEventListener('click', () => { runAsk(q, max + 10, lang, { exact: !!searched?.exact }); $('results').querySelectorAll('.answer li')[max]?.scrollIntoView({ block: 'start' }) })
   box.querySelectorAll('.lang-pick').forEach((b) => b.addEventListener('click', () => runAsk(q, max, b.dataset.lang)))
@@ -605,8 +605,8 @@ function wireMissed(q, log) {
   $('missed')?.addEventListener('click', async (e) => {
     const btn = e.currentTarget
     const body = `My question: ${q}\n\nWhat I hoped to find:\n`
-    if (FEEDBACK_EMAIL) { location.href = `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent('UB Tools Studio: a question it did not answer')}&body=${encodeURIComponent(body)}`; return }
-    btn.textContent = (await copyText(`UB Tools Studio did not find: ${q}`)) ? 'Copied. Paste it in an email to the Urantia Book Network.' : 'Copy was blocked.'
+    if (FEEDBACK_EMAIL) { location.href = `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent('UBN Tools: a question it did not answer')}&body=${encodeURIComponent(body)}`; return }
+    btn.textContent = (await copyText(`UBN Tools did not find: ${q}`)) ? 'Copied. Paste it in an email to the Urantia Book Network.' : 'Copy was blocked.'
   })
 }
 
