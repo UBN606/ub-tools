@@ -32,7 +32,7 @@ npm test           # unit tests, no Electron needed
 npm run dist:mac   # on a Mac: stage the files and build dist/UBN-Tools-mac.dmg
 ```
 
-The artwork is generated, then committed: `python3 scripts/make-icon.py` re-frames the Studio's gold mark on Apple's icon grid as `build/icon-mac.png`, and `python3 scripts/make-dmg-background.py` draws the install window (`build/dmg-background.png` and `@2x`). Once the app is signed with a Developer ID, drop the "Open Anyway" hint line from that script and run it again.
+The artwork is generated, then committed: `python3 scripts/make-icon.py` places the UBN emblem (`build/src/ubn-emblem.png`, cut from the website's `public/images/ubn-logo-mark.png`) on Apple's icon grid as `build/icon-mac.png`, and `python3 scripts/make-dmg-background.py` draws the install window (`build/dmg-background.png` and `@2x`). Once the app is signed with a Developer ID, drop the "Open Anyway" hint line from that script and run it again.
 
 `scripts/stage.mjs` copies the files git tracks (except development-only ones) into `desktop/site/`. `scripts/smoke.mjs <path to the app binary>` launches a built app and checks that the Studio opens from the bundle, that the page has no Node.js, that no service worker registers and that the book loads.
 
