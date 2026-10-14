@@ -359,7 +359,9 @@ export const speech = {
 // ---------- listening (the browser's speech recognition, where the browser has it) ----------
 export function listener(onText, onState) {
   const R = window.SpeechRecognition || window.webkitSpeechRecognition
-  if (!R) return null
+  // The Mac app's engine (Electron) has the API but no speech service behind it, so the
+  // button would do nothing there; Mac readers can use the system's own Dictation instead.
+  if (!R || window.ubDesktop) return null
   const r = new R()
   r.lang = 'en-US'
   r.interimResults = false

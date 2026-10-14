@@ -1,0 +1,135 @@
+# Builds UB Tools for Mac (desktop/) on a real Mac, launches it to check it works,
+# and, for a desktop-vX.Y.Z tag, publishes the .dmg as a GitHub release.
+#
+# Release:  bump "version" in desktop/package.json, commit, then
+#           git tag desktop-v1.0.1 && git push origin desktop-v1.0.1
+#
+# Signing: with no Apple secrets set, the app is ad-hoc signed and readers must
+# approve it once in System Settings (the release notes explain how). Add these
+# repository secrets to sign with a Developer ID and notarize, so it opens with
+# no warning at all:
+#   MAC_CERT_P12_BASE64          Developer ID Application certificate (.p12), base64
+#   MAC_CERT_PASSWORD            its password
+#   APPLE_ID                     Apple ID email of the developer account
+#   APPLE_APP_SPECIFIC_PASSWORD  app-specific password for that Apple ID
+#   APPLE_TEAM_ID                10-character team ID
+name: Mac app
+
+on:
+  push:
+    tags: ['desktop-v*']
+    branches: [main]
+    paths: ['desktop/**', 'app/**', 'ub-*.js', 'build-search-index.js', 'visuals/**', '.github/workflows/mac-app.yml']
+  pull_request:
+    paths: ['desktop/**', 'app/**', 'ub-*.js', 'build-search-index.js', 'visuals/**', '.github/workflows/mac-app.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mac-app-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    permissions:
+      contents: write # only used to publish a release, on desktop-v* tags
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Unit tests
+        run: |
+          npm test
+          node --test ../app/test/pwa.test.mjs
+
+      - name: Tag matches desktop/package.json version
+        if: startsWith(github.ref, 'refs/tags/desktop-v')
+        run: |
+          want="desktop-v$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_REF_NAME" != "$want" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version ($want). Bump the version first."
+            exit 1
+          fi
+
+      - name: Stage the Studio files
+        run: npm run stage
+
+      - name: "Build (universal: Apple silicon and Intel)"
+        env:
+          CSC_LINK: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -n "$CSC_LINK" ]; then
+            echo "Signing with Developer ID and notarizing."
+            echo "SIGNED=1" >> "$GITHUB_ENV"
+            npx electron-builder --mac --universal --publish never
+          else
+            echo "::warning::No Apple certificate secrets: building ad-hoc signed. Readers will need to approve the app once in System Settings."
+            echo "SIGNED=0" >> "$GITHUB_ENV"
+            unset CSC_LINK CSC_KEY_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID
+            CSC_IDENTITY_AUTO_DISCOVERY=false npx electron-builder --mac --universal --publish never \
+              -c.mac.identity=- -c.mac.hardenedRuntime=false
+          fi
+
+      - name: Check the signature
+        run: |
+          app="dist/mac-universal/UB Tools.app"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          lipo -archs "$app/Contents/MacOS/UB Tools"
+          if [ "$SIGNED" = "1" ]; then
+            spctl --assess --type execute --verbose=2 "$app"
+            xcrun stapler validate "$app"
+          fi
+
+      - name: Launch the app and check it works
+        run: node scripts/smoke.mjs "dist/mac-universal/UB Tools.app/Contents/MacOS/UB Tools"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: UB-Tools-mac
+          path: desktop/dist/*.dmg
+          if-no-files-found: error
+
+      - name: Publish the release
+        if: startsWith(github.ref, 'refs/tags/desktop-v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#desktop-v}"
+          {
+            echo "UB Tools for Mac, version $version. Works on Apple silicon and Intel Macs running macOS 13 Ventura or newer."
+            echo
+            echo "**To install:** download **UB-Tools-$version-mac.dmg** below, open it, and drag **UB Tools** into **Applications**."
+            if [ "$SIGNED" != "1" ]; then
+              echo
+              echo "**The first time you open it**, your Mac will say it can't check the app for malicious software. That's expected for now; to open it:"
+              echo
+              echo "1. Click **Done** on that message."
+              echo "2. Open **System Settings**, then **Privacy & Security**, scroll down, and click **Open Anyway** next to UB Tools."
+              echo "3. Enter your Mac password and click **Open**. You only do this once."
+              echo
+              echo "On macOS 13 or 14 you can instead hold **Control**, click UB Tools in Applications, choose **Open**, then **Open** again."
+            fi
+            echo
+            echo "Everything works offline after the first launch, which downloads the book text once from Urantiapedia (CC BY-SA 4.0)."
+          } > release-notes.md
+          gh release create "$GITHUB_REF_NAME" dist/*.dmg \
+            --title "UB Tools for Mac $version" --notes-file release-notes.md

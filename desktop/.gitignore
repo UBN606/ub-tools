@@ -1,0 +1,5 @@
+node_modules/
+dist/
+# Written by scripts/stage.mjs before every build
+site/
+build/icon.png
