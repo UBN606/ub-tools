@@ -1,7 +1,8 @@
 # Builds UB Tools for Mac (desktop/) on a real Mac, launches it to check it works,
-# and, for a desktop-vX.Y.Z tag, publishes the .dmg as a GitHub release.
+# and, for a desktop-vX.Y.Z tag or a release run, publishes the .dmg as a GitHub release.
 #
-# Release:  bump "version" in desktop/package.json, commit, then
+# Release:  bump "version" in desktop/package.json and merge it to main, then either
+#           Actions > Mac app > Run workflow on main with the release box ticked, or
 #           git tag desktop-v1.0.1 && git push origin desktop-v1.0.1
 #
 # Signing: with no Apple secrets set, the app is ad-hoc signed and readers must
@@ -23,6 +24,11 @@ on:
   pull_request:
     paths: ['desktop/**', 'app/**', 'ub-*.js', 'build-search-index.js', 'visuals/**', '.github/workflows/mac-app.yml']
   workflow_dispatch:
+    inputs:
+      release:
+        description: Publish this build as release desktop-v<version in desktop/package.json> (main only)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -57,14 +63,32 @@ jobs:
           npm test
           node --test ../app/test/pwa.test.mjs
 
-      - name: Tag matches desktop/package.json version
-        if: startsWith(github.ref, 'refs/tags/desktop-v')
+      - name: Decide whether this build is a release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_INPUT: ${{ inputs.release }}
         run: |
           want="desktop-v$(node -p "require('./package.json').version")"
-          if [ "$GITHUB_REF_NAME" != "$want" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version ($want). Bump the version first."
+          tag=""
+          if [[ "$GITHUB_REF" == refs/tags/desktop-v* ]]; then
+            tag="$GITHUB_REF_NAME"
+            if [ "$tag" != "$want" ]; then
+              echo "::error::Tag $tag does not match package.json version ($want). Bump the version first."
+              exit 1
+            fi
+          elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "$RELEASE_INPUT" = "true" ]; then
+            if [ "$GITHUB_REF" != "refs/heads/main" ]; then
+              echo "::error::Releases are published from main only."
+              exit 1
+            fi
+            tag="$want"
+          fi
+          if [ -n "$tag" ] && gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::Release $tag already exists. Bump the version in desktop/package.json first."
             exit 1
           fi
+          echo "RELEASE_TAG=$tag" >> "$GITHUB_ENV"
+          echo "Release: ${tag:-none (build only)}"
 
       - name: Stage the Studio files
         run: npm run stage
@@ -112,11 +136,11 @@ jobs:
           if-no-files-found: error
 
       - name: Publish the release
-        if: startsWith(github.ref, 'refs/tags/desktop-v')
+        if: env.RELEASE_TAG != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          version="${GITHUB_REF_NAME#desktop-v}"
+          version="${RELEASE_TAG#desktop-v}"
           {
             echo "UB Tools for Mac, version $version. Works on Apple silicon and Intel Macs running macOS 13 Ventura or newer."
             echo
@@ -134,5 +158,6 @@ jobs:
             echo
             echo "Everything works offline after the first launch, which downloads the book text once from Urantiapedia (CC BY-SA 4.0)."
           } > release-notes.md
-          gh release create "$GITHUB_REF_NAME" dist/*.dmg \
+          # Creates the tag on this commit when it doesn't exist yet (the Run workflow path).
+          gh release create "$RELEASE_TAG" dist/*.dmg --target "$GITHUB_SHA" \
             --title "UB Tools for Mac $version" --notes-file release-notes.md

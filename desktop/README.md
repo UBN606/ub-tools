@@ -38,9 +38,9 @@ npm run dist:mac   # on a Mac: stage the files and build dist/UB-Tools-<version>
 
 `.github/workflows/mac-app.yml` builds a universal `.dmg` on a GitHub Mac runner for every change to `desktop/` or the Studio, launches it with the smoke test, and keeps the `.dmg` as a build artifact. To publish a release:
 
-1. Bump `version` in `desktop/package.json` and commit.
-2. `git tag desktop-v1.0.1 && git push origin desktop-v1.0.1`
+1. Bump `version` in `desktop/package.json` and merge it to `main`.
+2. On GitHub, open **Actions → Mac app → Run workflow**, keep the branch on `main`, tick **Publish this build as release…**, and click **Run workflow**. Or push a tag from your computer: `git tag desktop-v1.0.1 && git push origin desktop-v1.0.1`.
 
-The workflow checks that the tag matches the version, builds and smoke-tests the app, and creates the GitHub release with the `.dmg` and install instructions. Releases are tagged `desktop-v…`, so the app's update check ignores any other release in this repository.
+The workflow checks that the version hasn't been released already (and, for a pushed tag, that the tag matches the version), builds and smoke-tests the app, and creates the GitHub release with the `.dmg` and install instructions. Releases are tagged `desktop-v…`, so the app's update check ignores any other release in this repository.
 
 **Signing (recommended).** Without Apple secrets, the app is ad-hoc signed and readers see the one-time warning above. To have it open with no warning, add a Developer ID Application certificate and notarization credentials as repository secrets: `MAC_CERT_P12_BASE64`, `MAC_CERT_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` and `APPLE_TEAM_ID`. They require an Apple Developer Program membership. The next tagged build is then signed, notarized and stapled automatically.
