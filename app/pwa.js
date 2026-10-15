@@ -68,6 +68,11 @@ export function isIOS(userAgent, maxTouchPoints = 0) {
 // Safari on a Mac. From macOS 14 Sonoma it can keep a site in the Dock as its own
 // app (File > Add to Dock), but it never offers that itself (no beforeinstallprompt),
 // so the nudge shows the menu steps. Other Mac browsers say so in their user agent.
+// True when the page's query string asks for the install steps: ?dock or ?dock=1.
+export function installRequested(search) {
+  try { return new URLSearchParams(String(search || '')).has('dock') } catch { return false }
+}
+
 export function isMacSafari(userAgent, maxTouchPoints = 0) {
   const ua = String(userAgent || '')
   if (!/Macintosh/.test(ua) || maxTouchPoints > 1) return false
@@ -77,10 +82,12 @@ export function isMacSafari(userAgent, maxTouchPoints = 0) {
 // Gate for the install nudge. hasPrompt is whether we hold a
 // beforeinstallprompt event (Android/Chrome); iOS and Mac Safari never have
 // one and get manual instructions instead, so they don't need it.
-export function shouldShowInstallPrompt({ visits, dismissedUntilRaw, nowMs, standalone, hasPrompt, ios, macSafari = false }) {
+// requested: the reader followed a link that asks for the install steps (?dock),
+// e.g. "open UBN Tools in Safari" on the apps page, so show them on the first visit.
+export function shouldShowInstallPrompt({ visits, dismissedUntilRaw, nowMs, standalone, hasPrompt, ios, macSafari = false, requested = false }) {
   if (standalone) return false
-  if (isSnoozed(dismissedUntilRaw, nowMs)) return false
-  if (visits < INSTALL_MIN_VISITS) return false
+  if (!requested && isSnoozed(dismissedUntilRaw, nowMs)) return false
+  if (!requested && visits < INSTALL_MIN_VISITS) return false
   if (!ios && !macSafari && !hasPrompt) return false
   return true
 }
@@ -234,6 +241,7 @@ function initWebOnly(window, document, nav, store) {
       hasPrompt: Boolean(deferredPrompt),
       ios,
       macSafari,
+      requested: installRequested(window.location.search),
     })
     if (!ok) return
     installShown = true

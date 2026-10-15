@@ -17,7 +17,7 @@
 //   would strand them on the old version forever.
 'use strict'
 
-const VERSION = 'ub-tools-20261014T104507'
+const VERSION = 'ub-tools-20261015T065231'
 const SHELL_CACHE = VERSION + '-shell'
 const TEXT_CACHE = VERSION + '-text'
 const MAX_TEXT_ENTRIES = 250
