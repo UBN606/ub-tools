@@ -21,8 +21,10 @@ test('thanks and blessings are recognized', () => {
 })
 
 test('follow-ups that point back at a last answer are recognized', () => {
-  for (const q of ['Tell me more', 'Can you explain that in simpler words?', 'What do you mean?', 'Why?', 'go on', 'What about him?'])
+  for (const q of ['Can you explain that in simpler words?', 'What do you mean?', 'Why?', 'What about him?'])
     assert.equal(kind(q), 'followup', q)
+  for (const q of ['Tell me more', 'go on', 'More please', 'Keep going', 'What else?', 'Can you tell me more?', 'Anything else'])
+    assert.equal(kind(q), 'more', q)
 })
 
 test('a follow-up that names a subject is a question', () => {

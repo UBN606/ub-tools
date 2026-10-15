@@ -17,7 +17,7 @@
 //   would strand them on the old version forever.
 'use strict'
 
-const VERSION = 'ub-tools-20261015T065231'
+const VERSION = 'ub-tools-20261015T102502'
 const SHELL_CACHE = VERSION + '-shell'
 const TEXT_CACHE = VERSION + '-text'
 const MAX_TEXT_ENTRIES = 250
@@ -34,7 +34,7 @@ const SHELL = [
   './quiz.js', './plans.js', './readalong.js', './deep-link.js', './a11y.js',
   './pwa.js', './share.js', './topics.js', './ask.js', './ask-format.js', './embed-quote.js', './edge-voices.js',
   './lang-detect.js', './parse-i18n.js', './ask-i18n.js', './load-translation.js',
-  './read-lang.js', './study-tracks.js', './chat.js',
+  './read-lang.js', './study-tracks.js', './chat.js', './spell.js', './feedback.js',
   './plans-data.json', './quiz-bank.json', './pronounce.json', './ubn-articles.json',
   './icons/icon-192.png', './icons/icon-512.png', './icons/ubn-emblem-102.png', './icons/favicon-64.png',
 ]

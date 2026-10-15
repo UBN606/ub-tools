@@ -82,6 +82,19 @@ test('an update keeps the stored book and index, and drops only old app caches',
   assert.equal(sw.keepOnActivate('ub-tools-20200101T000000-text'), false, 'old text cache should be dropped')
 })
 
+test('every module the app imports is in the offline cache list', () => {
+  const sw = readFileSync(join(appDir, 'sw.js'), 'utf8')
+  const seen = new Set()
+  const walk = (file) => {
+    if (seen.has(file)) return
+    seen.add(file)
+    const src = readFileSync(join(appDir, file), 'utf8')
+    for (const m of src.matchAll(/(?:^|\n)\s*import[^'"]*from\s*'\.\/([\w-]+\.js)'/g)) walk(m[1])
+  }
+  walk('app.js')
+  for (const f of seen) assert.ok(sw.includes(`'./${f}'`), `${f} is imported by the app but missing from sw.js SHELL, so it would break offline`)
+})
+
 test('bump-sw.mjs stamps a fresh version', async () => {
   const { execFileSync } = await import('node:child_process')
   const before = readFileSync(join(appDir, 'sw.js'), 'utf8')
