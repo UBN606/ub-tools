@@ -15,6 +15,7 @@ import { loadTranslation } from './load-translation.js'
 import { READ_LANG_KEY, normalizeReadLang, resolveReadParagraph, whereLine } from './read-lang.js'
 import { sendMissed, shouldLogMiss } from './feedback.js'
 import { chatIntent, trimChat, STARTERS } from './chat.js'
+import { buildVocab, correctQuestion } from './spell.js'
 
 const $ = (id) => document.getElementById(id)
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
@@ -389,19 +390,56 @@ function runAsk(q, max = 5, lang = 'en', { exact = false } = {}) {
   const L = askLabels(lang)
   if (!exact) {
     const intent = chatIntent(q)
+    // "Tell me more" continues the last answer with more of the book's passages.
+    if (intent && intent.kind === 'more' && lastAsk) return continueLastAsk()
     if (intent) return renderChat(intent, q)
   }
   // The search runs on the question inside a chatty message ("Hello, could you tell me
   // what the book says about angels? Thank you" -> "what the book says about angels?").
   const t = exact ? { question: q, trimmed: false } : trimChat(q)
-  const r = answer(E, t.question, { max })
-  renderAnswer({ q, max, lang, L, r, getPars: (refs) => E.search.getParagraphs(refs), showTopics: true, showSilence: true, showDeeper: true, searched: { ...t, exact } })
+  let r = answer(E, t.question, { max })
+  let searched = { ...t, exact }
+  // A word the book never uses is often a misspelling of one it does ("ascencion"):
+  // search for the book's word instead, and say so.
+  if (!exact) {
+    const unknown = (r.quiet || []).filter((x) => x.total === 0).map((x) => x.word)
+    const fix = unknown.length ? correctQuestion(t.question, unknown, bookVocab()) : { fixes: [] }
+    if (fix.fixes.length) {
+      const fixed = answer(E, fix.question, { max })
+      if (fixed.refs.length) { r = fixed; searched = { question: fix.question, trimmed: true, exact, fixes: fix.fixes } }
+    }
+  }
+  renderAnswer({ q, max, lang, L, r, getPars: (refs) => E.search.getParagraphs(refs), showTopics: true, showSilence: true, showDeeper: true, searched })
   lastAsk = q
+  lastLabel = searched.fixes?.length ? searched.question : q
+  lastMax = max
+  lastTop = r.refs[0] || null
+}
+
+// Every word the book uses, for spelling repair. Built once, on first need.
+let vocab = null
+function bookVocab() {
+  if (!vocab) vocab = buildVocab(Array.from(E.byRef.values(), (p) => p.text))
+  return vocab
+}
+
+// "Tell me more": the last answer again, with five more passages, and a line saying so.
+function continueLastAsk() {
+  const q = lastAsk
+  $('q').value = q
+  runAsk(q, lastMax + 5)
+  const note = document.createElement('p')
+  note.className = 'searched'
+  note.textContent = `More from the book on: ${lastLabel || q}`
+  $('results').prepend(note)
 }
 
 // Messages that aren't questions for the book get a kind, plain reply instead of
 // passages that only happen to share a word ("Thank you so much" used to show 167:5.1).
 let lastAsk = null
+let lastLabel = null // the question as searched (spelling repaired), for buttons and notes
+let lastMax = 5
+let lastTop = null
 const starterButtons = () => `<div class="chips chat-chips wrap">${STARTERS.map((s) => `<button type="button" class="chip" data-ask="${esc(s)}">${esc(s)}</button>`).join('')}</div>`
 const openButton = (ref, text) => `<button type="button" class="soft" data-open="${esc(ref)}">${esc(text)}</button>`
 function renderChat(intent, q) {
@@ -418,17 +456,23 @@ function renderChat(intent, q) {
       return
     }
   }
-  const back = lastAsk && intent.kind === 'followup' ? `<button type="button" class="soft" data-ask="${esc(lastAsk)}">Back to your last answer</button>` : ''
+  const back = lastAsk && (intent.kind === 'followup' || intent.kind === 'more')
+    ? `<button type="button" class="soft" data-more>More on: ${esc(lastLabel || lastAsk)}</button>${lastTop ? openButton(lastTop, `Read ${lastTop} with the paragraphs around it`) : ''}`
+    : ''
   const msg = {
     greeting: `<p><strong>Hello!</strong> This is a search of The Urantia Book, not a person to chat with. Type a short question and it shows you the book's own words, with where to find them.</p><p>Try one of these:</p>${starterButtons()}`,
     thanks: `<p><strong>You're welcome!</strong> Ask another question whenever you like, or try one of these:</p>${starterButtons()}`,
-    followup: `<p><strong>Ask doesn't remember your last question.</strong> It searches the book each time, so it needs the subject in the question, like <em>What happens after we die?</em></p><p>To read more about an answer, press <strong>See it in the book</strong> under any passage for the paragraphs around it, or <strong>Show more passages</strong> at the bottom of the answer.</p><div class="chat-actions">${back}</div>`,
+    followup: lastAsk
+      ? `<p><strong>Ask lets the book speak for itself, so it won't put it in other words.</strong> But it can show you more, or the passage in its setting:</p><div class="chat-actions">${back}</div>`
+      : `<p><strong>Ask searches the book for each question</strong>, so it needs the subject in the question, like <em>What happens after we die?</em></p><p>Try one of these:</p>${starterButtons()}`,
+    more: `<p><strong>Ask a question first</strong>, then say <em>tell me more</em> to see more of what the book says.</p><p>Try one of these:</p>${starterButtons()}`,
     author: `<p><strong>Ask can only show what the book says, in its own words.</strong> The papers are signed by those who presented them, for example at the end of Paper 2.</p><div class="chat-actions">${openButton('92:4.9', 'Where the book speaks of the papers (92:4.9)')}${openButton('2:7.13', 'A signature line (2:7.13)')}</div>`,
     true: `<p><strong>Ask can show you what the book says, with where to find it, but it can't judge whether the book is true.</strong> That is for each reader to weigh.</p><div class="chat-actions">${openButton('92:4.9', 'Where the book speaks of the papers (92:4.9)')}</div><p>Or ask about a subject:</p>${starterButtons()}`,
   }[intent.kind]
   box.innerHTML = `<div class="empty chat-reply">${msg}<p class="chat-exact"><button type="button" class="linkish" data-exact>Search the book for my exact words instead</button></p></div>`
   box.querySelectorAll('[data-ask]').forEach((b) => b.addEventListener('click', () => { $('q').value = b.dataset.ask; pendingScroll = true; runAsk(b.dataset.ask) }))
   box.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openRef(b.dataset.open)))
+  box.querySelector('[data-more]')?.addEventListener('click', () => { pendingScroll = true; continueLastAsk() })
   box.querySelector('[data-exact]').addEventListener('click', () => { pendingScroll = true; runAsk(q, 5, 'en', { exact: true }) })
   revealResults()
 }
@@ -502,7 +546,10 @@ function renderAnswer({ q, max, lang, L, r, getPars, showTopics, showSilence, sh
   if (!pars.length) { box.innerHTML = `<p class="empty">${esc(L.empty)}</p>${missed}`; wireMissed(q, !!FEEDBACK_ENDPOINT); revealResults(); return }
   // Shows what the search actually used, so readers learn that short questions work,
   // and can always run their own words instead.
-  const searchedLine = searched?.trimmed ? `<p class="searched">Searched the book for: <strong>${esc(searched.question)}</strong> <button type="button" class="linkish" id="search-exact">Use my exact words instead</button></p>` : ''
+  const typed = (searched?.fixes || []).map((f) => `<em>${esc(f.from)}</em>`).join(', ')
+  const searchedLine = searched?.fixes?.length
+    ? `<p class="searched">Showing results for: <strong>${esc(searched.question)}</strong> (you typed ${typed}) <button type="button" class="linkish" id="search-exact">Use my exact words instead</button></p>`
+    : searched?.trimmed ? `<p class="searched">Searched the book for: <strong>${esc(searched.question)}</strong> <button type="button" class="linkish" id="search-exact">Use my exact words instead</button></p>` : ''
   const silence = showSilence && r.quiet.length ? `<div class="silence"><strong>The book says little about this directly.</strong> ${r.quiet.map((x) => x.total === 0 ? `It never uses the word "${esc(x.word)}".` : `It uses the word "${esc(x.word)}" only ${x.total === 1 ? 'once' : `${x.total} times`}: ${x.refs.map((ref) => `<button type="button" class="linkish" data-open="${esc(ref)}">${esc(ref)}</button>`).join(', ')}.`).join(' ')} Below are the passages closest to your question. They may not answer it.</div>` : ''
   const topicsFound = showTopics ? findTopics(r.words, r.mapped) : []
   const index = topicsFound.length ? `<div class="index-hint">${topicsFound.map((t, k) => `<button type="button" class="soft" data-topic="${k}">The book's index: ${esc(t.label)} (${t.refs.length} passages)</button>`).join('')}</div>` : ''
