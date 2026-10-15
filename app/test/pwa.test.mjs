@@ -99,7 +99,7 @@ function repoRoot() {
 
 import {
   isSnoozed, updateSnoozeUntil, installDismissUntil,
-  nextVisitCount, isStandaloneDisplay, isIOS, isMacSafari, isDesktopApp, shouldShowInstallPrompt,
+  nextVisitCount, isStandaloneDisplay, isIOS, isMacSafari, installRequested, isDesktopApp, shouldShowInstallPrompt,
   buildUpdateBanner, buildInstallBanner, buildOnlineBadge,
   UPDATE_SNOOZE_HOURS, INSTALL_MIN_VISITS, INSTALL_SNOOZE_DAYS,
 } from '../pwa.js'
@@ -169,6 +169,18 @@ test('Mac Safari gets the Add to Dock nudge; iPads, other browsers and the Mac a
   const base = { visits: 9, dismissedUntilRaw: null, nowMs: 1_000_000, standalone: false, hasPrompt: false, ios: false }
   assert.equal(shouldShowInstallPrompt({ ...base, macSafari: true }), true, 'Mac Safari path')
   assert.equal(shouldShowInstallPrompt({ ...base, macSafari: true, standalone: true }), false, 'already in the Dock')
+})
+
+test('a ?dock link shows the install steps on the first visit, unless already installed', () => {
+  assert.equal(installRequested('?dock'), true)
+  assert.equal(installRequested('?dock=1'), true)
+  assert.equal(installRequested('?ref=1:0.1'), false)
+  assert.equal(installRequested(''), false)
+  const base = { visits: 1, dismissedUntilRaw: String(2_000_000), nowMs: 1_000_000, standalone: false, hasPrompt: false, ios: false, macSafari: true }
+  assert.equal(shouldShowInstallPrompt(base), false, 'first visit, snoozed: normally quiet')
+  assert.equal(shouldShowInstallPrompt({ ...base, requested: true }), true, 'asked for by the link')
+  assert.equal(shouldShowInstallPrompt({ ...base, requested: true, standalone: true }), false, 'already in the Dock')
+  assert.equal(shouldShowInstallPrompt({ ...base, requested: true, macSafari: false }), false, 'no way to install here')
 })
 
 test('install banner: Add to Dock steps for Mac Safari', () => {
