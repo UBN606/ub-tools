@@ -984,3 +984,22 @@ html[data-style="cosmic"][data-look="galaxy"] .help::backdrop{background:rgba(4,
 @media (prefers-reduced-motion: reduce){
   html[data-style="cosmic"][data-look="galaxy"][data-theme="dark"] body::after{animation:none}
 }
+
+/* Companion: an optional AI on the reader's computer (companion.js). Its words are set apart
+   from the book's, and labeled, so no one mistakes them for a quote. */
+#companion-open.on::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 7px; border-radius: 50%; background: var(--pass); vertical-align: 1px; }
+.companion-say { margin: 0 6px 18px; padding: 12px 16px; border-left: 3px solid var(--pass); border-radius: 12px; background: rgba(79, 111, 91, .08); }
+.companion-who { margin: 0 0 4px; font-size: 14px; font-weight: 600; color: var(--pass); }
+.companion-who span { font-weight: 400; color: var(--graphite); }
+.companion-text { margin: 0; font-size: 18px; line-height: 1.55; color: var(--ink); }
+html.big .companion-text { font-size: 20px; }
+html.bigger .companion-text { font-size: 22px; }
+.comp-about { margin: 0 0 16px; font-size: 18px; line-height: 1.55; }
+.comp-form { display: grid; gap: 8px; margin-top: 18px; font-size: 17px; }
+.comp-form label { font-weight: 600; }
+.comp-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.comp-row input { flex: 1 1 260px; }
+.comp-form input[type="url"], .comp-form select { font: inherit; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(0, 0, 0, .15); background: rgba(255, 255, 255, .7); color: var(--ink); min-width: 0; }
+html[data-theme="dark"] .comp-form input[type="url"], html[data-theme="dark"] .comp-form select { background: rgba(0, 0, 0, .25); border-color: rgba(255, 255, 255, .15); }
+.comp-check { display: flex; gap: 10px; align-items: center; font-weight: 400 !important; margin-top: 8px; }
+.comp-check input { width: 20px; height: 20px; }

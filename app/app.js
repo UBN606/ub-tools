@@ -16,6 +16,7 @@ import { READ_LANG_KEY, normalizeReadLang, resolveReadParagraph, whereLine } fro
 import { sendMissed, shouldLogMiss } from './feedback.js'
 import { chatIntent, trimChat, STARTERS } from './chat.js'
 import { buildVocab, correctQuestion } from './spell.js'
+import { COMPANION_KEY, parseSettings, normalizeUrl, isLocalUrl, listModels, chat, understandMessages, parseUnderstanding, welcomeMessages, guardIntro } from './companion.js'
 
 const $ = (id) => document.getElementById(id)
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
@@ -312,7 +313,11 @@ function dispatch() {
   const q = $('q').value.trim()
   if (!q) return
   if (mode === 'places') return runPlaces(q)
-  if (mode === 'ask' && !REF_ONLY.test(q)) return runAsk(q, 5, detectLang(q))
+  if (mode === 'ask' && !REF_ONLY.test(q)) {
+    const lang = detectLang(q)
+    if (lang === 'en' && companionWants(q)) return runCompanionAsk(q)
+    return runAsk(q, 5, lang)
+  }
   if (REF_ONLY.test(q)) {
     const refs = q.match(/\d{1,3}:\d{1,2}\.\d{1,3}/g)
     renderList(refs.map((r) => ({ ref: r })), { title: refs.length === 1 ? 'Reference' : `${refs.length} references`, sub: '' })
@@ -369,7 +374,7 @@ addEventListener('pagehide', stopReading)
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopReading() })
 
 // ---------- ask ----------
-function runAsk(q, max = 5, lang = 'en', { exact = false } = {}) {
+function runAsk(q, max = 5, lang = 'en', { exact = false, asked = null } = {}) {
   // Polish is detected but translations haven't shipped yet.
   // Show a graceful note and fall back to English instead of erroring.
   if (lang === 'pl') {
@@ -399,6 +404,8 @@ function runAsk(q, max = 5, lang = 'en', { exact = false } = {}) {
   const t = exact ? { question: q, trimmed: false } : trimChat(q)
   let r = answer(E, t.question, { max })
   let searched = { ...t, exact }
+  // The companion reworded the reader's message ("what about his brothers?"): say how.
+  if (asked) Object.assign(searched, { asked, understood: q })
   // A word the book never uses is often a misspelling of one it does ("ascencion"):
   // search for the book's word instead, and say so.
   if (!exact) {
@@ -406,7 +413,7 @@ function runAsk(q, max = 5, lang = 'en', { exact = false } = {}) {
     const fix = unknown.length ? correctQuestion(t.question, unknown, bookVocab()) : { fixes: [] }
     if (fix.fixes.length) {
       const fixed = answer(E, fix.question, { max })
-      if (fixed.refs.length) { r = fixed; searched = { question: fix.question, trimmed: true, exact, fixes: fix.fixes } }
+      if (fixed.refs.length) { r = fixed; searched = { ...searched, question: fix.question, trimmed: true, fixes: fix.fixes } }
     }
   }
   renderAnswer({ q, max, lang, L, r, getPars: (refs) => E.search.getParagraphs(refs), showTopics: true, showSilence: true, showDeeper: true, searched })
@@ -414,6 +421,7 @@ function runAsk(q, max = 5, lang = 'en', { exact = false } = {}) {
   lastLabel = searched.fixes?.length ? searched.question : q
   lastMax = max
   lastTop = r.refs[0] || null
+  lastRefs = r.refs
 }
 
 // Every word the book uses, for spelling repair. Built once, on first need.
@@ -440,6 +448,7 @@ let lastAsk = null
 let lastLabel = null // the question as searched (spelling repaired), for buttons and notes
 let lastMax = 5
 let lastTop = null
+let lastRefs = []
 const starterButtons = () => `<div class="chips chat-chips wrap">${STARTERS.map((s) => `<button type="button" class="chip" data-ask="${esc(s)}">${esc(s)}</button>`).join('')}</div>`
 const openButton = (ref, text) => `<button type="button" class="soft" data-open="${esc(ref)}">${esc(text)}</button>`
 function renderChat(intent, q) {
@@ -547,7 +556,9 @@ function renderAnswer({ q, max, lang, L, r, getPars, showTopics, showSilence, sh
   // Shows what the search actually used, so readers learn that short questions work,
   // and can always run their own words instead.
   const typed = (searched?.fixes || []).map((f) => `<em>${esc(f.from)}</em>`).join(', ')
-  const searchedLine = searched?.fixes?.length
+  const searchedLine = searched?.asked
+    ? `<p class="searched">Your companion understood: <strong>${esc(searched.understood)}</strong> <button type="button" class="linkish" id="search-exact">Use my exact words instead</button></p>`
+    : searched?.fixes?.length
     ? `<p class="searched">Showing results for: <strong>${esc(searched.question)}</strong> (you typed ${typed}) <button type="button" class="linkish" id="search-exact">Use my exact words instead</button></p>`
     : searched?.trimmed ? `<p class="searched">Searched the book for: <strong>${esc(searched.question)}</strong> <button type="button" class="linkish" id="search-exact">Use my exact words instead</button></p>` : ''
   const silence = showSilence && r.quiet.length ? `<div class="silence"><strong>The book says little about this directly.</strong> ${r.quiet.map((x) => x.total === 0 ? `It never uses the word "${esc(x.word)}".` : `It uses the word "${esc(x.word)}" only ${x.total === 1 ? 'once' : `${x.total} times`}: ${x.refs.map((ref) => `<button type="button" class="linkish" data-open="${esc(ref)}">${esc(ref)}</button>`).join(', ')}.`).join(' ')} Below are the passages closest to your question. They may not answer it.</div>` : ''
@@ -568,8 +579,8 @@ ${r.more.length ? `<button type="button" class="soft more" id="more">Show more p
 ${showDeeper ? goDeeper(pars.map((p) => p.ref)) : ''}
 ${missed}
 <p class="print-foot">From ${esc(L.book)}, as found by UBN Tools: https://ubn606.github.io/ub-tools/app/ . URANTIA BOOK NETWORK, urantiabooknetwork.com</p>`
-  $('search-exact')?.addEventListener('click', () => { pendingScroll = true; runAsk(q, max, lang, { exact: true }) })
-  $('more')?.addEventListener('click', () => { runAsk(q, max + 10, lang, { exact: !!searched?.exact }); $('results').querySelectorAll('.answer li')[max]?.scrollIntoView({ block: 'start' }) })
+  $('search-exact')?.addEventListener('click', () => { pendingScroll = true; runAsk(searched?.asked || q, max, lang, { exact: true }) })
+  $('more')?.addEventListener('click', () => { runAsk(q, max + 10, lang, { exact: !!searched?.exact, asked: searched?.asked }); $('results').querySelectorAll('.answer li')[max]?.scrollIntoView({ block: 'start' }) })
   box.querySelectorAll('.lang-pick').forEach((b) => b.addEventListener('click', () => runAsk(q, max, b.dataset.lang)))
   box.querySelectorAll('[data-topic]').forEach((b) => b.addEventListener('click', () => { const t = topicsFound[Number(b.dataset.topic)]; renderList(t.refs.map((ref) => ({ ref })), { title: `The book's index: ${esc(t.label)}`, sub: `${t.refs.length} passages the index lists. Tap one to read it.` }) }))
   wireMissed(q, logged)
@@ -645,6 +656,117 @@ $('help-close').addEventListener('click', () => { speech.stop(); $('help').close
 $('help').addEventListener('close', () => speech.stop())
 $('help-listen').addEventListener('click', () => speech.say([...document.querySelectorAll('.help-steps li')].map((li) => li.textContent).join(' ')))
 try { if (!localStorage.getItem('seen-help')) { localStorage.setItem('seen-help', '1'); addEventListener('load', () => openHelp()) } } catch {}
+
+// ---------- companion: an optional AI model on the reader's own computer (companion.js) ----------
+// Off unless the reader turns it on. It rewords the question for the search and says a
+// friendly word first; the passages are still the book's own, found by the same search.
+let companion = parseSettings(store.get(COMPANION_KEY, null))
+const companionHistory = [] // [{ asked, searched }], for "what about him?"
+let companionTurn = 0
+const companionWho = '<p class="companion-who">Companion <span>(an AI on your computer, not the book)</span></p>'
+function companionWants(q) {
+  if (!companion.on || !isLocalUrl(companion.url)) return false
+  const intent = chatIntent(q)
+  if (!intent) return true
+  // "What about him?" and "Why?" need the earlier questions, which the companion keeps.
+  // Greetings, thanks, "tell me more" and paper numbers keep their quick local replies.
+  return intent.kind === 'followup' && companionHistory.length > 0 && /\b(what about|why|how so)\b/i.test(q)
+}
+async function runCompanionAsk(q) {
+  const turn = ++companionTurn
+  stopReading()
+  const box = $('results')
+  box.innerHTML = '<p class="answer-loading">Your companion is reading your question…</p>'
+  let u, problem = ''
+  try {
+    u = parseUnderstanding(await chat(companion, understandMessages(q, companionHistory), { maxTokens: 160 }), q)
+  } catch (e) {
+    u = { question: q, reply: '', fallback: true }
+    problem = (e && e.message) || 'no answer'
+  }
+  if (turn !== companionTurn) return
+  if (!u.question) return renderCompanionReply(q, u.reply)
+  const reworded = !u.fallback && u.question.toLowerCase() !== q.toLowerCase()
+  lastRefs = [] // set again only if this search shows passages
+  runAsk(u.question, 5, 'en', reworded ? { asked: q } : {})
+  companionHistory.push({ asked: q, searched: u.question })
+  if (companionHistory.length > 6) companionHistory.shift()
+  revealResults()
+  if (problem) {
+    const note = document.createElement('p')
+    note.className = 'searched'
+    note.innerHTML = `The companion didn't answer (${esc(problem)}), so this is the plain search. <button type="button" class="linkish">Companion settings</button>`
+    note.querySelector('button').addEventListener('click', openCompanion)
+    box.prepend(note)
+    return
+  }
+  const pars = lastRefs.length ? E.search.getParagraphs(lastRefs.slice(0, 3)).filter((p) => !p.error) : []
+  if (!pars.length) return
+  const say = document.createElement('div')
+  say.className = 'companion-say'
+  say.innerHTML = `${companionWho}<p class="companion-text">…</p>`
+  box.prepend(say)
+  try {
+    const t = guardIntro(await chat(companion, welcomeMessages(u.question, pars), { maxTokens: 120 }), pars)
+    if (turn !== companionTurn || !say.isConnected) return
+    if (t) say.querySelector('.companion-text').textContent = t
+    else say.remove()
+  } catch { say.remove() }
+}
+function renderCompanionReply(q, reply) {
+  const box = $('results')
+  box.innerHTML = `<div class="empty chat-reply"><div class="companion-say">${companionWho}<p class="companion-text">${esc(reply)}</p></div><p>Try one of these:</p>${starterButtons()}<p class="chat-exact"><button type="button" class="linkish" data-exact>Search the book for my exact words instead</button></p></div>`
+  box.querySelectorAll('[data-ask]').forEach((b) => b.addEventListener('click', () => { $('q').value = b.dataset.ask; pendingScroll = true; dispatch() }))
+  box.querySelector('[data-exact]').addEventListener('click', () => { pendingScroll = true; runAsk(q, 5, 'en', { exact: true }) })
+  revealResults()
+}
+function openCompanion() {
+  $('comp-url').value = companion.url
+  const sel = $('comp-model')
+  if (!sel.options.length && companion.model) sel.innerHTML = `<option>${esc(companion.model)}</option>`
+  $('comp-on').checked = companion.on
+  $('comp-note').textContent = ''
+  const d = $('companion'); d.showModal(); d.scrollTop = 0; $('companion-title').focus()
+}
+function saveCompanion() {
+  companion = parseSettings({ on: $('comp-on').checked, url: $('comp-url').value, model: $('comp-model').value })
+  store.set(COMPANION_KEY, companion)
+  $('companion-open').classList.toggle('on', companion.on)
+}
+// Settings. The button shows once the reader opens the Studio with ?companion, or has it on.
+// (Skipped if a cached older page has no companion controls: one missing button must not
+// stop the rest of the Studio from starting.)
+if ($('companion-open')) {
+  $('companion-open').hidden = !(companion.on || new URL(location.href).searchParams.has('companion'))
+  $('companion-open').addEventListener('click', () => { stopReading(); openCompanion() })
+  $('comp-close').addEventListener('click', () => $('companion').close())
+  $('companion-open').classList.toggle('on', companion.on)
+  $('comp-connect').addEventListener('click', async () => {
+    const note = $('comp-note')
+    const url = normalizeUrl($('comp-url').value)
+    $('comp-url').value = url
+    if (!isLocalUrl(url)) { note.textContent = 'Use an address on this computer, like http://127.0.0.1:1234/v1, so your questions stay here.'; return }
+    note.textContent = 'Connecting…'
+    try {
+      const models = await listModels(url)
+      if (!models.length) { note.textContent = 'Connected, but no model is loaded. Load a chat model in LM Studio, then press Connect again.'; return }
+      const keep = companion.model && models.includes(companion.model) ? companion.model : models[0]
+      $('comp-model').innerHTML = models.map((m) => `<option${m === keep ? ' selected' : ''}>${esc(m)}</option>`).join('')
+      saveCompanion()
+      note.textContent = `Connected. ${models.length === 1 ? 'One model' : `${models.length} models`} found. Pick one, then turn the companion on.`
+    } catch (e) {
+      note.textContent = `Couldn't reach a model server at ${url}. In LM Studio, open the Developer tab, load a model, start the server, and turn on Enable CORS in its settings. If your browser asks to let this page reach apps on this device, choose Allow.`
+    }
+  })
+  $('comp-model').addEventListener('change', saveCompanion)
+  $('comp-url').addEventListener('change', saveCompanion)
+  $('comp-on').addEventListener('change', () => {
+    saveCompanion()
+    $('comp-note').textContent = companion.on
+      ? (companion.model ? 'The companion is on. Ask a question to try it.' : 'The companion is on. Press Connect to pick a model.')
+      : 'The companion is off. Ask works as before.'
+  })
+}
 
 // ---------- didn't find it ----------
 function wireMissed(q, log) {
