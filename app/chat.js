@@ -10,6 +10,8 @@ const norm = (s) => String(s || '').toLowerCase().replace(/[‘’]/g, "'").repl
 
 const GREETING = /^(hi|hello|hey|hiya|howdy|greetings|good (morning|afternoon|evening|day)|are you there|is anyone there|anybody there|test|testing)( there| friend| ub| claude| tools?| studio| everyone)?( (hi|hello|are you there|how are you))?$/
 const THANKS = /^((oh )?(thank you|thanks|thank u|ty|many thanks)( (so|very) much)?( for (that|this|your help|the help|everything))?|god bless( you)?|bless you|amen|ok(ay)?|great|wonderful|perfect|beautiful|lovely|got it|that helps|that was (helpful|great|beautiful))( (so|very) much)?( (thank you|thanks|god bless( you)?))?$/
+// "Tell me more": the reader wants more of the last answer, so Ask continues it.
+const MORE = /^((can you |could you |please )?(tell me more|say more|more please|more|go on|keep going|continue|and then( what)?|what else|show me more|anything else))( please)?$/
 const FOLLOWUP = /^((can you |could you |please )?(tell me more|say more|more please|more|go on|keep going|continue|elaborate|explain( that| this| it)?( more| again| better)?( in (simpler|plain|easier) (words|terms|english))?|what (do|did) you mean|what does (that|this|it) mean|i don't understand|i do not understand|in (simpler|plain|easier) (words|terms|english)|simpler( please)?|what about (that|this|it|him|her|them)|and then( what)?|why( is that)?|how so|really))$/
 const AUTHOR = /\b(who (wrote|authored|is the author of|are the authors of|gave us|created|made)( the)?( urantia)? (book|papers)|who are the authors|where did (the|this)( urantia)? book come from|how was (the|this)( urantia)? book (written|made|received))\b/
 const TRUE = /^(is|was) (the urantia book|this book|the book|it|this|the ub) (true|real|accurate|correct|legit|from god|inspired)\b|\b(can i|should i|do you) (trust|believe) (the urantia book|this book|the book|it)\b/
@@ -21,6 +23,7 @@ export function chatIntent(text) {
   if (!q) return null
   if (GREETING.test(q)) return { kind: 'greeting' }
   if (THANKS.test(q)) return { kind: 'thanks' }
+  if (MORE.test(q)) return { kind: 'more' }
   if (FOLLOWUP.test(q)) return { kind: 'followup' }
   const p = q.match(PAPER)
   if (p) {
