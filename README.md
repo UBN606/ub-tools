@@ -37,6 +37,8 @@ Display settings in the header, shared across the Studio and all four visuals pa
 
 **UBN Tools for Mac.** `desktop/` packages the Studio as a Mac app (Apple silicon and Intel, macOS 13 or newer) with its own window, Dock icon and Mac menus. The Studio's files are bundled, so the app works offline from the first launch. Download the `.dmg` from the latest *UBN Tools for Mac* release; `.github/workflows/mac-app.yml` builds and tests it on a real Mac. See `desktop/README.md`.
 
+**Companion (experimental, off by default).** `app/companion.js` lets Ask use an AI model running on the reader's own computer: LM Studio, Ollama or llama.cpp, anything with an OpenAI-style `/v1` API on `localhost`. Nothing goes to a cloud service. The model does two small jobs. First, it rewrites the reader's message as a standalone question for the same search, so "what about his brothers?" after a question about Jesus becomes "Who were the brothers of Jesus?". Second, it writes a one- or two-sentence welcome. `guardIntro` throws that welcome away if it quotes, cites, restates a passage or says what the book teaches, so every word of the book on screen is still the book's own. If the model is down or answers with nonsense, Ask falls back to the plain search. To try it, open `app/?companion`, press **Companion**, start LM Studio's server with **Enable CORS** on, and press **Connect**. Tests: `app/test/companion.test.mjs`.
+
 `app/embed-quote.js` is a separate drop-in widget any website can use: one script tag shows a verified quote-of-the-day (deterministic by date, 60 machine-sliced and `ub-verify.js`-checked quotes, no network needed). See `app/embed.md`.
 
 ## Browser extension: verify a quote on any webpage

@@ -45,6 +45,7 @@ try {
     <label class="voice-pick" id="voice-wrap" hidden><span class="sr">Reading voice</span><select id="voice" aria-label="Reading voice"></select></label>
     <button type="button" class="soft size help-btn" id="help-open">How to use</button>
     <button type="button" class="soft size" id="study-open">Study list (<span id="study-count">0</span>)</button>
+    <button type="button" class="soft size" id="companion-open" hidden>Companion</button>
     <div class="a11y-btns" role="group" aria-label="Display settings">
       <button type="button" class="soft size look-btn" id="look-toggle" aria-pressed="false" aria-label="Switch to the Cosmic look">Cosmic</button>
       <button type="button" class="soft size" id="theme-toggle" aria-pressed="false" aria-label="Dark mode"><svg class="ticon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M20 13.2A8.2 8.2 0 1 1 10.8 4a6.6 6.6 0 0 0 9.2 9.2z"/></svg> Dark</button>
@@ -152,6 +153,27 @@ try {
   <div class="help-actions">
     <button type="button" class="go" id="help-listen">Listen to these instructions</button>
     <button type="button" class="soft" id="help-close">Close</button>
+  </div>
+</dialog>
+
+<dialog class="help companion" id="companion" aria-labelledby="companion-title">
+  <h2 id="companion-title" tabindex="-1">Companion (experimental)</h2>
+  <p class="comp-about">The companion is an AI model that runs on your own computer, in an app like LM Studio. It reads your question, understands follow-ups like <em>what about his brothers?</em>, and says a friendly word before the passages. It never speaks for the book: every passage is still the book's own words with its citation, found by the same search. Your questions stay on your computer.</p>
+  <ol class="help-steps">
+    <li>In LM Studio, download a small chat model and load it.</li>
+    <li>Open the <strong>Developer</strong> tab, start the server, and turn on <strong>Enable CORS</strong> in its settings.</li>
+    <li>Press <strong>Connect</strong> here, pick the model, and turn the companion on.</li>
+  </ol>
+  <div class="comp-form">
+    <label for="comp-url">Model server address</label>
+    <div class="comp-row"><input id="comp-url" type="url" spellcheck="false" autocomplete="off"><button type="button" class="soft" id="comp-connect">Connect</button></div>
+    <label for="comp-model">Model</label>
+    <select id="comp-model"></select>
+    <label class="comp-check"><input type="checkbox" id="comp-on"> Use the companion when I ask a question</label>
+  </div>
+  <p class="a-note" id="comp-note" aria-live="polite"></p>
+  <div class="help-actions">
+    <button type="button" class="soft" id="comp-close">Close</button>
   </div>
 </dialog>
 
