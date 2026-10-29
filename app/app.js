@@ -1007,6 +1007,6 @@ $('t-share').querySelectorAll('.share-btn').forEach((btn) => btn.addEventListene
 }))
 addEventListener('afterprint', () => document.body.classList.remove('print-one'))
 
-// PWA: installable + offline shell + update banner + install nudge.
+// PWA: installable + offline shell + self-applying updates + install nudge.
 // Only on http(s); file:// has no service worker. All logic in pwa.js.
 initPWA()

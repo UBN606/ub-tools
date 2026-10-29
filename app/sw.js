@@ -10,14 +10,15 @@
 //   that step, readers keep the old cached app until their browser happens
 //   to re-fetch (up to 24h on some hosts).
 //   Update flow: new SW installs in the background, activates right away,
-//   and takes control. The page notices (see app/pwa.js) and shows one gentle
-//   "A new version is ready" banner with Reload / Later. We activate
-//   immediately instead of waiting for the reader on purpose: older cached
-//   pages have no banner code, and a waiting worker they can never dismiss
-//   would strand them on the old version forever.
+//   and takes control. The page notices (see app/pwa.js) and reloads onto
+//   the new version by itself when the reader won't notice (just opened, or
+//   switched away), so nobody has to click anything. We activate immediately
+//   instead of waiting for the reader on purpose: older cached pages have no
+//   update code, and a waiting worker they can never dismiss would strand
+//   them on the old version forever.
 'use strict'
 
-const VERSION = 'ub-tools-20261029T121447'
+const VERSION = 'ub-tools-20261029T124653'
 const SHELL_CACHE = VERSION + '-shell'
 const TEXT_CACHE = VERSION + '-text'
 const MAX_TEXT_ENTRIES = 250
