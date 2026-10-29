@@ -35,6 +35,28 @@ test('nothing outside the bundled site is ever served from disk', () => {
   assert.equal(site.localPath(ROOT, 'not a url'), null)
 })
 
+test('pages are told apart from their files, to pick live or bundled once per page', () => {
+  assert.equal(site.isPageRequest('https://ubn606.github.io/ub-tools/app/'), true)
+  assert.equal(site.isPageRequest('https://ubn606.github.io/ub-tools/app/?ref=180:2.1#top'), true)
+  assert.equal(site.isPageRequest('https://ubn606.github.io/ub-tools/visuals/cosmos/index.html'), true)
+  assert.equal(site.isPageRequest('https://ubn606.github.io/ub-tools/app/app.js'), false)
+  assert.equal(site.isPageRequest('https://ubn606.github.io/ub-tools/entities/people.json'), false)
+  // A folder without its / is redirected first (from the bundle), then loads as a page.
+  assert.equal(site.isPageRequest('https://ubn606.github.io/ub-tools/app'), false)
+  assert.equal(site.isPageRequest('https://example.com/'), false)
+})
+
+test('online the Studio comes from the website; offline, and a page\'s files, follow the page', () => {
+  // A page goes live only when the website answered it.
+  assert.equal(site.sourceFor({ page: true, liveAnswered: true }), 'live')
+  assert.equal(site.sourceFor({ page: true, liveAnswered: false }), 'bundled')
+  // Its files come from where the page came from, so one page is one version.
+  assert.equal(site.sourceFor({ page: false, pageSource: 'live' }), 'live')
+  assert.equal(site.sourceFor({ page: false, pageSource: 'bundled' }), 'bundled')
+  assert.equal(site.sourceFor({ page: false }), 'bundled')
+  assert.ok(site.LIVE_TIMEOUT_MS > 0 && site.LIVE_TIMEOUT_MS <= 10000, 'a slow site falls back to the bundle within seconds')
+})
+
 test('links: Studio pages stay, web and email go out, the rest is blocked', () => {
   assert.equal(site.linkAction('https://ubn606.github.io/ub-tools/visuals/cosmos/index.html'), 'internal')
   assert.equal(site.linkAction('https://urantiapedia.org/'), 'external')

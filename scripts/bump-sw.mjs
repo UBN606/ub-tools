@@ -4,7 +4,7 @@
 //
 // Why: the browser only looks for a new service worker when sw.js itself
 // changes byte-for-byte. Bumping VERSION on every push is what makes the
-// "A new version is ready" banner actually appear for readers. Skip this
+// new version actually reach readers (app/pwa.js then reloads onto it by itself). Skip this
 // step and readers sit on the old cached app (the Polish-bug scenario).
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'

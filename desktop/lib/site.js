@@ -9,6 +9,14 @@
 // allows the Studio (the read-aloud voices, the feedback logger) behave in the
 // app exactly as they do on the web. A file the app doesn't bundle (the 100 MB
 // read-along timings, for one) is fetched from the live site instead.
+//
+// Updates without a download: when the Mac is online, the Studio's pages and
+// files come from the live website, so the app shows the current Studio the
+// moment it is published, exactly as the website does. Offline, or when the
+// site is slow or down, the bundled copy answers. Which of the two a page uses
+// is decided when the page itself loads, and its files follow it, so a page
+// does not mix two versions (a file the website fails to send mid-page comes
+// from the bundle rather than leave the page broken).
 'use strict'
 
 const path = require('node:path')
@@ -20,6 +28,8 @@ const RELEASES_API = 'https://api.github.com/repos/UBN606/ub-tools/releases?per_
 const RELEASES_PAGE = 'https://github.com/UBN606/ub-tools/releases/latest'
 // Desktop releases are tagged desktop-v1.2.3 so they never collide with other tags.
 const TAG_PREFIX = 'desktop-v'
+// How long a page waits for the live site before the bundled copy answers.
+const LIVE_TIMEOUT_MS = 5000
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -66,6 +76,27 @@ function localPath(siteDir, raw) {
   if (file !== root && !file.startsWith(root + path.sep)) return null
   if (rel === '' || rel.endsWith('/')) file = path.join(file, 'index.html')
   return file
+}
+
+/**
+ * True when a site URL loads a page (a folder ending in / or an .html file),
+ * not one of a page's files (scripts, styles, data). A folder without its
+ * trailing / is first redirected to it, as on the website.
+ */
+function isPageRequest(raw) {
+  if (!isSiteUrl(raw)) return false
+  const last = new URL(raw).pathname.split('/').pop()
+  return last === '' || /\.html?$/i.test(last)
+}
+
+/**
+ * Where a site request is answered from: 'live' (the website) or 'bundled'.
+ * A page goes live when the website answered it; a page's files follow the
+ * page that asked for them (pageSource), so one page never mixes versions.
+ */
+function sourceFor({ page, liveAnswered, pageSource }) {
+  if (page) return liveAnswered ? 'live' : 'bundled'
+  return pageSource === 'live' ? 'live' : 'bundled'
 }
 
 /**
@@ -134,6 +165,6 @@ function restoreBounds(saved, displays, fallback = { width: 1200, height: 860 })
 }
 
 module.exports = {
-  SITE_ORIGIN, SITE_BASE, START_URL, RELEASES_API, RELEASES_PAGE, TAG_PREFIX,
-  contentType, isSiteUrl, localPath, linkAction, parseVersion, isNewer, latestDesktopRelease, restoreBounds,
+  SITE_ORIGIN, SITE_BASE, START_URL, RELEASES_API, RELEASES_PAGE, TAG_PREFIX, LIVE_TIMEOUT_MS,
+  contentType, isSiteUrl, localPath, isPageRequest, sourceFor, linkAction, parseVersion, isNewer, latestDesktopRelease, restoreBounds,
 }

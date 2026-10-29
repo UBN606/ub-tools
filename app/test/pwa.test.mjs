@@ -111,10 +111,10 @@ function repoRoot() {
 }
 
 import {
-  isSnoozed, updateSnoozeUntil, installDismissUntil,
+  isSnoozed, installDismissUntil, updateAction,
   nextVisitCount, isStandaloneDisplay, isIOS, isMacSafari, installRequested, isDesktopApp, shouldShowInstallPrompt,
-  buildUpdateBanner, buildInstallBanner, buildOnlineBadge,
-  UPDATE_SNOOZE_HOURS, INSTALL_MIN_VISITS, INSTALL_SNOOZE_DAYS,
+  buildInstallBanner, buildOnlineBadge,
+  UPDATE_RELOAD_WINDOW_SECONDS, INSTALL_MIN_VISITS, INSTALL_SNOOZE_DAYS,
 } from '../pwa.js'
 import { writeFileSync } from 'node:fs'
 
@@ -124,7 +124,6 @@ test('snooze math: dismissed stays quiet until the window passes', () => {
   assert.equal(isSnoozed(String(now - 1000), now), false)
   assert.equal(isSnoozed(null, now), false)
   assert.equal(isSnoozed('garbage', now), false)
-  assert.equal(updateSnoozeUntil(now) - now, UPDATE_SNOOZE_HOURS * 3600 * 1000)
   assert.equal(installDismissUntil(now) - now, INSTALL_SNOOZE_DAYS * 24 * 3600 * 1000)
 })
 
@@ -254,22 +253,22 @@ function fakeDoc() {
   return { createElement: (t) => fakeEl(t) }
 }
 
-test('update banner: copy, buttons, and callbacks', () => {
-  let updated = 0, latered = 0
-  const bar = buildUpdateBanner(fakeDoc(), { onUpdate: () => updated++, onLater: () => latered++ })
-  assert.equal(bar.className, 'pwa-banner')
-  assert.equal(bar['attr:role'], 'status')
-  const text = bar.query('pwa-banner-text')
-  assert.ok(text && /new version/i.test(text.textContent), 'banner should say a new version is ready')
-  const primary = bar.query('pwa-btn-primary')
-  assert.ok(primary, 'needs a primary action')
-  primary.click()
-  assert.equal(updated, 1)
-  // find the Later button (pwa-btn without pwa-btn-primary)
-  const later = bar.children[1].children.find((c) => c.className === 'pwa-btn')
-  assert.ok(later, 'needs a Later/dismiss action')
-  later.click()
-  assert.equal(latered, 1)
+test('updates apply themselves: reload when unseen, otherwise when the reader switches away', () => {
+  const W = UPDATE_RELOAD_WINDOW_SECONDS
+  // Nobody is looking: reload now.
+  assert.equal(updateAction({ hidden: true, interacted: true, secondsSinceOpen: 600 }), 'reload')
+  // Just opened and not touched yet: reload now, so the reader starts on the new version.
+  assert.equal(updateAction({ hidden: false, interacted: false, secondsSinceOpen: 3 }), 'reload')
+  assert.equal(updateAction({ hidden: false, interacted: false, secondsSinceOpen: W }), 'reload')
+  // Already reading, tapping or typing, or open a while: never under their eyes.
+  assert.equal(updateAction({ hidden: false, interacted: true, secondsSinceOpen: 3 }), 'when-hidden')
+  assert.equal(updateAction({ hidden: false, interacted: false, secondsSinceOpen: W + 1 }), 'when-hidden')
+})
+
+test('no update banner or button: a reader never has to act to update', () => {
+  const src = readFileSync(join(appDir, 'pwa.js'), 'utf8')
+  assert.ok(!/new version/i.test(src.replace(/^\s*\/\/.*$/gm, '')), 'pwa.js should not show a new-version message')
+  assert.ok(src.includes("addEventListener('controllerchange'"), 'pwa.js must still react to a new version taking control')
 })
 
 test('install banner: iOS wording vs native prompt wording', () => {

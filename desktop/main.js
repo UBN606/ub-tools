@@ -1,10 +1,12 @@
 // UBN Tools for Mac — the main process.
 //
-// One window showing UB Tools Studio. The Studio's files ship inside the app
-// (Contents/Resources/site) and are served at the Studio's own web address, so
-// the app works offline from the first launch and behaves exactly like the
-// website. See lib/site.js for the why. Links that leave the Studio open in the
-// reader's own browser or mail app; nothing else is sent anywhere.
+// One window showing UB Tools Studio, at the Studio's own web address. Online,
+// its pages come from the live website, so the app is always the current
+// Studio with nothing to download; offline, from the copy that ships inside
+// the app (Contents/Resources/site), so it works from the first launch. It
+// behaves exactly like the website. See lib/site.js for the why. Links that
+// leave the Studio open in the reader's own browser or mail app; nothing else
+// is sent anywhere.
 'use strict'
 
 const { app, BrowserWindow, Menu, clipboard, dialog, nativeTheme, net, protocol, screen, session, shell } = require('electron')
@@ -59,22 +61,44 @@ function writeState(patch) {
 
 // ---------- the Studio's files, served at its web address ----------
 
+// 'live' while the page on screen came from the website, 'bundled' while it came from the app.
+let pageSource = 'bundled'
+// UB_SITE_SOURCE=bundled serves only the bundled copy (scripts/smoke.mjs, so a build tests its own files).
+const LIVE_SITE = process.env.UB_SITE_SOURCE !== 'bundled'
+
+// The website's answer, or null when it is offline, slow, down or missing the file.
+async function fetchLive(request) {
+  try {
+    const res = await net.fetch(request.url, {
+      method: request.method,
+      bypassCustomProtocolHandlers: true,
+      signal: AbortSignal.timeout(site.LIVE_TIMEOUT_MS),
+    })
+    return res.ok ? res : null
+  } catch { return null }
+}
+
 async function serve(request) {
   if (request.method === 'GET' || request.method === 'HEAD') {
     const file = site.localPath(SITE_DIR, request.url)
-    if (file) {
-      const st = await fs.promises.stat(file).catch(() => null)
-      if (st && st.isDirectory()) {
-        // Same as the website: /ub-tools/app -> /ub-tools/app/
-        const u = new URL(request.url)
-        u.pathname += '/'
-        return new Response(null, { status: 301, headers: { location: u.href } })
-      }
-      if (st && st.isFile()) {
-        const headers = { 'content-type': site.contentType(file), 'content-length': String(st.size), 'cache-control': 'no-cache' }
-        if (request.method === 'HEAD') return new Response(null, { status: 200, headers })
-        return new Response(Readable.toWeb(fs.createReadStream(file)), { status: 200, headers })
-      }
+    const st = file ? await fs.promises.stat(file).catch(() => null) : null
+    if (st && st.isDirectory()) {
+      // Same as the website: /ub-tools/app -> /ub-tools/app/
+      const u = new URL(request.url)
+      u.pathname += '/'
+      return new Response(null, { status: 301, headers: { location: u.href } })
+    }
+    if (LIVE_SITE && site.isSiteUrl(request.url)) {
+      // Online: the website, so the Studio is always the newest. Offline: the bundled copy below.
+      const page = site.isPageRequest(request.url)
+      const live = page || pageSource === 'live' ? await fetchLive(request) : null
+      if (page) pageSource = site.sourceFor({ page, liveAnswered: Boolean(live) })
+      if (live) return live
+    }
+    if (st && st.isFile()) {
+      const headers = { 'content-type': site.contentType(file), 'content-length': String(st.size), 'cache-control': 'no-cache' }
+      if (request.method === 'HEAD') return new Response(null, { status: 200, headers })
+      return new Response(Readable.toWeb(fs.createReadStream(file)), { status: 200, headers })
     }
   }
   // Not bundled (the book text, read-aloud voices, read-along timings...): the network, as on the web.

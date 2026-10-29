@@ -1,10 +1,11 @@
 // app/pwa.js — PWA behavior for UB Tools Studio.
 //
 // Three jobs, all gentle (our readers are older; nothing nags):
-//   1. Update banner — when a new service worker takes control, show ONE
-//      calm banner: "A new version is ready." [Reload] [Later].
-//      "Later" means "I'll pick it up next launch" — the new worker is
-//      already active, so the next open loads fresh code automatically.
+//   1. Updates apply themselves. A new service worker takes control in the
+//      background; the page then reloads onto the new version at a moment
+//      the reader won't notice: right away if they just opened it and have
+//      not touched anything yet, otherwise the next time they switch away.
+//      No banner, no button: a reader never has to do anything to update.
 //   2. Install nudge — after a few visits, offer "Add to Home Screen".
 //      Dismissed = not asked again for 30 days. iOS gets Share-menu
 //      instructions (Safari never fires beforeinstallprompt).
@@ -15,12 +16,13 @@
 // DOM builders take `doc` so tests can pass a fake document, same pattern
 // as a11y.js.
 
-export const UPDATE_SNOOZE_KEY = 'ub-tools-update-snooze'
 export const INSTALL_DISMISS_KEY = 'ub-tools-install-dismissed'
 export const VISIT_COUNT_KEY = 'ub-tools-visits'
 
 export const UPDATE_CHECK_MINUTES = 30
-export const UPDATE_SNOOZE_HOURS = 24
+// A new version that arrives this soon after opening, before the reader has
+// touched anything, reloads at once (the page has barely been seen).
+export const UPDATE_RELOAD_WINDOW_SECONDS = 30
 export const INSTALL_MIN_VISITS = 3
 export const INSTALL_SNOOZE_DAYS = 30
 
@@ -32,8 +34,16 @@ export function isSnoozed(snoozedUntilRaw, nowMs) {
   return Number.isFinite(t) && t > nowMs
 }
 
-export function updateSnoozeUntil(nowMs) {
-  return nowMs + UPDATE_SNOOZE_HOURS * 60 * 60 * 1000
+// What to do once a new version has taken control of the page:
+//   'reload'      — now: nobody is looking, or the reader just opened it and
+//                   has not started reading, tapping or typing yet
+//   'when-hidden' — wait, and reload the next time the page is hidden
+//                   (another app or tab, the screen locked), so nothing
+//                   changes under the reader's eyes or loses what they typed
+export function updateAction({ hidden, interacted, secondsSinceOpen }) {
+  if (hidden) return 'reload'
+  if (!interacted && secondsSinceOpen <= UPDATE_RELOAD_WINDOW_SECONDS) return 'reload'
+  return 'when-hidden'
 }
 
 export function installDismissUntil(nowMs) {
@@ -111,24 +121,6 @@ function makeEl(doc, tag, cls, text) {
   return e
 }
 
-// Returns the banner element. Caller appends it and wires onUpdate/onLater.
-export function buildUpdateBanner(doc, { onUpdate, onLater }) {
-  const bar = makeEl(doc, 'div', 'pwa-banner')
-  bar.setAttribute('role', 'status')
-  bar.appendChild(makeEl(doc, 'p', 'pwa-banner-text', 'A new version of UBN Tools is ready.'))
-  const actions = makeEl(doc, 'div', 'pwa-banner-actions')
-  const update = makeEl(doc, 'button', 'pwa-btn pwa-btn-primary', 'Reload')
-  update.type = 'button'
-  update.addEventListener('click', onUpdate)
-  const later = makeEl(doc, 'button', 'pwa-btn', 'Later')
-  later.type = 'button'
-  later.addEventListener('click', onLater)
-  actions.appendChild(update)
-  actions.appendChild(later)
-  bar.appendChild(actions)
-  return bar
-}
-
 // ios=true -> Share-menu instructions; macSafari=true -> File-menu (Add to Dock)
 // instructions; otherwise the native prompt button.
 export function buildInstallBanner(doc, { ios, macSafari = false, onInstall, onDismiss }) {
@@ -176,10 +168,16 @@ export function initPWA() {
   initOfflineBadge(window, document, nav)
 }
 
-// Service worker, update banner and install nudge: the website only.
+// Service worker, self-applying updates and install nudge: the website only.
 function initWebOnly(window, document, nav, store) {
   const nowMs = () => Date.now()
+  const openedAt = nowMs()
   const hadController = Boolean(nav.serviceWorker.controller)
+  // Any tap, click or key press means the reader has started; an update then waits.
+  let interacted = false
+  for (const type of ['pointerdown', 'keydown', 'touchstart']) {
+    window.addEventListener(type, () => { interacted = true }, { capture: true, passive: true, once: true })
+  }
 
   // ---- visits (for the install nudge) ----
   const visits = nextVisitCount(safeGet(store, VISIT_COUNT_KEY))
@@ -204,24 +202,21 @@ function initWebOnly(window, document, nav, store) {
     })
   }).catch(() => { /* offline first run: fine, page still works */ })
 
-  // ---- update banner ----
-  let bannerShown = false
+  // ---- updates apply themselves ----
   let firstInstall = !hadController
+  let reloading = false
+  const reload = () => { if (!reloading) { reloading = true; window.location.reload() } }
   nav.serviceWorker.addEventListener('controllerchange', () => {
     if (firstInstall) { firstInstall = false; return } // nothing to update from
-    if (bannerShown) return
-    if (isSnoozed(safeGet(store, UPDATE_SNOOZE_KEY), nowMs())) return
-    bannerShown = true
-    const bar = buildUpdateBanner(document, {
-      onUpdate: () => { window.location.reload() },
-      // "Later" = pick it up next launch. The new worker is already active,
-      // so the next open loads fresh code with no further prompting.
-      onLater: () => {
-        safeSet(store, UPDATE_SNOOZE_KEY, String(updateSnoozeUntil(nowMs())))
-        bar.remove()
-      },
+    const action = updateAction({
+      hidden: document.visibilityState === 'hidden',
+      interacted,
+      secondsSinceOpen: (nowMs() - openedAt) / 1000,
     })
-    document.body.appendChild(bar)
+    if (action === 'reload') return reload()
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') reload()
+    })
   })
 
   // ---- install nudge ----
