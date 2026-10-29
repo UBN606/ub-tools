@@ -263,12 +263,23 @@ function toolCheckClaims({ text, allow }) {
   });
 }
 
-let askModule = null
+let askModule = null, askByRef = null
+// The paragraph map app/engine.js hands the Studio's answer(). Without it answer() skips
+// every rule that reads paragraph text (whole words, birth sections, the planet's age,
+// Jesus' lifespan), so ub_ask would rank differently from the Studio.
+function loadByRef() {
+  const index = JSON.parse(fs.readFileSync(path.join(__dirname, 'source-texts', 'ub-search-index.json'), 'utf8'))
+  const byRef = new Map()
+  for (const p of index.papers) for (const s of p.sections) for (const par of s.paragraphs)
+    byRef.set(par.ref, { ...par, paper: p.paper_index, paperTitle: p.paper_title, author: p.author, sectionTitle: s.section_title })
+  return byRef
+}
 async function toolAsk({ question, max }) {
   if (!question || !String(question).trim()) return errorResult('question is required')
   if (!askModule) askModule = await import(require('url').pathToFileURL(path.join(__dirname, 'app', 'ask.js')).href)
+  if (!askByRef) askByRef = loadByRef()
   const n = Math.min(Math.max(Number(max) || 5, 1), 15)
-  const r = askModule.answer({ search: { searchUB } }, String(question), { max: n })
+  const r = askModule.answer({ search: { searchUB }, byRef: askByRef }, String(question), { max: n })
   const pars = getParagraphs(r.refs).filter(p => !p.error)
   return textResult({
     question,
@@ -352,7 +363,8 @@ async function selfTest() {
     ['recall tells a Maya draft citing only 79:5.9 to read 64:7.5', async () => parse(await runTool('ub_recall', { text: '# The Maya world tree\n\nThe book places the only Andite trace in Peru (79:5.9), not among the Maya.' })).unread.some(p => p.ref === '64:7.5')],
     ['claims catches a date the cited paragraph does not give', async () => parse(await runTool('ub_check_claims', { text: "The UB's dating (late Andite migrations, c. 6000-2000 BCE) comes from 78:5.7." })).findings.some(f => f.kind === 'C2 NUMBER')],
     ['claims passes a figure the book gives in words', async () => parse(await runTool('ub_check_claims', { text: 'The book says the red race crossed about 85,000 years ago (64:6.5).' })).result === 'CLAIMS PASS'],
-    ['ask answers a guardian angel question from Paper 113', async () => parse(await runTool('ub_ask', { question: 'Do I have a guardian angel?' })).passages[0].ref.startsWith('113:')],
+    ['ask answers a guardian angel question with Paper 113', async () => parse(await runTool('ub_ask', { question: 'Do I have a guardian angel?' })).passages.some(p => p.ref.startsWith('113:'))],
+    ['ask dates the planet from 57:8.1, as the Studio does', async () => parse(await runTool('ub_ask', { question: 'How old is Urantia?' })).passages[0].ref === '57:8.1'],
     ['ask says where the book is silent (abortion, once, 68:6.9)', async () => /only 1 time\(s\): 68:6\.9/.test(parse(await runTool('ub_ask', { question: 'What does the book say about abortion?' })).silence)],
     ['unknown tool is an error, not a crash', async () => (await runTool('nope', {})).isError === true],
   ];
