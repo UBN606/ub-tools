@@ -1,0 +1,8 @@
+# Voice: Kokoro-82M (code and weights Apache-2.0, commercial use allowed). Needs Python 3.10-3.12.
+kokoro==0.9.4
+# Caption timing for audio/align.py
+faster-whisper
+# Quote cards and the closing still (matplotlib supplies the DejaVu fonts on Windows)
+pillow
+matplotlib
+numpy

@@ -7,3 +7,6 @@ node_modules/
 __pycache__/
 *.pyc
 .DS_Store
+# make_episode.py: episode work files and the Python it installs
+episodes/work/
+.venv-episodes/
