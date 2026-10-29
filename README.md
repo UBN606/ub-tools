@@ -8,8 +8,9 @@ These free tools let any AI, or any person, pull the book's exact wording and ch
 
 | Tool | What it does |
 |---|---|
-| `ub-mcp.js` | A **Model Context Protocol server** that gives Claude, Codex or any MCP-capable assistant six tools: `ub_search`, `ub_get_paragraphs` (exact text by reference), `ub_get_section`, `ub_topic_lookup`, `ub_verify_text`, `ub_recall` and `ub_check_claims` |
+| `ub-mcp.js` | A **Model Context Protocol server** that gives Claude, Codex or any MCP-capable assistant eight tools: `ub_search`, `ub_get_paragraphs` (exact text by reference), `ub_get_section`, `ub_topic_lookup`, `ub_verify_text`, `ub_recall`, `ub_check_claims` and `ub_ask` (a question answered the way the Studio's Ask answers it) |
 | `ub-search.js` | Command-line search of the whole book (whole-word matching; `--ref 180:2.1` prints a paragraph's exact text) |
+| `ub-ask.js` | A plain question answered with the Studio's Ask: the exact text of the top passages, in the same blocks as `ub-search.js --ref` (`--json` for other tools). Other programs, such as Prophet's `prophet ub`, can read it |
 | `ub-verify.js` | Checks every `"quote" (Paper:Section.Paragraph)` in a draft against the book. Results are PASS, PUNCTUATION (for example, the book's em dash turned into a comma), MISMATCH (reports where the words really are when the citation is wrong) or NOT FOUND |
 | `ub-recall.js` | Before you say what the book says, or does not say, about a place or people, it lists **every** paragraph on it, resolving modern names to the book's (Maya to Mexico and Central America, Rapa Nui to Easter Island). `--check draft.md` reports the paragraphs on the draft's subject that it neither cites nor records as read |
 | `ub-claims.js` | Checks what a draft says the book says, beyond exact quotes: a claim credited to the book with no citation, a date or figure the cited paragraph does not contain (it reads the book's number words, so "eighty-five thousand" matches 85,000), and the book's words in quotation marks with no citation |
@@ -102,6 +103,7 @@ Try it:
 ```bash
 node ub-search.js "vine branches"
 node ub-search.js --ref 180:2.1
+node ub-ask.js "How old is Urantia?"
 node ub-verify.js my-article.md
 ```
 
