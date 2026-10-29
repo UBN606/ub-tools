@@ -1,0 +1,145 @@
+[
+  {
+    "card_name": "1-2-3 the Second",
+    "closest_book_terms": [
+      "1-2-3 the first",
+      "United Midwayers"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "Alexander the Metalworker",
+    "closest_book_terms": [
+      "Alexander (Jewish banker, brother of Philo)",
+      "Alexander (son of Simon of Cyrene)"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "Ancient of Days",
+    "duplicate_of": "Ancients of Days",
+    "reason": "duplicate"
+  },
+  {
+    "card_name": "Cymboyton's Eldest Son",
+    "closest_book_terms": [
+      "Cymboyton's eldest son"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "Jesus / Joshua ben Joseph",
+    "closest_book_terms": [
+      "Jesus of Nazareth (existing-156)",
+      "Joshua ben Joseph"
+    ],
+    "reason": "duplicate"
+  },
+  {
+    "card_name": "Life Carrier Number One",
+    "closest_book_terms": [
+      "senior Life Carriers"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "Midwayer of the Bestowal Reserve",
+    "closest_book_terms": [
+      "secondary midwayers",
+      "United Midwayers"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "Midwayer United Spokesman",
+    "closest_book_terms": [
+      "United Midwayers"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "Nok",
+    "closest_book_terms": [
+      "Nod",
+      "commission on industry and trade"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "Primary Midwayer of First Subgroup",
+    "closest_book_terms": [
+      "primary midwayers",
+      "1-2-3 the first"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "Rebel Secondary Midwayer",
+    "closest_book_terms": [
+      "rebel midwayers",
+      "apostate secondary midwayers",
+      "Beelzebub"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "Sangik Mother",
+    "closest_book_terms": [
+      "Sangik family"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "Secondary Midwayer 1-2-3 Group Member",
+    "closest_book_terms": [
+      "secondary midwayers",
+      "A-B-C the first",
+      "contact personalities"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "Secondary Midwayer of Sonship Group",
+    "closest_book_terms": [
+      "secondary midwayers"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "The Andite Horse Domesticator",
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "The First Alphabet Maker",
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "The First Navigator",
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "The First Potter",
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "The Midwayer Who Served at Pentecost",
+    "closest_book_terms": [
+      "United Midwayers",
+      "secondary midwayers"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "The Ten Council Leaders",
+    "closest_book_terms": [
+      "ten autonomous councils",
+      "Prince's staff (existing-156)"
+    ],
+    "reason": "not-in-book"
+  },
+  {
+    "card_name": "The Young Man Who Was Afraid",
+    "duplicate_of": "Fortune (kept in this batch; the section 130:6 titled The Young Man Who Was Afraid is about Fortune)",
+    "reason": "duplicate"
+  }
+]

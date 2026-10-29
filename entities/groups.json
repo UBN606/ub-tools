@@ -50,6 +50,17 @@
     "note": "The high angels devoted to creature uplift and resurrection roll calls."
   },
   {
+    "name": "Associate Power Directors",
+    "kind": "group",
+    "refs": [
+      "29:4.15"
+    ],
+    "note": "An order of Master Physical Controllers that assigns and dispatches the physical controllers according to the changing energy needs of the realms.",
+    "aliases": [
+      "Associate Power Director"
+    ]
+  },
+  {
     "name": "Celestial Artisans",
     "kind": "group",
     "refs": [
@@ -80,6 +91,42 @@
     "note": "The Vorondadek rulers of the constellations."
   },
   {
+    "name": "Dawn mammals",
+    "kind": "group",
+    "refs": [
+      "62:2.1",
+      "62:2.5"
+    ],
+    "note": "Small, agile, flesh-eating prehuman creatures descended from the North American lemur type, which suddenly appeared in Mesopotamia and developed a strong tribal spirit.",
+    "aliases": [
+      "Dawn Mammal Ancestor"
+    ]
+  },
+  {
+    "name": "Divine Counselors",
+    "kind": "group",
+    "refs": [
+      "19:3.1",
+      "19:3.6"
+    ],
+    "note": "Trinity-origin beings who are the counsel of Deity to the seven superuniverses, three billion being assigned to each.",
+    "aliases": [
+      "Divine Counselor"
+    ]
+  },
+  {
+    "name": "Energy Transformers",
+    "kind": "group",
+    "refs": [
+      "29:4.22",
+      "29:4.23"
+    ],
+    "note": "An order of Master Physical Controllers created by the Supreme Power Directors and Center Supervisors, usually one hundred per inhabited world.",
+    "aliases": [
+      "Energy Transformer"
+    ]
+  },
+  {
     "name": "Essenes",
     "kind": "group",
     "refs": [
@@ -106,6 +153,52 @@
       "31:2.1"
     ],
     "note": "The corps of perfected ascendant mortals destined for outer-space service."
+  },
+  {
+    "name": "Foxhall peoples",
+    "kind": "group",
+    "refs": [
+      "64:2.5",
+      "64:2.6"
+    ],
+    "note": "Andonite tribes who were the first humans in England, retaining much Andonic culture and flintworking, and ancestors of the Eskimos.",
+    "aliases": [
+      "Foxhall Peoples"
+    ]
+  },
+  {
+    "name": "Frandalanks",
+    "kind": "group",
+    "refs": [
+      "29:4.36"
+    ],
+    "note": "The most numerous order of Master Physical Controllers, jointly created by force organizers and power directors and stationed on all inhabited worlds.",
+    "aliases": [
+      "Frandalank"
+    ]
+  },
+  {
+    "name": "Heidelberg race",
+    "kind": "group",
+    "refs": [
+      "64:2.3"
+    ],
+    "note": "A somewhat superior and prolific people whose descendants spread over Europe from the northern ice to the Alps and the Mediterranean.",
+    "aliases": [
+      "Heidelberg Race Representative"
+    ]
+  },
+  {
+    "name": "Indigo race",
+    "kind": "group",
+    "refs": [
+      "64:6.25",
+      "64:6.26"
+    ],
+    "note": "The last and least progressive of the six Sangik races, who migrated to Africa and later experienced a great spiritual awakening under Orvonon.",
+    "aliases": [
+      "Early Indigo Race Leader"
+    ]
   },
   {
     "name": "Lanonandek Sons",
@@ -168,6 +261,18 @@
     "note": "The order of Sons who serve as teachers and emergency ministers; Machiventa was one."
   },
   {
+    "name": "Mid-mammals",
+    "kind": "group",
+    "refs": [
+      "62:3.3",
+      "62:3.6"
+    ],
+    "note": "The prehuman species founded by superior twins born to dawn mammals, improved in every way over their ancestors and showing several rudimentary human traits.",
+    "aliases": [
+      "Mid-mammal Pair"
+    ]
+  },
+  {
     "name": "Midwayers",
     "kind": "group",
     "refs": [
@@ -198,6 +303,19 @@
     "note": "The friendly hosts of ascending mortals on the morontia worlds."
   },
   {
+    "name": "Neanderthal race",
+    "kind": "group",
+    "refs": [
+      "64:3.5",
+      "64:4.1"
+    ],
+    "note": "A people descended from improved Badonite stock; excellent fighters who spread from northwest India to France, China and northern Africa and long dominated the world.",
+    "aliases": [
+      "Neanderthalers",
+      "Neanderthal Representative"
+    ]
+  },
+  {
     "name": "Nodites",
     "kind": "group",
     "refs": [
@@ -218,6 +336,30 @@
     "note": "The order of Michael Sons who create and rule the local universes."
   },
   {
+    "name": "Perfectors of Wisdom",
+    "kind": "group",
+    "refs": [
+      "19:2.1"
+    ],
+    "note": "A specialized creation of the Paradise Trinity personifying the wisdom of divinity, one billion assigned to each of the seven superuniverses.",
+    "aliases": [
+      "Perfector of Wisdom"
+    ]
+  },
+  {
+    "name": "Personalized Adjusters",
+    "kind": "group",
+    "refs": [
+      "40:4.2",
+      "109:7.2"
+    ],
+    "note": "Thought Adjusters granted personality by the Universal Father after experience with mortals, classed as the highest order of ascending Sons of God.",
+    "aliases": [
+      "Personalized Adjuster",
+      "Personalized Thought Adjusters"
+    ]
+  },
+  {
     "name": "Pharisees",
     "kind": "group",
     "refs": [
@@ -226,6 +368,18 @@
       "166:1.4"
     ],
     "note": "A Jewish religious party prominent in the gospel narratives."
+  },
+  {
+    "name": "Primates",
+    "kind": "group",
+    "refs": [
+      "62:4.1",
+      "62:4.2"
+    ],
+    "note": "The prehuman species founded by superior twins born to mid-mammal parents, who walked erect from birth; the direct animal ancestors of the human family.",
+    "aliases": [
+      "The Primates"
+    ]
   },
   {
     "name": "Sadducees",
@@ -308,6 +462,19 @@
     "note": "The sevenfold expression of the Infinite Spirit, each ruling a superuniverse."
   },
   {
+    "name": "Seven Supreme Power Directors",
+    "kind": "group",
+    "refs": [
+      "29:1.1",
+      "29:1.2"
+    ],
+    "note": "The seven physical-energy regulators of the grand universe, created by the Seven Master Spirits, each in eternal union with one Master Spirit.",
+    "aliases": [
+      "Supreme Power Directors",
+      "Supreme Power Director"
+    ]
+  },
+  {
     "name": "Solitary Messengers",
     "kind": "group",
     "refs": [
@@ -385,6 +552,29 @@
       "45:4.16"
     ],
     "note": "The council of twenty-four advisers on Jerusem."
+  },
+  {
+    "name": "Unions of Days",
+    "kind": "group",
+    "refs": [
+      "18:6.1"
+    ],
+    "note": "Trinity-origin liaison personalities, one assigned to each local universe as counselor and representative of the Paradise Trinity to its rulers.",
+    "aliases": [
+      "Union of Days"
+    ]
+  },
+  {
+    "name": "Universal Censors",
+    "kind": "group",
+    "refs": [
+      "19:4.1",
+      "19:4.4"
+    ],
+    "note": "Trinity-origin beings who are the judgment of Deity, rendering verdicts in liaison with Perfectors of Wisdom and Divine Counselors.",
+    "aliases": [
+      "Universal Censor"
+    ]
   },
   {
     "name": "Universe Power Directors",

@@ -16,7 +16,7 @@ These free tools let any AI, or any person, pull the book's exact wording and ch
 | `ub-bench/` | A 21-question benchmark of how accurately an AI quotes and cites the UB, with first results |
 | `extension/` | A Manifest V3 browser extension (Chrome, Edge, Firefox): select any alleged UB quote on any webpage and verify it against the book's exact text, with the same verdicts as `ub-verify.js` |
 | `parallel/` | UB Parallel — a better Paramony: 78 verified Bible ↔ UB links typed by relationship (restates / expands / corrects / fulfills), a side-by-side explorer in `parallel/app/`, and a proposer that finds candidate parallels for human review |
-| `entities/` | An open JSON index of 156 people, places and groups in the book (455 citations across 87 papers), with a build script that verifies every citation and a coverage report |
+| `entities/` | An open JSON index of 309 people, places and groups in the book (748 citations across 114 papers), with a build script that verifies every citation and a coverage report |
 | `quote-cards/` | 34 verbatim, cited quote cards across 10 topics, plus a renderer for square and story-size social graphics — the build refuses any card that isn't verified word-for-word |
 | `visuals/` | Four self-contained interactive visuals, each one portable folder that works offline and drops onto any static site: a clickable map of the master universe (Papers 11–15), a scrubbable timeline of Jesus' life (Papers 120–196), a schematic ancient Palestine map built from the entity index, and clickable family trees — every quote, date and relationship verified against the book's exact text |
 
@@ -55,7 +55,7 @@ Like everything here, it never redistributes the book: on first run it downloads
 
 ## Entity index: people, places, groups
 
-`entities/` is an open JSON index of 156 people, places and orders of beings named in the book — 455 citations across 87 papers. `node entities/build.mjs` rebuilds it from the curation file, verifies every citation against the text, and writes a coverage report that is honest about thin spots. To add an entry, edit `curate/entities.json`, rebuild, run the tests. See `entities/README.md`.
+`entities/` is an open JSON index of 309 people, places and orders of beings named in the book — 748 citations across 114 papers. `node entities/build.mjs` rebuilds it from the curation file, verifies every citation against the text, and writes a coverage report that is honest about thin spots. To add an entry, edit `curate/entities.json`, rebuild, run the tests. See `entities/README.md`.
 
 ## Quote cards: verbatim, cited, ready to share
 
