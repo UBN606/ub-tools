@@ -37,8 +37,31 @@ export const BOOK_TERMS = {
   // "How do I become more spiritual?": Paper 100 (religious growth, spiritual development).
   'more spiritual': ['religious growth', 'spiritual development'], 'spiritual growth': ['religious growth', 'spiritual development'],
   'grow spiritually': ['religious growth', 'spiritual development'], spirituality: ['spirituality', 'spiritual development'],
+  // Missed-question log (2026-10). The book never says "technology": it speaks of
+  // invention and machines (81:6, 99:1).
+  technology: ['invention', 'machine'], technologies: ['invention', 'machine'], technological: ['invention', 'machine'],
+  // The book names them both ways: "the midwayers" and "the midway creatures" (77:8.1).
+  midwayer: ['midwayers', 'midway creatures'], midwayers: ['midwayers', 'midway creatures'],
+  'on the cross': ['crucifixion'], crucified: ['crucifixion'], crucifixion: ['crucifixion'],
+  // "The beginning of time" is the book's "eternity of the past" and "dawn of time".
+  'beginning of time': ['eternity of the past', 'dawn of time'], 'start of time': ['eternity of the past', 'dawn of time'],
+  'before time': ['eternity of the past', 'dawn of time'],
 }
-const QUESTION_WORDS = new Set('what whats who whom whose when where why how which does do did is are was were will would can could should shall may might the a an of to in on for from with about into and or but if then than that this these those it its be been being have has had i me my we our you your they them their he him his she her there here say says said tell define defined definition book urantia ub please'.split(' '))
+const QUESTION_WORDS = new Set('what whats who whom whose when where why how which does do did is are was were will would can could should shall may might the a an of to in on for from with about into and or but if then than that this these those it its be been being have has had i me my we our you your they them their he him his she her there here say says said tell define defined definition book urantia ub please described describe describes mentioned explained discussed'.split(' '))
+
+// Specific subjects outrank general ones: a question about a child who dies is about the
+// probationary nursery first, the mansion worlds second.
+const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools', 'religious growth', 'spiritual development', 'eternity of the past', 'dawn of time'])
+
+// How a question asks for a number: "how many days", "how long". The frame and its unit
+// say what kind of answer is wanted (a number, a time), not what to search for.
+const QUANTITY = /\bhow (many|much|long|often)\b|\bnumber of\b/
+const QUANTITY_FRAME = /\bhow (?:many|much|long|often)(?: (?:days|hours|years|minutes|weeks|months|times))?\b|\bnumber of\b/g
+const TIME_UNIT = /\bhow (?:many (?:days|hours|years|minutes|weeks|months)|long)\b/
+// "What does it mean to be spiritual?" asks about "spiritual", not about "mean".
+const MEAN_FRAME = /\bwhat (?:does|do|did) it mean(?: to be| to| that)?\b|\bwhat is meant by\b/g
+// "Will" is glue in "will I see God?" but the subject in "our will" and "God's will".
+const NOUN_WILL = /\b(?:our|my|your|his|her|their|own|free|human|divine|thy|[a-z]+'s) will\b/
 
 // The question's own content words, and the book's terms they map to. Possessives are
 // stripped ("Eve's" -> "Eve") so the words match the book's text.
@@ -48,14 +71,125 @@ export function toBookTerms(question) {
   for (const [k, terms] of Object.entries(BOOK_TERMS)) {
     if (new RegExp(`\\b${k}\\b`).test(q)) mapped.push(...terms)
   }
-  const words = q.split(' ').filter((w) => w.length > 2 && !QUESTION_WORDS.has(w.replace(/'s$/, ''))).map((w) => w.replace(/'s$/, ''))
+  const framed = q.replace(QUANTITY_FRAME, ' ').replace(MEAN_FRAME, ' ')
+  const words = framed.split(' ').filter((w) => w.length > 2 && !QUESTION_WORDS.has(w.replace(/'s$/, ''))).map((w) => w.replace(/'s$/, ''))
+  if (NOUN_WILL.test(q) && !words.includes('will')) words.push('will')
   return { words, mapped: [...new Set(mapped)] }
 }
+
+// ---------- the book's own phrasing ----------
+// Names the book itself capitalizes ("Supreme Being", "God the Supreme", "Thought Adjuster"),
+// counted once per book. A reader who types "define the supreme being" means the name, not
+// the words "supreme" and "being" (the second is glue everywhere else).
+const NAME_RUN = /\b[A-Z][a-z]+(?:(?:\s+of)?(?:\s+the)?\s+[A-Z][a-z]+)+/g
+const NOT_NAME = new Set('the a an in and but this these that those when if as at on for of to it he she they we you all such while thus so then there here his her their its our your my no not now nor or yet what who which how why where both each every many most some even only also let behold before after during upon though although because since'.split(' '))
+const namesCache = new WeakMap()
+function bookNames(E) {
+  if (namesCache.has(E)) return namesCache.get(E)
+  const count = new Map()
+  for (const p of E.byRef.values()) {
+    for (const m of p.text.matchAll(NAME_RUN)) {
+      const toks = m[0].split(/\s+/)
+      // Every run of 2-4 words inside the match that starts and ends on a capitalized
+      // word: "Father God the Supreme" counts "God the Supreme" too.
+      for (let i = 0; i < toks.length; i++) {
+        if (!/^[A-Z]/.test(toks[i]) || NOT_NAME.has(toks[i].toLowerCase())) continue
+        for (let j = i + 1; j < Math.min(toks.length, i + 4); j++) {
+          if (!/^[A-Z]/.test(toks[j])) continue
+          const k = toks.slice(i, j + 1).join(' ').toLowerCase()
+          count.set(k, (count.get(k) || 0) + 1)
+        }
+      }
+    }
+  }
+  const names = new Set([...count].filter(([, c]) => c >= 5).map(([k]) => k))
+  namesCache.set(E, names)
+  return names
+}
+
+// The book's names in the question, longest first, without overlaps.
+function namesIn(E, q) {
+  const names = bookNames(E)
+  const toks = q.split(' ')
+  const used = new Array(toks.length).fill(false)
+  const found = []
+  for (let n = 4; n >= 2; n--) {
+    for (let i = 0; i + n <= toks.length; i++) {
+      if (used.slice(i, i + n).some(Boolean)) continue
+      const k = toks.slice(i, i + n).join(' ')
+      if (!names.has(k)) continue
+      found.push(k)
+      for (let j = i; j < i + n; j++) used[j] = true
+    }
+  }
+  return found
+}
+
+// Every word of the book's paper and section titles, once per book.
+const titlesCache = new WeakMap()
+function titleWords(E) {
+  if (titlesCache.has(E)) return titlesCache.get(E)
+  const set = new Set()
+  for (const p of E.byRef.values())
+    for (const t of [p.paperTitle, p.sectionTitle]) for (const w of String(t || '').toLowerCase().match(/[a-z]+/g) || []) set.add(w)
+  titlesCache.set(E, set)
+  return set
+}
+
+const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const NUMBER = /\d|\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|half|dozen)\b/i
+const TIME = /\b(?:o['’]clock|hours?|days?|years?|minutes?|weeks?|months?|morning|afternoon|evening|noon|midnight)\b/i
+// "Define X", "What is X?", "What does it mean to be X?": the subject X.
+const DEFINE = /^(?:please )?(?:define|definition of|what is meant by|what (?:does|do) it mean to be|what(?:'s| is| are| was| were)|explain)\s+(?:the |a |an )?(.+)$/
+const DEFINE_TAIL = /\s+(?:for me|to me|for us|please|in (?:the )?(?:urantia )?book|according to .*|as (?:described|explained|mentioned|defined|presented) in .*|in paper \d+.*)$/
 
 // Run the tools' own search for the question's words and for each mapped book term, and rank the
 // paragraphs found by how many of those searches found them, and how well.
 export function answer(E, question, { max = 5 } = {}) {
-  const { words, mapped } = toBookTerms(question)
+  let { words, mapped } = toBookTerms(question)
+  const typed = words
+  const qn = question.toLowerCase().replace(/[‘’]/g, "'").replace(/[^a-z0-9'\s-]/g, ' ').replace(/\s+/g, ' ').trim()
+  const dfCache = new Map()
+  const df = (w) => {
+    if (!dfCache.has(w)) dfCache.set(w, E.search.searchUB({ query: w, limit: 3 }))
+    return dfCache.get(w)
+  }
+  // "God the Supreme as described in Paper 117": the reader names the paper, so its
+  // paragraphs are searched on their own as well, and "paper" is not a search word.
+  const pm = qn.match(/\bpaper (\d{1,3})\b/)
+  const paperScope = pm && Number(pm[1]) <= 196 ? Number(pm[1]) : null
+  if (paperScope !== null) words = words.filter((w) => w !== 'paper')
+  // The book's names in the question ("supreme being", "god the supreme") are searched as
+  // phrases, and a word inside a name keeps its own meaning: "god" in "God the Supreme"
+  // is not mapped to the Universal Father.
+  const names = E.byRef ? namesIn(E, qn.replace(/'s\b/g, '')) : []
+  if (names.length) {
+    let rest = qn
+    for (const n of names) rest = rest.replace(new RegExp(`\\b${esc(n)}\\b`, 'g'), ' ')
+    const outside = toBookTerms(rest).mapped
+    mapped = mapped.filter((t) => outside.includes(t) || names.includes(t.toLowerCase()))
+  }
+  // A hyphenated word the book never uses ("non-adamic") is searched by its parts
+  // ("adamic"). The never-used note still names the word as the reader typed it.
+  const PREFIX = new Set(['non', 'anti', 'pre', 'post', 'semi', 'pro'])
+  words = words.flatMap((w) => (w.includes('-') && !df(w).total ? w.split('-').filter((x) => x.length > 2 && !PREFIX.has(x)) : [w]))
+  // A reader's idiom the book never uses ("the beginning of time") is searched as the book's
+  // own terms for it ("the eternity of the past"), not word by word.
+  for (const [k, terms] of Object.entries(BOOK_TERMS)) {
+    if (!k.includes(' ') || !terms.every((t) => SPECIFIC.has(t)) || !new RegExp(`\\b${esc(k)}\\b`).test(qn)) continue
+    if ((E.search.searchUB({ query: k, limit: 1 }).results[0]?.score || 0) >= 100) continue
+    const idiom = new Set(k.split(' '))
+    words = words.filter((w) => !idiom.has(w))
+  }
+  // A word far rarer than the question's others names its subject ("midwayers" beside
+  // "created" and "left"): paragraphs without it are about something else. Only a word
+  // the book's own headings use counts ("The United Midwayers"): a rare verb ("happens",
+  // "salvaged") is not a subject.
+  const headed = E.byRef ? titleWords(E) : null
+  const byDf = words.filter((w) => w !== 'will').map((w) => ({ w, n: df(w).total })).filter((x) => x.n > 0).sort((a, b) => a.n - b.n)
+  const anchor = headed && byDf.length >= 2 && byDf[0].n <= 300 && byDf[1].n >= 2 * byDf[0].n &&
+    [...headed].some((t) => t.startsWith(byDf[0].w)) ? byDf[0].w : null
+  const anchorForms = anchor ? [anchor, ...(BOOK_TERMS[anchor] || []).filter((t) => t.toLowerCase() !== anchor)] : []
   // "How old was X?" is answered by X's birth narrative: pair the subject with birth terms,
   // and favor the book's birth sections about that subject. "What is the age of X?" too.
   const ageQ = /\bhow old\b|\bage of\b/i.test(question)
@@ -113,9 +247,6 @@ export function answer(E, question, { max = 5 } = {}) {
   // not about either one alone.
   if (words.includes('eternity') && words.includes('infinity'))
     queries.push({ q: 'eternity-infinity', weight: 2.5, label: 'eternity-infinity' })
-  // Specific subjects outrank general ones: a question about a child who dies is about the
-  // probationary nursery first, the mansion worlds second.
-  const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools', 'religious growth', 'spiritual development'])
   // A parenthetical clarification names the term the reader means ("What are Spoor Nega?
   // (means Spornagia)"): long parenthetical words get their own high-weight query so the
   // misspelled words outside the parens can't drown them out.
@@ -124,6 +255,19 @@ export function answer(E, question, { max = 5 } = {}) {
     for (const w of m[1].toLowerCase().split(/[^a-z0-9']+/).filter(Boolean))
       if (w.length >= 7 && !QUESTION_WORDS.has(w) && !parenSpecific.includes(w)) parenSpecific.push(w)
   for (const t of parenSpecific) queries.push({ q: t, weight: 3, label: `clarified:"${t}"` })
+  // Only the paragraphs that use a name as written count for it ("Supreme Being", not
+  // every paragraph with "supreme" in it).
+  for (const n of names) queries.push({ q: n, weight: 2.5, label: n, phrase: true })
+  if (paperScope !== null) {
+    if (words.length) queries.push({ q: words.join(' '), weight: 1.5, label: `Paper ${paperScope}`, paper: paperScope })
+    for (const n of names) queries.push({ q: n, weight: 2.5, label: `${n}, Paper ${paperScope}`, phrase: true, paper: paperScope })
+  }
+  if (anchor && words.length >= 2) {
+    for (const form of anchorForms) {
+      const q = words.map((w) => (w === anchor ? form : w)).join(' ')
+      queries.push({ q, weight: 1.5, label: form, limit: 400, keep: 40, must: new RegExp(`\\b${esc(form)}`, 'i') })
+    }
+  }
   // Bare "birth"/"born" searches only match birth-word noise on age questions
   // (103:2.1's "birth of religion"): subjects pair with birth terms directly
   // ("Jesus born"), the planet's age has its own statement, and subject-less
@@ -147,9 +291,11 @@ export function answer(E, question, { max = 5 } = {}) {
     for (const s of subjects.slice(0, 2)) queries.push({ q: `${s} born`, weight: 2, label: `${s} born`, limit: 60 })
   }
   const score = new Map(), why = new Map()
-  for (const { q, weight, label, ownWords, limit } of queries) {
-    const lim = limit || 40
-    const r = E.search.searchUB({ query: q, limit: lim })
+  for (const { q, weight, label, ownWords, limit, phrase, paper, must, keep } of queries) {
+    const lim = keep || limit || 40
+    const r = E.search.searchUB({ query: q, limit: limit || 40, paper })
+    if (phrase) r.results = r.results.filter((x) => x.score >= 100)
+    if (must) r.results = r.results.filter((x) => must.test(x.text)).slice(0, lim)
     if (ownWords) {
       // The search scores a paragraph 50+ only when every one of the question's words is in
       // it. When that is true of just a handful of paragraphs, they are almost certainly the
@@ -160,8 +306,11 @@ export function answer(E, question, { max = 5 } = {}) {
         for (const x of direct) score.set(x.ref, (score.get(x.ref) || 0) + 2)
       }
     }
+    // A paragraph whose first sentence carries a name or the book's phrase is about it
+    // ("In the eternity of the past, ..."); a passing mention later on usually is not.
+    const opens = (phrase || (SPECIFIC.has(q) && q.includes(' '))) && new RegExp(`^[^.!?]*\\b${esc(q)}\\b`, 'i')
     r.results.forEach((x, i) => {
-      const s = (x.score / 100 + (lim - i) / (4 * lim)) * weight
+      const s = (x.score / 100 + (lim - i) / (4 * lim) + (opens && opens.test(x.text) ? 0.5 : 0)) * weight
       score.set(x.ref, (score.get(x.ref) || 0) + s)
       if (!why.has(x.ref)) why.set(x.ref, new Set())
       why.get(x.ref).add(label)
@@ -248,14 +397,121 @@ export function answer(E, question, { max = 5 } = {}) {
       }
     }
   }
+  if (E.byRef) bookPhrasing(E, { qn, words, names, anchorForms, ageQ, score, why, df })
   const all = [...score.entries()].sort((a, b) => b[1] - a[1]).map(([ref]) => ref)
   // Where the book is silent: a word of the question that the book uses rarely or never.
   const quiet = []
-  for (const w of words) {
-    const r = E.search.searchUB({ query: w, limit: 3 })
+  for (const w of typed) {
+    const r = df(w)
     if (r.total <= 3) quiet.push({ word: w, total: r.total, refs: r.results.map((x) => x.ref) })
   }
-  return { refs: all.slice(0, max), more: all.slice(max, max + 10), why, words, mapped, quiet }
+  return { refs: all.slice(0, max), more: all.slice(max, max + 10), why, words: typed, mapped, quiet }
+}
+
+// The ways a question is phrased that the book phrases differently, or that say what kind
+// of passage answers it. Each finds the paragraphs that match across the whole book and
+// adds to their score; a pattern that matches too much of the book says nothing and is
+// applied only to paragraphs the searches already found.
+function bookPhrasing(E, { qn, words, names, anchorForms, ageQ, score, why, df }) {
+  const add = (ref, s, label) => {
+    score.set(ref, (score.get(ref) || 0) + s)
+    if (!why.has(ref)) why.set(ref, new Set())
+    why.get(ref).add(label)
+  }
+  const boost = (test, s, label, cap) => {
+    const hits = []
+    for (const [ref, p] of E.byRef) if (test(p)) hits.push(ref)
+    for (const ref of hits) if (hits.length <= cap || score.has(ref)) add(ref, s, label)
+  }
+  const toks = qn.replace(/[?.!,]+/g, ' ').split(' ').filter(Boolean)
+  const inName = (w) => names.some((n) => n.split(' ').includes(w))
+  // The book's word order: "God's will" is "the will of God" and "the Father's will",
+  // "our will" is "the human will", "the ascension plan" is "the plan of ... ascension".
+  const owner = (w) => {
+    const m = BOOK_TERMS[w]
+    return m && m.length === 1 && m[0].includes(' ') ? [w, m[0].split(' ').pop().toLowerCase()] : [w]
+  }
+  for (let i = 0; i + 1 < toks.length; i++) {
+    const a = toks[i], b = toks[i + 1].replace(/'s$/, '')
+    if (b.length < 4 || (QUESTION_WORDS.has(b) && b !== 'will')) continue
+    let re = null, label = ''
+    if (/'s$/.test(a) && a.length > 4) {
+      const o = owner(a.slice(0, -2)).map(esc).join('|')
+      re = new RegExp(`\\b(?:(?:${o})['’]s ${esc(b)}|${esc(b)} of (?:the )?(?:${o}))\\b`, 'i')
+      label = `${b} of ${a.slice(0, -2)}`
+    } else if (a === 'our' || a === 'my') {
+      re = new RegExp(`\\b(?:human|your|man['’]s|mortal|creature|personal) ${esc(b)}\\b`, 'i')
+      label = `human ${b}`
+    } else if (a.length >= 4 && !QUESTION_WORDS.has(a) && !inName(a) && !inName(b)) {
+      re = new RegExp(`\\b${esc(b)}s? of (?:[a-z-]+ ){0,2}?${esc(a)}\\b`, 'i')
+      label = `${b} of ${a}`
+    }
+    if (re) boost((p) => re.test(p.text), 1.5, label, 300)
+  }
+  // "Define X", "What is X?", "What does it mean to be X?": the book's own "X is ..."
+  // sentences answer it. An adjective is also tried as the book's noun ("spiritual" ->
+  // "Spirituality becomes ...").
+  const dm = qn.replace(/[?.!]+$/, '').match(DEFINE)
+  const subject = dm ? dm[1].replace(/'s\b/g, '').replace(DEFINE_TAIL, '').trim() : ''
+  if (subject && subject.split(' ').length <= 4 && !QUESTION_WORDS.has(subject)) {
+    const forms = [subject]
+    if (!subject.includes(' ')) for (const suffix of ['ity', 'ness']) if (E.search.searchUB({ query: subject + suffix, limit: 1 }).total) forms.push(subject + suffix)
+    const defRe = new RegExp(`(?:^|[.!?:;—]\\s*)[“"‘*]*(?:the |a |an )?(?:${forms.map(esc).join('|')})\\*?,? (?:is|are|becomes|means|indicates|represents|consists)\\b`, 'i')
+    boost((p) => defRe.test(p.text), 2, `what ${forms[forms.length - 1]} is`, 40)
+    // A section titled with the name ("VII. The Supreme Being") is the book's own entry on it.
+    const title = (t) => String(t || '').toLowerCase().replace(/^[\divx]+\.\s*/, '').replace(/^the /, '').trim()
+    boost((p) => title(p.sectionTitle) === subject || title(p.paperTitle) === subject, 1, `the book's section on ${subject}`, 300)
+  }
+  // "How many ...?", "How long ...?": the answer states a number (or a time) about the
+  // subject: "numbering 10,992" (77:8.1), "half past nine o'clock" (187:3.1).
+  if (QUANTITY.test(qn) && !ageQ && words.length) {
+    const all = words.map((w) => new RegExp(`\\b${esc(w)}`, 'i'))
+    if (TIME_UNIT.test(qn)) {
+      // A time is told across a narrative ("half past nine o'clock ... hung upon the cross").
+      boost((p) => NUMBER.test(p.text) && TIME.test(p.text) && all.every((re) => re.test(p.text)), 2.5, 'the time', 80)
+    } else {
+      // A count stands beside what it counts: "eight brothers and sisters", "the original
+      // 50,000 [midwayers], 40,119 had joined", "midway creatures ... numbering 10,992".
+      // What is counted is what follows "how many": "how many brothers and sisters did ...".
+      const cm = qn.match(/\bhow many ([a-z' -]+?)(?= (?:did|do|does|is|are|was|were|has|have|had|will|can|could|would|in|on|of|at|for)\b|[?.!]|$)/)
+      const counted = cm ? cm[1].split(' ').filter((w) => w.length > 2 && !QUESTION_WORDS.has(w)) : []
+      const forms = (counted.length ? counted : words).flatMap((w) => [w, ...(BOOK_TERMS[w] || [])]).map((w) => w.toLowerCase().split(' ')[0])
+      const near = (p) => {
+        const t = p.text.toLowerCase().split(/[^a-z0-9,'-]+/)
+        const at = [], nums = []
+        t.forEach((x, i) => {
+          if (forms.some((w) => x.startsWith(w))) at.push(i)
+          if (NUMBER.test(x) && x !== 'one') nums.push(i)
+        })
+        return at.some((i) => nums.some((j) => Math.abs(i - j) <= 4))
+      }
+      const label = `the number of ${counted.length ? counted.join(' ') : words[0]}`
+      boost(near, 2, label, 80)
+      // The count right before the reader's own words is the plainest answer ("eight
+      // brothers and sisters").
+      if (cm && counted.length) {
+        const exact = new RegExp(`(?:\\d[\\d,]*|\\b[a-z]+(?:-[a-z]+)?)\\s+(?:${esc(cm[1])})\\b`, 'gi')
+        boost((p) => [...p.text.matchAll(exact)].some((m) => NUMBER.test(m[0].split(/\s+/)[0])), 2, label, 80)
+      }
+      boost((p) => near(p) && all.every((re) => re.test(p.text)), 1, label, 80)
+    }
+  }
+  // Three or more words close together are the passage's subject ("love—truth, beauty,
+  // and goodness"), not words that happen to share a long paragraph. Words found all
+  // through the book ("life", "other") are close to everything, so at most one may be.
+  const close = words.filter((w) => w.length > 2 && w !== 'will')
+  if (close.length >= 3 && close.filter((w) => df(w).total > 1000).length <= 1) {
+    const res = close.map((w) => new RegExp(`^${esc(w)}`, 'i'))
+    boost((p) => {
+      const t = p.text.toLowerCase().split(/[^a-z'-]+/)
+      const last = res.map(() => -1)
+      for (let i = 0; i < t.length; i++) {
+        res.forEach((re, k) => { if (re.test(t[i])) last[k] = i })
+        if (last.every((x) => x >= 0) && i - Math.min(...last) < 12) return true
+      }
+      return false
+    }, 1.5, `${close.join(', ')} together`, 60)
+  }
 }
 
 // Voice-garble guard: did the question likely come through garbled (dictation
