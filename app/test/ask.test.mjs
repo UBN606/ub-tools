@@ -191,3 +191,10 @@ test('answered questions are not emailed as misses', () => {
   for (const q of ['How old was Jesus when he died?', 'How old is Jesus when he died?', 'What happens after we die?', 'Why is there evil?'])
     assert.equal(shouldLogMiss(answer(E, q)), false, q)
 })
+
+test('"Do I have a guardian angel?" leads with Paper 113, not a passing mention', () => {
+  // 25:8.10 names "the guardian angel of the mortal career" once, in a story about a
+  // pilgrim who fails in Havona; the book's answer is Paper 113, "Seraphic Guardians of Destiny".
+  const r = answer(E, 'Do I have a guardian angel?')
+  assert.ok(r.refs[0].startsWith('113:'), `top 5 were: ${r.refs.join(',')}`)
+})

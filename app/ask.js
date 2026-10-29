@@ -192,6 +192,24 @@ export function answer(E, question, { max = 5 } = {}) {
       }
     }
   }
+  if (words.length >= 2 && !ageQ && E.byRef) {
+    // The paragraphs of the section or paper that is about the question's subject outrank a
+    // passing mention elsewhere: "Do I have a guardian angel?" is answered in 113:1 "The
+    // Guardian Angels", not by 25:8.10, which names "the guardian angel of the mortal career"
+    // once while telling of a pilgrim who fails in Havona. Only paragraphs already found get
+    // the boost, and every content word must be in the heading (plurals allowed), so broad
+    // and one-word questions are unaffected.
+    const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const res = words.map((w) => new RegExp(`\\b${esc(w)}(?:s|es)?\\b`, 'i'))
+    for (const ref of score.keys()) {
+      const p = E.byRef.get(ref)
+      const heading = p && `${p.sectionTitle || ''} | ${p.paperTitle || ''}`
+      if (heading && res.every((re) => re.test(heading))) {
+        score.set(ref, score.get(ref) + 1.5)
+        why.get(ref).add('section about it')
+      }
+    }
+  }
   if (subjects.length && !worldAgeQ && E.byRef) {
     // The book's birth narratives live in birth-titled sections: they answer "how old" even
     // when the subject is named there less often than in later discourses.
