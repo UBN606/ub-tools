@@ -8,15 +8,16 @@ These free tools let any AI, or any person, pull the book's exact wording and ch
 
 | Tool | What it does |
 |---|---|
-| `ub-mcp.js` | A **Model Context Protocol server** that gives Claude, Codex or any MCP-capable assistant six tools: `ub_search`, `ub_get_paragraphs` (exact text by reference), `ub_get_section`, `ub_topic_lookup`, `ub_verify_text`, `ub_recall` and `ub_check_claims` |
+| `ub-mcp.js` | A **Model Context Protocol server** that gives Claude, Codex or any MCP-capable assistant eight tools: `ub_search`, `ub_get_paragraphs` (exact text by reference), `ub_get_section`, `ub_topic_lookup`, `ub_verify_text`, `ub_recall`, `ub_check_claims` and `ub_ask` (a question answered the way the Studio's Ask answers it) |
 | `ub-search.js` | Command-line search of the whole book (whole-word matching; `--ref 180:2.1` prints a paragraph's exact text) |
+| `ub-ask.js` | A plain question answered with the Studio's Ask: the exact text of the top passages, in the same blocks as `ub-search.js --ref` (`--json` for other tools). Other programs, such as Prophet's `prophet ub`, can read it |
 | `ub-verify.js` | Checks every `"quote" (Paper:Section.Paragraph)` in a draft against the book. Results are PASS, PUNCTUATION (for example, the book's em dash turned into a comma), MISMATCH (reports where the words really are when the citation is wrong) or NOT FOUND |
 | `ub-recall.js` | Before you say what the book says, or does not say, about a place or people, it lists **every** paragraph on it, resolving modern names to the book's (Maya to Mexico and Central America, Rapa Nui to Easter Island). `--check draft.md` reports the paragraphs on the draft's subject that it neither cites nor records as read |
 | `ub-claims.js` | Checks what a draft says the book says, beyond exact quotes: a claim credited to the book with no citation, a date or figure the cited paragraph does not contain (it reads the book's number words, so "eighty-five thousand" matches 85,000), and the book's words in quotation marks with no citation |
 | `ub-bench/` | A 21-question benchmark of how accurately an AI quotes and cites the UB, with first results |
 | `extension/` | A Manifest V3 browser extension (Chrome, Edge, Firefox): select any alleged UB quote on any webpage and verify it against the book's exact text, with the same verdicts as `ub-verify.js` |
 | `parallel/` | UB Parallel — a better Paramony: 78 verified Bible ↔ UB links typed by relationship (restates / expands / corrects / fulfills), a side-by-side explorer in `parallel/app/`, and a proposer that finds candidate parallels for human review |
-| `entities/` | An open JSON index of 156 people, places and groups in the book (455 citations across 87 papers), with a build script that verifies every citation and a coverage report |
+| `entities/` | An open JSON index of 309 people, places and groups in the book (748 citations across 114 papers), with a build script that verifies every citation and a coverage report |
 | `quote-cards/` | 34 verbatim, cited quote cards across 10 topics, plus a renderer for square and story-size social graphics — the build refuses any card that isn't verified word-for-word |
 | `visuals/` | Four self-contained interactive visuals, each one portable folder that works offline and drops onto any static site: a clickable map of the master universe (Papers 11–15), a scrubbable timeline of Jesus' life (Papers 120–196), a schematic ancient Palestine map built from the entity index, and clickable family trees — every quote, date and relationship verified against the book's exact text |
 
@@ -55,7 +56,7 @@ Like everything here, it never redistributes the book: on first run it downloads
 
 ## Entity index: people, places, groups
 
-`entities/` is an open JSON index of 156 people, places and orders of beings named in the book — 455 citations across 87 papers. `node entities/build.mjs` rebuilds it from the curation file, verifies every citation against the text, and writes a coverage report that is honest about thin spots. To add an entry, edit `curate/entities.json`, rebuild, run the tests. See `entities/README.md`.
+`entities/` is an open JSON index of 309 people, places and orders of beings named in the book — 748 citations across 114 papers. `node entities/build.mjs` rebuilds it from the curation file, verifies every citation against the text, and writes a coverage report that is honest about thin spots. To add an entry, edit `curate/entities.json`, rebuild, run the tests. See `entities/README.md`.
 
 ## Quote cards: verbatim, cited, ready to share
 
@@ -102,6 +103,7 @@ Try it:
 ```bash
 node ub-search.js "vine branches"
 node ub-search.js --ref 180:2.1
+node ub-ask.js "How old is Urantia?"
 node ub-verify.js my-article.md
 ```
 

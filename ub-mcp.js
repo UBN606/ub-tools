@@ -16,7 +16,7 @@
 //   ub_check_claims    claims credited to the book: cited? figures in the cited paragraph? book words cited?
 //   ub_ask             a plain question answered in the book's own words (the same answers as the Studio app)
 //
-// It reuses ub-search.js and ub-verify.js from this folder, so the server, the CLIs and the
+// It reuses ub-search.js, ub-verify.js and ub-ask.js from this folder, so the server, the CLIs and the
 // skills can never disagree. Dependency-free JSON-RPC 2.0 over newline-delimited stdio.
 //
 // Add it:
@@ -34,6 +34,7 @@ const { searchUB, getParagraphs } = require('./ub-search.js');
 const V = require('./ub-verify.js');
 const R = require('./ub-recall.js');
 const C = require('./ub-claims.js');
+const A = require('./ub-ask.js');
 
 const SERVER_INFO = { name: 'ub-tools', version: '1.3.1' };
 const DEFAULT_PROTOCOL = '2024-11-05';
@@ -263,28 +264,15 @@ function toolCheckClaims({ text, allow }) {
   });
 }
 
-let askModule = null
-// Every paragraph with its paper and section titles, built the way app/engine.js builds it:
-// answer() needs it for the exact-words refinement, the section-about-it boost and the
-// age questions, so without it the server would not give the Studio's answers.
-let askByRef = null
-function paragraphsByRef() {
-  if (askByRef) return askByRef
-  const index = JSON.parse(fs.readFileSync(path.join(__dirname, 'source-texts', 'ub-search-index.json'), 'utf8'))
-  askByRef = new Map()
-  for (const p of index.papers) for (const s of p.sections) for (const par of s.paragraphs)
-    askByRef.set(par.ref, { ...par, paper: p.paper_index, paperTitle: p.paper_title, author: p.author, sectionTitle: s.section_title })
-  return askByRef
-}
 async function toolAsk({ question, max }) {
   if (!question || !String(question).trim()) return errorResult('question is required')
-  if (!askModule) askModule = await import(require('url').pathToFileURL(path.join(__dirname, 'app', 'ask.js')).href)
   const n = Math.min(Math.max(Number(max) || 5, 1), 15)
-  const r = askModule.answer({ search: { searchUB }, byRef: paragraphsByRef() }, String(question), { max: n })
-  const pars = getParagraphs(r.refs).filter(p => !p.error)
+  // ub-ask.js runs the Studio's answer() with the byRef map app/engine.js builds, so these are the Studio's answers.
+  const r = await A.askUB(String(question), { max: n })
+  const pars = r.passages
   return textResult({
     question,
-    silence: r.quiet.length ? r.quiet.map(x => x.total === 0 ? `The book never uses the word "${x.word}".` : `The book uses the word "${x.word}" only ${x.total} time(s): ${x.refs.join(', ')}.`).join(' ') + ' The passages below are the closest to the question; they may not answer it.' : undefined,
+    silence: A.silence(r.quiet),
     passages: pars.map(p => ({ ref: p.ref, where: `${p.paperTitle}. ${p.section}.`, text: String(p.text).replace(/<[^>]+>/g, ''), foundBecauseItSpeaksOf: [...(r.why.get(p.ref) || [])] })),
     morePassages: r.more,
     bookTermsUsed: r.mapped,

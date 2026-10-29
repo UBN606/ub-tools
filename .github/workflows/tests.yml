@@ -1,0 +1,46 @@
+# Runs every test suite and self-test on each pull request and on main, the same
+# commands a contributor runs locally (see README). The book text is not committed,
+# so each run downloads it from Urantiapedia first with fetch-data.js.
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Download the book text and build the search index
+        run: node fetch-data.js
+
+      - name: node --test (every suite)
+        run: node --test $(find . -name '*.test.mjs' -not -path '*/node_modules/*' | sort) audio/tests/test_schema.mjs
+
+      - name: Self-tests
+        run: |
+          node ub-verify.js --self-test
+          node ub-mcp.js --self-test
+          node ub-recall.js --self-test
+          node ub-claims.js --self-test
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Audio aligner tests
+        run: |
+          pip install pytest
+          pytest audio/tests/test_align.py

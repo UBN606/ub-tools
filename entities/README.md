@@ -9,8 +9,8 @@ you have to trust.
 
 ## The honesty note
 
-This is a **verified seed, not an exhaustive concordance**: 156 entries
-(54 people, 59 places, 43 groups), 455 citations across 87 of the 197 papers.
+This is a **verified seed, not an exhaustive concordance**: 309 entries
+(191 people, 59 places, 59 groups), 748 citations across 114 of the 197 papers.
 `refs` are the key paragraphs — where the entity is introduced or described at
 length — not every mention. Every ref is machine-verified to exist in the book
 text and to actually mention the entity; anything that failed verification was
@@ -60,6 +60,16 @@ node --test entities/test/entities.test.mjs
 Tests validate the published artifacts: schema, kinds, ref format, every ref
 resolving to a real paragraph, no duplicate names (case-insensitive), sort
 order, and coverage counts matching the files. Zero npm dependencies throughout.
+
+## Card-game characters
+
+153 entries came from the characters of a Urantia Book card game. Each was
+curated like any other entry: the book's own spelling as `name` (the card's
+name kept in `aliases` where it differs), refs read in full and pinned, and a
+note that says only what those paragraphs say; the card descriptions were used
+only to tell which person was meant. 21 characters are not in the index:
+`curate/card-game-not-indexed.json` lists each with the reason (the book never
+names that individual, or it duplicates an entry) and the closest book terms.
 
 ## Contributing an entry
 
