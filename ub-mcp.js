@@ -35,7 +35,7 @@ const V = require('./ub-verify.js');
 const R = require('./ub-recall.js');
 const C = require('./ub-claims.js');
 
-const SERVER_INFO = { name: 'ub-tools', version: '1.3.0' };
+const SERVER_INFO = { name: 'ub-tools', version: '1.3.1' };
 const DEFAULT_PROTOCOL = '2024-11-05';
 const PAPERS_DIR = path.join(__dirname, 'source-texts', 'papers');
 const TOPIC_DIR = path.join(__dirname, 'source-texts', 'topic-index');
@@ -264,11 +264,23 @@ function toolCheckClaims({ text, allow }) {
 }
 
 let askModule = null
+// Every paragraph with its paper and section titles, built the way app/engine.js builds it:
+// answer() needs it for the exact-words refinement, the section-about-it boost and the
+// age questions, so without it the server would not give the Studio's answers.
+let askByRef = null
+function paragraphsByRef() {
+  if (askByRef) return askByRef
+  const index = JSON.parse(fs.readFileSync(path.join(__dirname, 'source-texts', 'ub-search-index.json'), 'utf8'))
+  askByRef = new Map()
+  for (const p of index.papers) for (const s of p.sections) for (const par of s.paragraphs)
+    askByRef.set(par.ref, { ...par, paper: p.paper_index, paperTitle: p.paper_title, author: p.author, sectionTitle: s.section_title })
+  return askByRef
+}
 async function toolAsk({ question, max }) {
   if (!question || !String(question).trim()) return errorResult('question is required')
   if (!askModule) askModule = await import(require('url').pathToFileURL(path.join(__dirname, 'app', 'ask.js')).href)
   const n = Math.min(Math.max(Number(max) || 5, 1), 15)
-  const r = askModule.answer({ search: { searchUB } }, String(question), { max: n })
+  const r = askModule.answer({ search: { searchUB }, byRef: paragraphsByRef() }, String(question), { max: n })
   const pars = getParagraphs(r.refs).filter(p => !p.error)
   return textResult({
     question,
@@ -353,6 +365,7 @@ async function selfTest() {
     ['claims catches a date the cited paragraph does not give', async () => parse(await runTool('ub_check_claims', { text: "The UB's dating (late Andite migrations, c. 6000-2000 BCE) comes from 78:5.7." })).findings.some(f => f.kind === 'C2 NUMBER')],
     ['claims passes a figure the book gives in words', async () => parse(await runTool('ub_check_claims', { text: 'The book says the red race crossed about 85,000 years ago (64:6.5).' })).result === 'CLAIMS PASS'],
     ['ask answers a guardian angel question from Paper 113', async () => parse(await runTool('ub_ask', { question: 'Do I have a guardian angel?' })).passages[0].ref.startsWith('113:')],
+    ['ask answers Jesus\'s age at death with the stated lifespan (189:1.2), as the Studio does', async () => parse(await runTool('ub_ask', { question: 'How old was Jesus when he died?' })).passages[0].ref === '189:1.2'],
     ['ask says where the book is silent (abortion, once, 68:6.9)', async () => /only 1 time\(s\): 68:6\.9/.test(parse(await runTool('ub_ask', { question: 'What does the book say about abortion?' })).silence)],
     ['unknown tool is an error, not a crash', async () => (await runTool('nope', {})).isError === true],
   ];
