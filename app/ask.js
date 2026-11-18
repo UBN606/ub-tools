@@ -46,12 +46,20 @@ export const BOOK_TERMS = {
   // "The beginning of time" is the book's "eternity of the past" and "dawn of time".
   'beginning of time': ['eternity of the past', 'dawn of time'], 'start of time': ['eternity of the past', 'dawn of time'],
   'before time': ['eternity of the past', 'dawn of time'],
+  // Missed-question log (2026-10/11). The reader's phrase is the book's own: "he was one
+  // continuous question mark" (123:2.3), "there is set a severe test" (140:1.4).
+  'question mark': ['question mark'], 'severe test': ['severe test'],
+  // How Urantia came to be: the Andronover nebula and the birth of Monmatia (57:5, 57:6).
+  'earth created': ['Andronover', 'Monmatia'], 'earth formed': ['Andronover', 'Monmatia'],
+  'earth made': ['Andronover', 'Monmatia'], 'origin of the earth': ['Andronover', 'Monmatia'],
+  // "Why did Jesus die on the cross?": the book's "Meaning of the Death on the Cross" (188:4).
+  'die on the cross': ['death on the cross'], 'died on the cross': ['death on the cross'],
 }
 const QUESTION_WORDS = new Set('what whats who whom whose when where why how which does do did is are was were will would can could should shall may might the a an of to in on for from with about into and or but if then than that this these those it its be been being have has had i me my we our you your they them their he him his she her there here say says said tell define defined definition book urantia ub please described describe describes mentioned explained discussed'.split(' '))
 
 // Specific subjects outrank general ones: a question about a child who dies is about the
 // probationary nursery first, the mansion worlds second.
-const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools', 'religious growth', 'spiritual development', 'eternity of the past', 'dawn of time'])
+const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools', 'religious growth', 'spiritual development', 'eternity of the past', 'dawn of time', 'question mark', 'severe test', 'Andronover', 'Monmatia', 'death on the cross'])
 
 // How a question asks for a number: "how many days", "how long". The frame and its unit
 // say what kind of answer is wanted (a number, a time), not what to search for.
@@ -59,7 +67,7 @@ const QUANTITY = /\bhow (many|much|long|often)\b|\bnumber of\b/
 const QUANTITY_FRAME = /\bhow (?:many|much|long|often)(?: (?:days|hours|years|minutes|weeks|months|times))?\b|\bnumber of\b/g
 const TIME_UNIT = /\bhow (?:many (?:days|hours|years|minutes|weeks|months)|long)\b/
 // "What does it mean to be spiritual?" asks about "spiritual", not about "mean".
-const MEAN_FRAME = /\bwhat (?:does|do|did) it mean(?: to be| to| that)?\b|\bwhat is meant by\b/g
+const MEAN_FRAME = /\bwhat (?:does|do|did) it mean(?: to be| to| that)?\b|\bwhat is meant by\b|\bwhat do you mean by\b/g
 // "Will" is glue in "will I see God?" but the subject in "our will" and "God's will".
 const NOUN_WILL = /\b(?:our|my|your|his|her|their|own|free|human|divine|thy|[a-z]+'s) will\b/
 
@@ -140,7 +148,7 @@ const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const NUMBER = /\d|\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|half|dozen)\b/i
 const TIME = /\b(?:o['’]clock|hours?|days?|years?|minutes?|weeks?|months?|morning|afternoon|evening|noon|midnight)\b/i
 // "Define X", "What is X?", "What does it mean to be X?": the subject X.
-const DEFINE = /^(?:please )?(?:define|definition of|what is meant by|what (?:does|do) it mean to be|what(?:'s| is| are| was| were)|explain)\s+(?:the |a |an )?(.+)$/
+const DEFINE = /^(?:please )?(?:define|how (?:does|do) (?:the )?(?:urantia book|ub|book) define|definition of|what is meant by|what (?:does|do) it mean to be|what do you mean by|what(?:'s| is| are| was| were)|explain)\s+(?:the |a |an )?(.+)$/
 const DEFINE_TAIL = /\s+(?:for me|to me|for us|please|in (?:the )?(?:urantia )?book|according to .*|as (?:described|explained|mentioned|defined|presented) in .*|in paper \d+.*)$/
 
 // Run the tools' own search for the question's words and for each mapped book term, and rank the
@@ -154,6 +162,11 @@ export function answer(E, question, { max = 5 } = {}) {
     if (!dfCache.has(w)) dfCache.set(w, E.search.searchUB({ query: w, limit: 3 }))
     return dfCache.get(w)
   }
+  // "Jesus was one big question mark as a child" is about Jesus' boyhood (123:2.3), not about
+  // children who die young: without a death word, "child" keeps its plain meaning.
+  const NURSERY = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools'])
+  if (/\bjesus\b/i.test(question) && !/\b(die|died|dies|dying|death|dead|abortion|miscarriage|unborn)\b/i.test(question))
+    mapped = mapped.filter((t) => !NURSERY.has(t))
   // "God the Supreme as described in Paper 117": the reader names the paper, so its
   // paragraphs are searched on their own as well, and "paper" is not a search word.
   const pm = qn.match(/\bpaper (\d{1,3})\b/)
@@ -283,7 +296,7 @@ export function answer(E, question, { max = 5 } = {}) {
   const DEATH_TERMS = new Set(['survival', 'mansion worlds', 'resurrection halls'])
   for (const t of mapped) {
     if (ageQ && (t === 'birth' || t === 'born')) continue
-    if (jesusDeathAgeQ && DEATH_TERMS.has(t)) continue
+    if (jesusDeathAgeQ && (DEATH_TERMS.has(t) || t === 'death on the cross')) continue
     if (distinctiveOn && distinctiveSet.has(t.toLowerCase()) && typedWords.has(t.toLowerCase())) continue
     queries.push({ q: t, weight: SPECIFIC.has(t) ? 3 : 1.2, label: t })
   }

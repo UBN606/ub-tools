@@ -62,6 +62,19 @@ const MISSED = [
   ['truth, Beauty, love', 3, ['196:3.24', '1:7.3', '5:4.6', '196:3.29', '140:8.31']],
   // The reader's words are the book's: "take delight in cultivating these qualities".
   ['Take delight in cultivating', 1, ['16:6.9']],
+  // Missed-question log, Oct–Nov 2026 (read and judged by hand):
+  // 123:2.3 "From the time Jesus was five years old until he was ten, he was one continuous question mark."
+  ['Jesus was one big question mark as a child', 1, ['123:2.3']],
+  // 140:1.4 "for all others who would follow you into this kingdom, there is set a severe test".
+  ['what is the severe test to remain in the kingdom of God', 1, ['140:1.4']],
+  // 98:2.12 "Philosophy is to religion as conception is to action"; 112:2.12 "philosophy is the observation of this observation".
+  ['How does the Urantia Book define philosophy?', 2, ['98:2.12', '112:2.12']],
+  // 188:4 "Meaning of the Death on the Cross"; 187:0.3 "submit to death on the cross, he does of his own free will".
+  ['WHY DID THE FATHER WILL THAT JESUS DIE ON THE CROSS?', 3, ['188:4.1', '188:4.3', '187:0.3']],
+  // 100:2.4 "Spirituality becomes at once the indicator of one's nearness to God".
+  ['what do you mean by spiritual?', 1, ['100:2.4']],
+  // Paper 57: the Andronover nebula and the origin of Monmatia, "the solar system to which your world belongs" (57:5.3).
+  ['How was earth created', 3, ['57:5.3', '57:5.4', '57:6.1', '57:2.2', '15:3.6']],
 ]
 
 for (const [q, n, good] of MISSED) {
