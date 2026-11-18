@@ -74,6 +74,15 @@ const MISSED = [
   // 100:2.4 "Spirituality becomes at once the indicator of one's nearness to God".
   ['what do you mean by spiritual?', 1, ['100:2.4']],
   // Paper 57: the Andronover nebula and the origin of Monmatia, "the solar system to which your world belongs" (57:5.3).
+  // The reader meant "what are the leading values communicated in the UB?": 194:4.4 and 12:7.8,
+  // "the fatherhood of God and the brotherhood of man"; 0:1.17, 56:10.9 "truth, beauty, and goodness".
+  ['what are the main points of the urantia book?', 2, ['194:4.4', '12:7.8', '0:1.17', '56:10.9']],
+  ['what are the leading values communicated in the ub?', 2, ['194:4.4', '12:7.8', '0:1.17', '56:10.9']],
+  // The reader meant God or the Thought Adjuster: 5:6.1 "The Universal Father is the God of
+  // personalities"; 1:0.3, 1:1.4, 1:0.1 the Universal Father; 110:1.2 the Adjusters as guides.
+  ['who is the highest guiding spirituel  personality in the universe?', 3, ['1:1.4', '1:2.9', '1:0.1', '1:0.3', '5:6.1', '110:1.2']],
+  ['who is the highest and wisest guiding  personality in the universe?', 1, ['5:6.1', '1:0.1', '1:0.3', '110:1.2']],
+  ['who are the wisest divine guiding  personality in the universe?', 1, ['1:0.3', '1:0.1', '5:6.1', '110:1.2']],
   ['How was earth created', 3, ['57:5.3', '57:5.4', '57:6.1', '57:2.2', '15:3.6']],
 ]
 
