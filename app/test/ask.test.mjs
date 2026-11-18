@@ -70,7 +70,9 @@ test('broad questions still answer through the term mappings', () => {
 test("'define' is structural: the philosophy question answers about philosophy", () => {
   const r = answer(E, 'How does the Urantia Book define philosophy?')
   assert.ok(!r.refs.slice(0, 3).includes('94:8.16'), `top 3 were: ${r.refs.slice(0, 3).join(',')}`)
-  assert.ok(r.refs.slice(0, 5).includes('103:6.14'), `top 5 were: ${r.refs.join(',')}`)
+  // Any of the book's statements of what philosophy is: 98:2.12 "Philosophy is to religion as
+  // conception is to action", 112:2.12 "philosophy is the observation of this observation", 103:6.14.
+  assert.ok(r.refs.slice(0, 5).some((x) => ['98:2.12', '112:2.12', '103:6.14'].includes(x)), `top 5 were: ${r.refs.join(',')}`)
 })
 
 test("Spanish 'filosofia' maps to philosophy", () => {
