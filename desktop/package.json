@@ -16,8 +16,8 @@
     "smoke": "node scripts/smoke.mjs"
   },
   "devDependencies": {
-    "electron": "44.4.5",
-    "electron-builder": "26.15.3"
+    "electron": "45.3.4",
+    "electron-builder": "26.18.0"
   },
   "build": {
     "appId": "com.urantiabooknetwork.ubtools",
