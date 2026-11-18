@@ -124,7 +124,10 @@ test('email: Jesus\'s siblings leads with "eight brothers and sisters"', () => {
 
 test('email: highest and wisest personality leads with all-wisdom', () => {
   const r = answer(E, 'who is the highest and wisest guiding personality in the universe?')
-  assert.equal(r.refs[0], '3:2.9')
+  // The reader meant God (or the Thought Adjuster): 5:6.1 "The Universal Father is the God of
+  // personalities" now leads, with 3:2.9 (all-wisdom) still in the top three.
+  assert.equal(r.refs[0], '5:6.1')
+  assert.ok(r.refs.slice(0, 3).includes('3:2.9'), `top 3 were: ${r.refs.slice(0, 3).join(',')}`)
 })
 
 test('email: "the god in me" leads with the indwelling Adjuster', () => {

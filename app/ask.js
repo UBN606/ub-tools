@@ -54,12 +54,25 @@ export const BOOK_TERMS = {
   'earth made': ['Andronover', 'Monmatia'], 'origin of the earth': ['Andronover', 'Monmatia'],
   // "Why did Jesus die on the cross?": the book's "Meaning of the Death on the Cross" (188:4).
   'die on the cross': ['death on the cross'], 'died on the cross': ['death on the cross'],
+  // "What are the main points / leading values of the Urantia Book?": the book's own summaries,
+  // "truth, beauty, and goodness" (0:1.17, 2:7.10) and "the fatherhood of God and the
+  // brotherhood of man" (12:7.8, 142:7.4).
+  'main points': ['truth, beauty, and goodness', 'fatherhood of God and the brotherhood of man'],
+  'leading values': ['truth, beauty, and goodness', 'fatherhood of God and the brotherhood of man'],
+  'main values': ['truth, beauty, and goodness', 'fatherhood of God and the brotherhood of man'],
+  'core values': ['truth, beauty, and goodness', 'fatherhood of God and the brotherhood of man'],
+  'main teachings': ['truth, beauty, and goodness', 'fatherhood of God and the brotherhood of man'],
+  'key teachings': ['truth, beauty, and goodness', 'fatherhood of God and the brotherhood of man'],
+  // "Who is the highest guiding personality in the universe?" asks about God and the
+  // Thought Adjuster: "the Adjusters are loving leaders, your safe and sure guides" (110:1.2).
+  // (Also any question with both "guiding" and "personality": see toBookTerms.)
+  'highest personality': ['Universal Father', 'Thought Adjuster'],
 }
 const QUESTION_WORDS = new Set('what whats who whom whose when where why how which does do did is are was were will would can could should shall may might the a an of to in on for from with about into and or but if then than that this these those it its be been being have has had i me my we our you your they them their he him his she her there here say says said tell define defined definition book urantia ub please described describe describes mentioned explained discussed'.split(' '))
 
 // Specific subjects outrank general ones: a question about a child who dies is about the
 // probationary nursery first, the mansion worlds second.
-const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools', 'religious growth', 'spiritual development', 'eternity of the past', 'dawn of time', 'question mark', 'severe test', 'Andronover', 'Monmatia', 'death on the cross'])
+const SPECIFIC = new Set(['Adjusterless children', 'probationary nursery', 'infant-receiving schools', 'religious growth', 'spiritual development', 'eternity of the past', 'dawn of time', 'question mark', 'severe test', 'Andronover', 'Monmatia', 'death on the cross', 'truth, beauty, and goodness', 'fatherhood of God and the brotherhood of man'])
 
 // How a question asks for a number: "how many days", "how long". The frame and its unit
 // say what kind of answer is wanted (a number, a time), not what to search for.
@@ -79,6 +92,7 @@ export function toBookTerms(question) {
   for (const [k, terms] of Object.entries(BOOK_TERMS)) {
     if (new RegExp(`\\b${k}\\b`).test(q)) mapped.push(...terms)
   }
+  if (/\bguid(?:e|es|ing|ance)\b/.test(q) && /\bpersonalit(?:y|ies)\b/.test(q)) mapped.push('Universal Father', 'Thought Adjuster')
   const framed = q.replace(QUANTITY_FRAME, ' ').replace(MEAN_FRAME, ' ')
   const words = framed.split(' ').filter((w) => w.length > 2 && !QUESTION_WORDS.has(w.replace(/'s$/, ''))).map((w) => w.replace(/'s$/, ''))
   if (NOUN_WILL.test(q) && !words.includes('will')) words.push('will')
