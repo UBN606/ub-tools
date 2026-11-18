@@ -4,11 +4,15 @@ UBN Tools is UB Tools Studio as a Mac app: Read, Listen, Plans, Quiz, Explore an
 
 ## For readers
 
-1. Download **UBN-Tools-mac.dmg** from the latest *UBN Tools for Mac* release (always at `https://github.com/UBN606/ub-tools/releases/latest/download/UBN-Tools-mac.dmg`).
-2. Open it and drag **UBN Tools** into **Applications**.
+**Easiest way, nothing to install:** open the Studio at <https://ubn606.github.io/ub-tools/app/> and keep it in your Dock. In **Safari** (macOS 14 or newer) choose **File → Add to Dock**; in **Chrome**, click the install icon at the right end of the address bar. It opens like any other app, shows no warning, and updates itself.
+
+**Or download the Mac app:**
+
+1. Download **UBN-Tools-mac.dmg** from the latest *UBN Tools for Mac* release (always at `https://github.com/UBN606/ub-tools/releases/latest/download/UBN-Tools-mac.dmg`) and open it.
+2. Drag **UBN Tools** onto the **Applications** folder.
 3. Open UBN Tools. The first launch downloads the book's text once from [Urantiapedia](https://urantiapedia.org) (CC BY-SA 4.0). After that, everything works offline.
 
-Until the app is signed with an Apple Developer ID, your Mac will warn the first time that it can't check the app. Click **Done**, open **System Settings → Privacy & Security**, click **Open Anyway** next to UBN Tools, and enter your password. You only do this once. (On macOS 13 or 14 you can instead Control-click the app, choose **Open**, then **Open** again.)
+Until the app is signed with an Apple Developer ID, the first time you open it your Mac says it can't check the app. This is normal: the app is safe, it just isn't registered with Apple yet. Click **Done**, then **Apple menu → System Settings → Privacy & Security**, scroll all the way down, click **Open Anyway** next to UBN Tools, type your Mac password and click **Open**. You only do this once.
 
 When the Mac is online, the Studio inside the app comes straight from the website, so improvements to the Studio reach you the moment they are published, with nothing to download or install. Offline, the app uses the copy built into it. Only a change to the app itself (rare) needs a new download: the app then says so once and offers it. Your reading plans, study list and saved book text are kept when you replace the app.
 

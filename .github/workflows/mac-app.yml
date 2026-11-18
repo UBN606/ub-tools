@@ -144,16 +144,25 @@ jobs:
           {
             echo "UBN Tools for Mac, version $version. Works on Apple silicon and Intel Macs running macOS 13 Ventura or newer."
             echo
-            echo "**To install:** download **UBN-Tools-mac.dmg** below, open it, and drag **UBN Tools** into **Applications**."
             if [ "$SIGNED" != "1" ]; then
+              echo "**Easiest way, nothing to install:** open the Studio in your browser at https://ubn606.github.io/ub-tools/app/ and keep it in your Dock. In **Safari** (macOS 14 or newer) choose **File → Add to Dock**. In **Chrome**, click the install icon at the right end of the address bar. It then opens like any other app and updates itself."
               echo
-              echo "**The first time you open it**, your Mac will say it can't check the app for malicious software. That's expected for now; to open it:"
+              echo "**Or download the Mac app:**"
+            else
+              echo "**To install:**"
+            fi
+            echo
+            echo "1. Download **UBN-Tools-mac.dmg** below and open it."
+            echo "2. Drag **UBN Tools** onto the **Applications** folder."
+            if [ "$SIGNED" != "1" ]; then
+              echo "3. Open UBN Tools. The first time, your Mac shows a message that it can't check the app. This is normal: the app is safe, it just isn't registered with Apple yet. Click **Done**."
+              echo "4. Click the **Apple menu** (top left of the screen), then **System Settings**."
+              echo "5. Click **Privacy & Security** in the list on the left, then scroll all the way down."
+              echo "6. Next to the line about UBN Tools, click **Open Anyway**. Type your Mac password and click **Open**."
               echo
-              echo "1. Click **Done** on that message."
-              echo "2. Open **System Settings**, then **Privacy & Security**, scroll down, and click **Open Anyway** next to UBN Tools."
-              echo "3. Enter your Mac password and click **Open**. You only do this once."
-              echo
-              echo "On macOS 13 or 14 you can instead hold **Control**, click UBN Tools in Applications, choose **Open**, then **Open** again."
+              echo "That's it. You only do this once; after that UBN Tools opens normally."
+            else
+              echo "3. Open UBN Tools from Applications."
             fi
             echo
             echo "Everything works offline after the first launch, which downloads the book text once from Urantiapedia (CC BY-SA 4.0)."
